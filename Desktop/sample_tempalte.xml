@@ -1,0 +1,59 @@
+<root>
+
+	<!-- menues node-->
+	<menues>
+		<item name="Pizza">
+			<option id="size"  name="small" price="0.5" uuid="124456611" />
+			<option id="size" name="medium" price="0.8" />
+			<option id="size" name="large" price="1.2" />
+			<item name="topping" displayname_en="topping">			
+				<option id="toppingammount" name="few" price="0.5" />
+				<option id="toppingammount" name="more" price="0.8" />
+				<option id="toppingammount" name="lots" price="1.2" />
+				<item name="margarita">
+					<option id="size"  name="small" overwrite_price="5.5" />
+					<option id="size" name="medium" overwrite_price="5.8" />
+					<option id="size" name="large" 	price="1.2" />
+				</item>
+			</item>
+		</item>
+		<item name="Drink" displayname_en="drink">
+				<option id="size" name="small" price="0.5" />
+				<option id="size" name="medium" price="0.8" />
+				<option id="size" name="large" price="1.2" />
+				<ingridients name="suggar,water"/>
+				<item name="Coca Cola" displayname_en="Coce">
+					<option id="size" name="small" displayname_de="klein" overwrite_price="2.0" />
+					<option id="size" name="medium" displayname_de="mittel" />
+					<option id="size" name="large" displayname_de="gross" overwrite_price="2.5" />
+				</item>
+				<item name="Fanta" displayname_en="Fanta" price="0.5"/>
+				
+		</item>
+	</menues>
+	<layout>
+		<level value="1" name="firstfloor" displayname_de="erster stock" >
+			<image value=""/>
+			<table value="1" displayname_de="Tisch" name="table" >
+				<x>0</x>
+				<y>0</y>
+				<rot>0</rot>
+				<width>100</width>
+				<height>100</height>
+			</table>
+		</level>
+	</layout>
+	<reservations>
+		<date value="24.2.2021">
+			<table id="1">
+				<time format="utc">9pm</time>
+			</table>	
+		</date>
+	</reservations>
+	
+	<settings>
+		<language>en</language>
+	</settings>
+	
+
+</root>

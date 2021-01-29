@@ -1,0 +1,7 @@
+language=en
+timeformat=12
+database_address=tcp://127.0.0.1:3306
+database_username=root
+database_userpassword=dj2!jkfhksRk4
+database_name=gastrojungle
+database_filename=2021_db
