@@ -4938,3 +4938,319 @@
 	<wx/datetime.h>
 	<map>
 
+1611156857 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\config.cpp
+	<fstream>
+	<string>
+	<iostream>
+	<sstream>
+	<iostream>
+	<iterator>
+	<numeric>
+	<algorithm>
+	<vector>
+	<streambuf>
+	"config.h"
+	"filesystem/rapidxml.hpp"
+	"nodes/cSettingsNode.h"
+	"nodes/cLevelNode.hpp"
+	"nodes/cLevelsNode.hpp"
+	"nodes/cTableNode.hpp"
+	"nodes/cChairNode.hpp"
+	"nodes/cMenuItemNode.hpp"
+	"nodes/cMenusNode.hpp"
+	"nodes/cMenuOptionNode.hpp"
+	"wxcrafter.h"
+
+1611238817 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\config.h
+	<unordered_map>
+	<string>
+
+1242171978 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\filesystem\rapidxml.hpp
+	<cstdlib>
+	<cassert>
+	<new>
+	<exception>
+
+1610984714 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\csettingsnode.h
+	"cTreeNode.hpp"
+
+1611307401 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\ctreenode.hpp
+	"../Tree/cWXTreeCtrl.h"
+	"../config.h"
+	<unordered_map>
+
+1611241154 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\tree\cwxtreectrl.h
+	<memory>
+	<vector>
+	<string>
+	<unordered_map>
+	<wx/treectrl.h>
+	<wx/wx.h>
+
+1610628143 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clevelnode.hpp
+	"cTreeNode.hpp"
+
+1611059531 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clevelsnode.hpp
+	"cTreeNode.hpp"
+
+1611312701 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\ctablenode.hpp
+	"c4PolgoneRectangle.hpp"
+	<wx/listimpl.cpp>
+	"cBookingNode.hpp"
+
+1611066039 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\c4polgonerectangle.hpp
+	"cTreeNode.hpp"
+	<wx/wx.h>
+
+1611330947 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cbookingnode.hpp
+	"c4PolgoneRectangle.hpp"
+	<wx/wx.h>
+	<wx/datetime.h>
+	<map>
+
+1610635523 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cchairnode.hpp
+	"c4PolgoneRectangle.hpp"
+
+1610981993 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenuitemnode.hpp
+	"cTreeNode.hpp"
+
+1610976321 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenusnode.hpp
+	"cTreeNode.hpp"
+
+1610981998 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
+	"cTreeNode.hpp"
+
+1611312862 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxcrafter.h
+	<wx/artprov.h>
+	<wx/xrc/xmlres.h>
+	<wx/statusbr.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/string.h>
+	<wx/treectrl.h>
+	<wx/sizer.h>
+	<wx/panel.h>
+	<wx/bitmap.h>
+	<wx/image.h>
+	<wx/icon.h>
+	<wx/button.h>
+	<wx/combobox.h>
+	<wx/filepicker.h>
+	<wx/statbmp.h>
+	<wx/notebook.h>
+	<wx/splitter.h>
+	<wx/statbox.h>
+	<wx/menu.h>
+	<wx/calctrl.h>
+	<wx/timer.h>
+	<wx/frame.h>
+	<wx/filedlg.h>
+	"Tree/cWXTreeCtrl.h"
+	"nodes/cTableNode.hpp"
+	"wxbookingsdialog.hpp"
+	"nodes/cBookingNode.hpp"
+
+1611925284 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxbookingsdialog.hpp
+	<wx/artprov.h>
+	<wx/xrc/xmlres.h>
+	<wx/string.h>
+	<wx/stattext.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/sizer.h>
+	<wx/button.h>
+	<wx/statline.h>
+	<wx/dialog.h>
+	<wx/timectrl.h>
+	<wx/dateevt.h>
+	<memory>
+
+1553612408 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\main.cpp
+	<wx/app.h>
+	<wx/event.h>
+	"MainFrame.h"
+	<wx/image.h>
+
+1553612408 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\mainframe.h
+	"wxcrafter.h"
+
+1610455113 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\mainframe.cpp
+	"MainFrame.h"
+	<wx/aboutdlg.h>
+
+1610995911 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\math\geometry.cpp
+	"geometry.h"
+	<math.h>
+
+1610700222 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\math\geometry.h
+	<wx/wx.h>
+
+1611051605 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\c4polgonerectangle.cpp
+	"c4PolgoneRectangle.hpp"
+	<math.h>
+	<stdlib.h>
+	"../math/geometry.h"
+
+1611925171 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cbookingnode.cpp
+	"cBookingNode.hpp"
+
+1610628196 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cchairnode.cpp
+	"cChairNode.hpp"
+
+1611058045 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clevelnode.cpp
+	"cLevelNode.hpp"
+
+1611059001 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clevelsnode.cpp
+	"cLevelsNode.hpp"
+
+1610457765 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clinkernode.cpp
+	"cLinkerNode.hpp"
+
+1610457765 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\clinkernode.hpp
+
+1610976395 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenuesnode.cpp
+	"cMenusNode.hpp"
+	"../config.h"
+
+1610976143 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenuitemnode.cpp
+
+1610976177 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cmenuoptionnode.cpp
+
+1610615509 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cpropertynode.cpp
+	"cPropertyNode.hpp"
+
+1610616614 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\cpropertynode.hpp
+	"cTreeNode.hpp"
+
+1610984805 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\csettingsnode.cpp
+	"../config.h"
+	"cSettingsNode.h"
+
+1611308096 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\ctablenode.cpp
+	"cTableNode.hpp"
+	<string>
+
+1611307977 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\nodes\ctreenode.cpp
+	"cTreeNode.hpp"
+	"cPropertyNode.hpp"
+
+1611238417 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\sqlite\sqlite3.c
+	"config.h"
+	<vxWorks.h>
+	<pthread.h>
+	"mingw.h"
+	"_mingw.h"
+	<stdarg.h>
+	<stdint.h>
+	<inttypes.h>
+	<intrin.h>
+	<cmnintrin.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<stddef.h>
+	<TargetConditionals.h>
+	<ctype.h>
+	<time.h>
+	<sys/sysctl.h>
+	<malloc/malloc.h>
+	<libkern/OSAtomic.h>
+	<malloc.h>
+	<pthread.h>
+	"windows.h"
+	<sys/cygwin.h>
+	<errno.h>
+	<process.h>
+	<math.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<fcntl.h>
+	<sys/ioctl.h>
+	<unistd.h>
+	<sys/time.h>
+	<errno.h>
+	<sys/mman.h>
+	<sys/file.h>
+	<sys/param.h>
+	<semaphore.h>
+	<limits.h>
+	<sys/mount.h>
+	<utime.h>
+	<sys/dcmd_blk.h>
+	<sys/statvfs.h>
+	<dlfcn.h>
+	"sqlite_tcl.h"
+	"tcl.h"
+	<ctype.h>
+	"sqlite3rtree.h"
+	<ctype.h>
+	<unicode/utypes.h>
+	<unicode/uregex.h>
+	<unicode/ustring.h>
+	<unicode/ucol.h>
+	<unicode/ubrk.h>
+	<unicode/utf16.h>
+	<math.h>
+
+1610626033 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\tree\cwxtreectrl.cpp
+	"cWXTreeCtrl.h"
+	<memory>
+
+1611312882 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxcrafter.cpp
+	"wxcrafter.h"
+	"nodes/cSettingsNode.h"
+	"nodes/cLevelNode.hpp"
+	"nodes/cLevelsNode.hpp"
+	"nodes/cMenusNode.hpp"
+	"nodes/cTableNode.hpp"
+	"nodes/cChairNode.hpp"
+	"config.h"
+	"sqlite/gj_mysql.hpp"
+	"wx/wx.h"
+	"wx/sizer.h"
+	<sys/stat.h>
+
+1611925316 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\sqlite\gj_mysql.hpp
+
+1610455095 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxcrafter_bitmaps.cpp
+	<wx/wxprec.h>
+	<wx/filesys.h>
+	<wx/fs_mem.h>
+	<wx/xrc/xmlres.h>
+	<wx/xrc/xh_all.h>
+
+1611134566 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxtextinputdialog.cpp
+	"wxtextinputdialog.hpp"
+
+1611309624 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxtextinputdialog.hpp
+	<wx/artprov.h>
+	<wx/xrc/xmlres.h>
+	<wx/string.h>
+	<wx/textctrl.h>
+	<wx/gdicmn.h>
+	<wx/font.h>
+	<wx/colour.h>
+	<wx/settings.h>
+	<wx/button.h>
+	<wx/sizer.h>
+	<wx/dialog.h>
+
+1611331299 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\sqlite\gj_mysql.cpp
+	"gj_mysql.hpp"
+	"../config.h"
+	"sqlite3.h"
+	"../nodes/cBookingNode.hpp"
+
+1611238417 c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\sqlite\sqlite3.h
+	<stdarg.h>
+
+1611330951 source:c:\workspace\restaurantepoint\restaurantepoint\restaurantepoint\restpoint\gastromanager\desktop\src\wxbookingsdialog.cpp
+	"wxbookingsdialog.hpp"
+	"wxtextinputdialog.hpp"
+	<wx/dateevt.h>
+

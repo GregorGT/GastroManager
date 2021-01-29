@@ -23,6 +23,7 @@
 #include <wx/timectrl.h>
 #include <wx/dateevt.h>
 
+#include <memory>
 ///////////////////////////////////////////////////////////////////////////
 
 class MyDialogTextInput;

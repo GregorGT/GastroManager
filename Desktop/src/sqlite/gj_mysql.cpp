@@ -61,7 +61,7 @@ bool create_db_and_tables()
       bookingstable += "' (";
 
       bookingstable +="'id' INTEGER PRIMARY KEY AUTOINCREMENT,";
-      bookingstable +="'floors' int(11)  NOT NULL default 1,";
+      bookingstable +="'floors' varchar(250)  NOT NULL default '',";
       bookingstable +="'tables' varchar(250)  NOT NULL default '',";
       bookingstable +="'name'  varchar(250)  NOT NULL default '',";
       bookingstable +="'begin'  DATETIME NOT NULL default NOW,";
