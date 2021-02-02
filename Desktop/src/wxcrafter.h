@@ -158,6 +158,8 @@ protected:
     void OnTreeLeftButtonDClick( wxMouseEvent& event );
     void OnTreeRightButtonClick( wxMouseEvent& event );
 
+    virtual void OnSaveToXML( wxCommandEvent& event );// { event.Skip(); }
+
     virtual void OnTimer( wxTimerEvent& event ); //) { event.Skip(); }
 
     void deactivatePolygonMotion();

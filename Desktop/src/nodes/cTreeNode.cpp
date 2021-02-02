@@ -304,6 +304,40 @@ void cTreeNode::setNewProperty(std::string &name, std::string &value)
 
 }
 
+void cTreeNode::saveTOXML(std::ofstream &fstr)
+{
+    if(m_children.size() > 0)
+        fstr << "<" << m_xmlname << " ";
+    else
+        fstr << "<" << m_xmlname << " ";
+
+    for(auto iter : m_attributes)
+    {
+        fstr << " " << iter.first << "=\"" << iter.second << "\" ";
+    }
+
+    if(m_children.size() > 0)
+        fstr << " >" << std::endl;
+    else
+        fstr << " />" << std::endl;
+
+
+    if(m_children.size() > 0)
+    {
+        for(auto iter : m_children)
+        {
+            std::shared_ptr<cTreeNode> node = std::dynamic_pointer_cast<cTreeNode>(iter);
+            if(node)
+                node->saveTOXML(fstr);
+        }
+
+    }
+
+    if(m_children.size() > 0)
+        fstr << "</" << m_xmlname << ">" << std::endl;
+}
+
+
 void cTreeNode::updateDisplay()
 {
 

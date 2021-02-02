@@ -4,6 +4,8 @@
 #include "../Tree/cWXTreeCtrl.h"
 #include "../config.h"
 #include <unordered_map>
+#include <iostream>
+#include <fstream>
 
 enum TREENODE_FLAGS {
 		IS_ACTIVATALBE = 1,
@@ -50,6 +52,8 @@ public:
     virtual bool getChildXMLValue(std::string &xmlanme, std::string &value);
 
     virtual void updateDisplay();
+
+    virtual void saveTOXML(std::ofstream &fstr);
 
     virtual void printToXMLString(std::string &result);
 

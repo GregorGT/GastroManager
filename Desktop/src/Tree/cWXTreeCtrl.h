@@ -15,6 +15,8 @@
 #include <wx/treectrl.h>
 #include <wx/wx.h>
 
+class cTreeNode;
+
 namespace TREES {
 
 class cPrimitiveNode;
@@ -176,11 +178,12 @@ public:
 	virtual void printToXMLString(std::string &) {};
 };
 
+
 class cWXTreeCtrl : public wxTreeCtrl {
 
 	public:
 
-	std::shared_ptr<cPrimitiveNode> m_root;
+	std::shared_ptr<cTreeNode> m_root;
 
 	cWXTreeCtrl(wxWindow *parent, wxWindowID id = wxID_ANY,
                const wxPoint& pos = wxDefaultPosition,
@@ -190,7 +193,7 @@ class cWXTreeCtrl : public wxTreeCtrl {
                const wxString& name = wxTreeCtrlNameStr) : wxTreeCtrl(parent, id, pos, size, style, validator, name) {};
 
 
-	void appendRoot(std::shared_ptr<cPrimitiveNode> &node, std::string &name);
+	void appendRoot(std::shared_ptr<cTreeNode> &node, std::string &name);
 
 
 };

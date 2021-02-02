@@ -175,14 +175,14 @@ void loadXMLFileRecursiveMenues(xml_node<> *node, std::shared_ptr<TREES::cPrimit
 	std::shared_ptr<TREES::cPrimitiveNode> newnode;
 	if(name == "option")
 	{
-			auto level = std::shared_ptr<cLevelNode>( new cLevelNode );
-			auto tl = std::dynamic_pointer_cast<cTreeNode>(level);
+			auto option = std::shared_ptr<cMenuOptionNode>( new cMenuOptionNode );
+			auto tl = std::dynamic_pointer_cast<cTreeNode>(option);
 			readXMLAttributes(node, tl);
 			newnode = std::dynamic_pointer_cast<TREES::cPrimitiveNode>(tl);
-			tl->m_xmlname = "level";
+			tl->m_xmlname = "option";
 
 			std::string nodename;
-			level->getDisplayString(nodename);
+			tl->getDisplayString(nodename);
 			currentnode->appendExistingChild(newnode, nodename);
 	}
 	else if(name == "ingredient")
@@ -197,14 +197,14 @@ void loadXMLFileRecursiveMenues(xml_node<> *node, std::shared_ptr<TREES::cPrimit
     }
 	else if(name == "item")
 	{
-			auto level = std::shared_ptr<cMenuItemNode>( new cMenuItemNode );
-			auto tl = std::dynamic_pointer_cast<cTreeNode>(level);
+			auto menuitem = std::shared_ptr<cMenuItemNode>( new cMenuItemNode );
+			auto tl = std::dynamic_pointer_cast<cTreeNode>(menuitem);
 			readXMLAttributes(node, tl);
 			newnode = std::dynamic_pointer_cast<TREES::cPrimitiveNode>(tl);
-			tl->m_xmlname = "level";
+			tl->m_xmlname = "item";
 
 			std::string nodename;
-			level->getDisplayString(nodename);
+			tl->getDisplayString(nodename);
 			currentnode->appendExistingChild(newnode, nodename);
 
 	}else if(g_propertyxmlnames.find(name) != g_propertyxmlnames.end())
@@ -230,12 +230,12 @@ void loadXMLFileRecursiveMenues(xml_node<> *node, std::shared_ptr<TREES::cPrimit
 	auto next = node->next_sibling();
 	if(next)
 	{
-		if(newnode)
+	/*	if(newnode)
 		{
 			auto tn = std::dynamic_pointer_cast<TREES::cPrimitiveNode>(newnode);
 			loadXMLFileRecursiveMenues(next, tn, depth + 1);
 		}
-		else
+		else */
 			loadXMLFileRecursiveMenues(next, currentnode, depth + 1);
 
 	}
@@ -396,7 +396,19 @@ void loadXMLFileRecursive(xml_node<> *node, std::shared_ptr<TREES::cPrimitiveNod
 	if(depth == 1 and name == "menues")
 	{
 			donotparse = true;
-			loadXMLFileRecursiveMenues(node, currentnode, depth);
+			auto menues = std::shared_ptr<cMenuesNode>( new cMenuesNode );
+			//g_levelsnode = level;
+			auto tl = std::dynamic_pointer_cast<cTreeNode>(menues);
+			readXMLAttributes(node, tl);
+			auto newnode = std::dynamic_pointer_cast<TREES::cPrimitiveNode>(tl);
+			tl->m_xmlname = "menue";
+            std::string name;
+            /// default is english
+            tl->m_name = "menue";
+            getTranslation(tl->m_xmlname, name);
+			currentnode->appendExistingChild(newnode, name);
+
+			loadXMLFileRecursiveMenues(node, newnode, depth);
 	}
 	else
 	if(depth == 1 and name == "layout")

@@ -26,6 +26,7 @@
 #define NODE_PROPERTY_Y "y"
 #define NODE_PROPERTY_ROT "rot"
 #define NODE_ATTRIBUTE_UUID "uuid"
+#define NODE_ATTRIBUTE_NAME "name"
 #define NODE_IMAGE "image"
 
 

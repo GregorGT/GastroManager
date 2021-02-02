@@ -196,6 +196,10 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	m_menuItemLoad = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("LoadFile") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu_new->Append( m_menuItemLoad );
 
+    wxMenuItem* m_menuItemSave;
+	m_menuItemSave = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("Save to xml") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menu_new->Append( m_menuItemSave );
+
 	m_menubar1->Append( m_menu_new, wxT("New") );
 
 	m_menuAbout = new wxMenu();
@@ -265,6 +269,8 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	this->Connect( m_menuItemActivate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrameBaseClass::OnTableActivate ) );
 
 	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrameBaseClass::OnLoadFile ) );
+
+	m_menu_new->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrameBaseClass::OnSaveToXML ), this, m_menuItemSave->GetId());
 
 	InitTree();
 }
@@ -338,6 +344,40 @@ MainFrameBaseClass::~MainFrameBaseClass()
 	delete m_menuTable;
 	delete m_bookingsdialog;
 }
+
+void MainFrameBaseClass::OnSaveToXML( wxCommandEvent& event ) {
+
+    if(!g_root)
+        return;
+
+    wxFileDialog
+        openFileDialog(this, _("Open XYZ file"), "", "",
+                       "XYZ files (*.xml)|*.xml", wxFD_OPEN);
+    if (openFileDialog.ShowModal() == wxID_CANCEL)
+        return;     // the user changed idea...
+
+    // proceed loading the file chosen by the user;
+    // this can be done with e.g. wxWidgets input streams:
+    std::string filename(openFileDialog.GetPath().mb_str());
+
+    std::ofstream fstr;
+
+    fstr.open(filename);
+
+    if(fstr.is_open())
+    {
+        auto node = std::dynamic_pointer_cast<cTreeNode>(g_root);
+        if(node)
+            node->saveTOXML(fstr);
+    }
+
+
+	fstr.close();
+	int test = 0;
+
+    event.Skip();
+}
+
 
 void MainFrameBaseClass::NewBookingClick( wxCommandEvent& event ){
      event.Skip(); }
@@ -1280,7 +1320,7 @@ void MainFrameBaseClass::OnLoadFile( wxCommandEvent& event )
 void MainFrameBaseClass::InitTree()
 {
 	std::string name = "root";
-	std::shared_ptr<TREES::cPrimitiveNode> root;
+	std::shared_ptr<cTreeNode> root;
 	std::shared_ptr<TREES::cPrimitiveNode> menu;
 	std::shared_ptr<TREES::cPrimitiveNode> layout;
 	//std::shared_ptr<TREES::cPrimitiveNode> settings;
