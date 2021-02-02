@@ -26,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="242.75489"
-     inkscape:cy="702.16841"
+     inkscape:cx="466.25042"
+     inkscape:cy="673.71528"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -44,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -58,24 +58,32 @@
        width="67.886459"
        height="91.940712"
        x="13.898015"
-       y="51.112034" />
+       y="51.112034"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.76499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect2196"
        width="60.402912"
        height="94.078873"
        x="117.06405"
-       y="51.112034" />
+       y="51.112034"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
     <path
        style="fill:#0f0f0f;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 89.802561,83.718915 v 5.078121 h 9.755336 v 4.810853 l 7.483543,-7.483547 -7.483543,-7.483546 v 4.81085 z"
        id="path2198"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
     <path
        style="fill:#0f0f0f;fill-opacity:1;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 107.2693,106.83773 v -5.07812 h -9.755339 v -4.810851 l -7.483546,7.483551 7.483546,7.48354 V 107.105 Z"
        id="path2198-4"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
@@ -121,13 +129,17 @@
        width="24.568451"
        height="9.0714283"
        x="137.20535"
-       y="149.58928" />
+       y="149.58928"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="144.76489"
        y="155.06993"
-       id="text2269"><tspan
+       id="text2269"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999"><tspan
          sodipodi:role="line"
          id="tspan2267"
          x="144.76489"

@@ -5254,7 +5254,7 @@
 	"wxtextinputdialog.hpp"
 	<wx/dateevt.h>
 
-1611156857 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\config.cpp
+1612277707 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\config.cpp
 	<fstream>
 	<string>
 	<iostream>
@@ -5277,7 +5277,7 @@
 	"nodes/cMenuOptionNode.hpp"
 	"wxcrafter.h"
 
-1611238817 c:\workspace\restaurantepoint\gastromanager\desktop\src\config.h
+1612277357 c:\workspace\restaurantepoint\gastromanager\desktop\src\config.h
 	<unordered_map>
 	<string>
 
@@ -5290,12 +5290,14 @@
 1610984714 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\csettingsnode.h
 	"cTreeNode.hpp"
 
-1611307401 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\ctreenode.hpp
+1612278314 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\ctreenode.hpp
 	"../Tree/cWXTreeCtrl.h"
 	"../config.h"
 	<unordered_map>
+	<iostream>
+	<fstream>
 
-1611241154 c:\workspace\restaurantepoint\gastromanager\desktop\src\tree\cwxtreectrl.h
+1612279295 c:\workspace\restaurantepoint\gastromanager\desktop\src\tree\cwxtreectrl.h
 	<memory>
 	<vector>
 	<string>
@@ -5327,16 +5329,16 @@
 1610635523 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cchairnode.hpp
 	"c4PolgoneRectangle.hpp"
 
-1610981993 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuitemnode.hpp
+1612277248 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuitemnode.hpp
 	"cTreeNode.hpp"
 
 1610976321 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenusnode.hpp
 	"cTreeNode.hpp"
 
-1610981998 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
+1612277286 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
 	"cTreeNode.hpp"
 
-1611312862 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.h
+1612278977 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.h
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/statusbr.h>
@@ -5432,9 +5434,11 @@
 	"cMenusNode.hpp"
 	"../config.h"
 
-1610976143 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuitemnode.cpp
+1612277566 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuitemnode.cpp
+	"cMenuItemNode.hpp"
 
-1610976177 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuoptionnode.cpp
+1612277586 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuoptionnode.cpp
+	"cMenuOptionNode.hpp"
 
 1610615509 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cpropertynode.cpp
 	"cPropertyNode.hpp"
@@ -5450,7 +5454,7 @@
 	"cTableNode.hpp"
 	<string>
 
-1611307977 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\ctreenode.cpp
+1612278513 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\ctreenode.cpp
 	"cTreeNode.hpp"
 	"cPropertyNode.hpp"
 
@@ -5524,8 +5528,9 @@
 	<unicode/utf16.h>
 	<math.h>
 
-1610626033 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\tree\cwxtreectrl.cpp
+1612279205 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\tree\cwxtreectrl.cpp
 	"cWXTreeCtrl.h"
+	"../nodes/cTreeNode.hpp"
 	<memory>
 
 1611330951 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\wxbookingsdialog.cpp
@@ -5546,7 +5551,7 @@
 	<wx/sizer.h>
 	<wx/dialog.h>
 
-1611312882 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.cpp
+1612279222 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.cpp
 	"wxcrafter.h"
 	"nodes/cSettingsNode.h"
 	"nodes/cLevelNode.hpp"

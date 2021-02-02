@@ -17,7 +17,7 @@
 				</item>
 			</item>
 		</item>
-		<item name="Drink" displayname_en="drink">
+		<item name="Drink" displayname_en="Drink" displayname_de="Getränk">
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
