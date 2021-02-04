@@ -16,22 +16,17 @@
 					<Add option="-std=c++11" />
 					<Add option="-g" />
 					<Add option="-D__WXDEBUG__" />
-					<Add directory="C:/wxWidgets/lib/gcc_dll/mswd" />
-					<Add directory="C:/wxWidgets/lib/gcc810_x64_dll/mswu" />
-					<Add directory="C:/boost_1_75_0" />
+					<Add directory="C:/wxWidgets/include/wx-3.1" />
+					<Add directory="C:/wxWidgets/lib/wx/include/msw-unicode-3.1" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="C:/wxWidgets/lib/gcc_dll/mswd" />
+					<Add directory="C:/wxWidgets/include/wx-3.1" />
 				</ResourceCompiler>
 				<Linker>
-					<Add library="libwxmsw30u_core.a" />
-					<Add library="libwxmsw30u_adv.a" />
-					<Add library="libwxbase30u.a" />
-					<Add library="libwxpng.a" />
-					<Add library="libwxzlib.a" />
-					<Add directory="C:/wxWidgets/lib/gcc_dll" />
-					<Add directory="C:/wxWidgets/lib/gcc810_x64_dll/mswu" />
-					<Add directory="C:/wxWidgets/lib/gcc810_x64_dll" />
+					<Add library="C:/wxWidgets/lib/libwx_baseud_xml-3.1.dll.a" />
+					<Add library="C:/wxWidgets/lib/libwx_baseud-3.1.dll.a" />
+					<Add library="C:/wxWidgets/lib/libwx_mswud_core-3.1.dll.a" />
+					<Add directory="C:/wxWidgets/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -65,14 +60,9 @@
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DWXUSINGDLL" />
-			<Add directory="C:/wxWidgets/include" />
 		</Compiler>
-		<ResourceCompiler>
-			<Add directory="C:/wxWidgets/include" />
-		</ResourceCompiler>
 		<Linker>
 			<Add option="-mthreads" />
-			<Add directory="C:/wxWidgets/lib/gcc_dll" />
 		</Linker>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />

@@ -142,10 +142,10 @@ void c4PolgoneRectangle::OnPaint(wxDC *dc, int offsetx, int offsety)
 		g_tmppoints[3].y = m_point[3].y + offsety;
 
 		dc->SetBrush( wxBrush( m_filling ) ); // green filling
-		dc->SetPen( wxPen( m_color, 5) ); // 5-pixels-thick red outline
+		dc->SetPen( wxPen( m_color, 4) ); // 5-pixels-thick red outline
 		dc->DrawPolygon(WXSIZEOF(g_tmppoints), g_tmppoints);
 
-		m_textcolor = wxColor(255,255,255);
+		m_textcolor = wxColor(255,255,155);
 
 		dc->SetTextForeground(m_textcolor);
 		dc->SetTextBackground(m_textcolorbackground);

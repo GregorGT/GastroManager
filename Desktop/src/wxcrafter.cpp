@@ -40,11 +40,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 {
     g_mainframebaseclass  = this;
 
-    this->SetSizeHints( wxDefaultSize, wxDefaultSize );
+    this->SetSizeHints( wxSize( 900, 600) , wxDefaultSize );
 
 	m_statusBar1 = this->CreateStatusBar( 1, wxST_SIZEGRIP, wxID_ANY );
 	wxStaticBoxSizer* sbSizer1;
-	sbSizer1 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("label") ), wxHORIZONTAL );
+	sbSizer1 = new wxStaticBoxSizer( new wxStaticBox( this, wxID_ANY, wxT("My Restaurant") ), wxHORIZONTAL );
 
 	m_splitter1 = new wxSplitterWindow( sbSizer1->GetStaticBox(), wxID_ANY, wxDefaultPosition, wxDefaultSize, wxSP_3D );
 	//m_splitter1->SetSashSize( 5 );
@@ -97,7 +97,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	m_staticTextLayoutBmp->Wrap( -1 );
 	bSizerLayout4->Add( m_staticTextLayoutBmp, 0, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
-	m_filePickerFloorPlan = new wxFilePickerCtrl( m_panelLayout, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE );
+	m_filePickerFloorPlan = new wxFilePickerCtrl( m_panelLayout, wxID_ANY, wxEmptyString, wxT("Select a file"), wxT("*.JPG*"), wxDefaultPosition, wxDefaultSize, wxFLP_DEFAULT_STYLE );
 	bSizerLayout4->Add( m_filePickerFloorPlan, 1, wxALL|wxALIGN_CENTER_VERTICAL, 5 );
 
 
@@ -152,7 +152,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	m_scrolledWindowBookings->SetSizer( bSizer11 );
 	m_scrolledWindowBookings->Layout();
 	bSizer11->Fit( m_scrolledWindowBookings );
-	m_notebook->AddPage( m_scrolledWindowBookings, wxT("bookings"), true );
+	m_notebook->AddPage( m_scrolledWindowBookings, wxT("Bookings"), true );
 
 	bSizer5->Add( m_notebook, 1, wxALL|wxEXPAND, 5 );
 
@@ -162,6 +162,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	bSizer5->Fit( m_panel4 );
 	m_splitter1->SplitVertically( m_panel3, m_panel4, 0 );
 	sbSizer1->Add( m_splitter1, 1, wxEXPAND, 5 );
+
 
 
 	this->SetSizer( sbSizer1 );
@@ -193,11 +194,11 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	m_menubar1 = new wxMenuBar( 0 );
 	m_menu_new = new wxMenu();
 	wxMenuItem* m_menuItemLoad;
-	m_menuItemLoad = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("LoadFile") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemLoad = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("Load File") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu_new->Append( m_menuItemLoad );
 
     wxMenuItem* m_menuItemSave;
-	m_menuItemSave = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("Save to xml") ) , wxEmptyString, wxITEM_NORMAL );
+	m_menuItemSave = new wxMenuItem( m_menu_new, wxID_ANY, wxString( wxT("Save to Xml") ) , wxEmptyString, wxITEM_NORMAL );
 	m_menu_new->Append( m_menuItemSave );
 
 	m_menubar1->Append( m_menu_new, wxT("New") );
@@ -271,6 +272,7 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
 	this->Connect( m_menuItemLoad->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrameBaseClass::OnLoadFile ) );
 
 	m_menu_new->Bind(wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler( MainFrameBaseClass::OnSaveToXML ), this, m_menuItemSave->GetId());
+
 
 	InitTree();
 }
@@ -996,7 +998,7 @@ void MainFrameBaseClass::renderBookings(wxDC &dc)
                 std::string tmp = std::to_string(i);
                 dc.DrawText(wxString(tmp), 10+m_scrolloffsetbookingsx, i*35+50+m_scrolloffsetbookingsy);
             }
-           for(int i = 1; i<=12;++i)
+           for(int i = 0; i<=12;++i)
             {
                 std::string tmp = std::to_string(i);
                 dc.DrawText(wxString(tmp), 10+m_scrolloffsetbookingsx, (i+12)*35+50+m_scrolloffsetbookingsy);
@@ -1302,8 +1304,8 @@ void MainFrameBaseClass::OnLoadFile( wxCommandEvent& event )
     //                                    wxFLP_OPEN);
 
     wxFileDialog
-        openFileDialog(this, _("Open XYZ file"), "", "",
-                       "XYZ files (*.xml)|*.xml", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
+        openFileDialog(this, _("Open XML file"), "", "",
+                       "XML files (*.xml)|*.xml", wxFD_OPEN|wxFD_FILE_MUST_EXIST);
     if (openFileDialog.ShowModal() == wxID_CANCEL)
         return;     // the user changed idea...
 

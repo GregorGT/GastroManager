@@ -14,6 +14,12 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.*;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -56,6 +62,7 @@ public class MainWindow {
 			}
 		}
 	}
+	
 
 	/**
 	 * Create contents of the window.
@@ -63,7 +70,7 @@ public class MainWindow {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(475, 350);
-		shell.setText("SWT Application");
+		shell.setText("GastroManager");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		sashForm = new SashForm(shell, SWT.NONE);
@@ -79,9 +86,41 @@ public class MainWindow {
 		tbtmNewItem = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem.setText("Layout");
 		sashForm.setWeights(new int[] {1, 1});
+		
+		Menu menu = new Menu(shell, SWT.BAR);
+		shell.setMenuBar(menu);
+		
+		MenuItem mntmLoadFile = new MenuItem(menu, SWT.CASCADE);
+		mntmLoadFile.setText("File");
+		
+		Menu menu_1 = new Menu(mntmLoadFile);
+		mntmLoadFile.setMenu(menu_1);
+		
+		MenuItem mntmOpenFile = new MenuItem(menu_1, SWT.NONE);
+		mntmOpenFile.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				 FileDialog fd = new FileDialog(shell, SWT.OPEN);
+			        fd.setText("Open XML file");
+			        fd.setFilterPath("C:/");
+			        String[] filterExt = { "*.XML", "*.xml"};
+			        fd.setFilterExtensions(filterExt);
+			        String selected = fd.open();
+			        System.out.println(selected);
+			}
+		});
+		mntmOpenFile.setText("Open File");
+		
+		MenuItem mntmAbout = new MenuItem(menu, SWT.CASCADE);
+		mntmAbout.setText("About");
+		
+		Menu menu_2 = new Menu(mntmAbout);
+		mntmAbout.setMenu(menu_2);
 		m_bindingContext = initDataBindings();
 
 	}
+	
+	
 	protected DataBindingContext initDataBindings() {
 		DataBindingContext bindingContext = new DataBindingContext();
 		//
