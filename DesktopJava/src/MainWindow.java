@@ -13,6 +13,7 @@ import org.eclipse.jface.databinding.swt.SWTObservables;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.layout.FillLayout;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -61,12 +62,11 @@ public class MainWindow {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(450, 300);
+		shell.setSize(475, 350);
 		shell.setText("SWT Application");
+		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		sashForm = new SashForm(shell, SWT.NONE);
-		sashForm.setSize(432, 230);
-		sashForm.setLocation(0, 10);
 		
 		TreeViewer treeViewer = new TreeViewer(sashForm, SWT.BORDER);
 		Tree tree = treeViewer.getTree();
