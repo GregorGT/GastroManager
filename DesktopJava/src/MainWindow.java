@@ -2,6 +2,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -20,6 +21,8 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.*;
+import org.xml.sax.*;
+import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -29,6 +32,7 @@ public class MainWindow {
 	private TabFolder tabFolder;
 	private TabItem tbtmView;
 	private TabItem tbtmNewItem;
+	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 
 	/**
 	 * Launch the application.
@@ -75,8 +79,12 @@ public class MainWindow {
 		
 		sashForm = new SashForm(shell, SWT.NONE);
 		
-		TreeViewer treeViewer = new TreeViewer(sashForm, SWT.BORDER);
-		Tree tree = treeViewer.getTree();
+		Tree root = new Tree(sashForm, SWT.BORDER);
+		formToolkit.adapt(root);
+		formToolkit.paintBordersFor(root);
+		
+		TreeItem trtmRoot = new TreeItem(root, SWT.NONE);
+		trtmRoot.setText("root");
 		
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		
@@ -100,7 +108,7 @@ public class MainWindow {
 		mntmOpenFile.addSelectionListener(new SelectionAdapter() {			
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				 FileDialog fd = new FileDialog(shell, SWT.OPEN);
+				 	FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			        fd.setText("Open XML file");
 			        fd.setFilterPath("C:/");
 			        String[] filterExt = { "*.XML", "*.xml"};
@@ -116,6 +124,7 @@ public class MainWindow {
 		
 		Menu menu_2 = new Menu(mntmAbout);
 		mntmAbout.setMenu(menu_2);
+		
 		m_bindingContext = initDataBindings();
 
 	}
