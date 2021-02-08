@@ -2,7 +2,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -20,9 +19,26 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.FileDialog;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import javax.swing.tree.DefaultTreeModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.eclipse.*;
 import org.xml.sax.*;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -51,7 +67,54 @@ public class MainWindow {
 			}
 		});
 	}
+	
+	public static Document loadXMLFromString(String xml) throws Exception
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        return builder.parse(is);
+    }
 
+	static String readFileToString(String path, Charset encoding)
+			  throws IOException
+			{
+			  byte[] encoded = Files.readAllBytes(Paths.get(path));
+			  return new String(encoded, encoding);
+			}
+		
+	void treeBuild(GMTreeItem rootNode, Node xmlNode) {
+		
+	 GMTreeItem newNode = new GMTreeItem(rootNode, SWT.NONE);
+	 
+	 List attributes = xmlNode.getAttributes();
+	 Iterator it = attributes.iterator();
+	 while (it.hasNext()) {
+	   Attribute att = (Attribute)it.next();
+	   System.out.println(att.getName()); // att1
+	   System.out.println(att.getValue()); // value1
+	 }
+	 
+	 NodeList children = xmlNode.getChildNodes();
+	 
+	 for (int i = 0; i < children.getLength(); ++i) {
+		 treeBuild(newNode, children.item(i));
+	 }
+	}
+	
+	
+	void parseXmlDocument(Document doc, GMTreeItem root) {
+		try {
+			
+			//NodeList items = doc.getElementsByTagName("item");
+			//NodeList itemOptions = doc.getElementsByTagName("option");
+		    treeBuild(root, doc.getFirstChild());
+					    
+		    } catch (Exception e) {
+		    e.printStackTrace();
+		    }
+	}
+	
 	/**
 	 * Open the window.
 	 */
@@ -83,7 +146,7 @@ public class MainWindow {
 		formToolkit.adapt(root);
 		formToolkit.paintBordersFor(root);
 		
-		TreeItem trtmRoot = new TreeItem(root, SWT.NONE);
+		GMTreeItem trtmRoot = new GMTreeItem(root, SWT.NONE);
 		trtmRoot.setText("root");
 		
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
@@ -110,12 +173,28 @@ public class MainWindow {
 			public void widgetSelected(SelectionEvent e) {
 				 	FileDialog fd = new FileDialog(shell, SWT.OPEN);
 			        fd.setText("Open XML file");
-			        fd.setFilterPath("C:/");
+			        fd.setFilterPath("C:\\");
 			        String[] filterExt = { "*.XML", "*.xml"};
 			        fd.setFilterExtensions(filterExt);
 			        String selected = fd.open();
-			        System.out.println(selected);
-			}
+			        Document doc;
+			        try {
+					
+			        String fstr = readFileToString(selected, Charset.defaultCharset());
+					doc = loadXMLFromString(fstr);
+					parseXmlDocument(doc, trtmRoot);
+					
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+			        
+			        }
+			
 		});
 		mntmOpenFile.setText("Open File");
 		
