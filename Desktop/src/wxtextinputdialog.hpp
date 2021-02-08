@@ -43,4 +43,4 @@ class MyDialogTextInput : public wxDialog
 
 };
 
-#endif //__NONAME_H__
+#endif

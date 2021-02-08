@@ -14,6 +14,31 @@ import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.swt.custom.CTabFolder;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.FileDialog;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import javax.swing.tree.DefaultTreeModel;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.eclipse.*;
+import org.xml.sax.*;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -23,6 +48,7 @@ public class MainWindow {
 	private TabFolder tabFolder;
 	private TabItem tbtmView;
 	private TabItem tbtmNewItem;
+	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 
 	/**
 	 * Launch the application.
@@ -41,7 +67,54 @@ public class MainWindow {
 			}
 		});
 	}
+	
+	public static Document loadXMLFromString(String xml) throws Exception
+    {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(xml));
+        return builder.parse(is);
+    }
 
+	static String readFileToString(String path, Charset encoding)
+			  throws IOException
+			{
+			  byte[] encoded = Files.readAllBytes(Paths.get(path));
+			  return new String(encoded, encoding);
+			}
+		
+	void treeBuild(GMTreeItem rootNode, Node xmlNode) {
+		
+	 GMTreeItem newNode = new GMTreeItem(rootNode, SWT.NONE);
+	 
+	 List attributes = xmlNode.getAttributes();
+	 Iterator it = attributes.iterator();
+	 while (it.hasNext()) {
+	   Attribute att = (Attribute)it.next();
+	   System.out.println(att.getName()); // att1
+	   System.out.println(att.getValue()); // value1
+	 }
+	 
+	 NodeList children = xmlNode.getChildNodes();
+	 
+	 for (int i = 0; i < children.getLength(); ++i) {
+		 treeBuild(newNode, children.item(i));
+	 }
+	}
+	
+	
+	void parseXmlDocument(Document doc, GMTreeItem root) {
+		try {
+			
+			//NodeList items = doc.getElementsByTagName("item");
+			//NodeList itemOptions = doc.getElementsByTagName("option");
+		    treeBuild(root, doc.getFirstChild());
+					    
+		    } catch (Exception e) {
+		    e.printStackTrace();
+		    }
+	}
+	
 	/**
 	 * Open the window.
 	 */
@@ -56,6 +129,7 @@ public class MainWindow {
 			}
 		}
 	}
+	
 
 	/**
 	 * Create contents of the window.
@@ -63,13 +137,17 @@ public class MainWindow {
 	protected void createContents() {
 		shell = new Shell();
 		shell.setSize(475, 350);
-		shell.setText("SWT Application");
+		shell.setText("GastroManager");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		sashForm = new SashForm(shell, SWT.NONE);
 		
-		TreeViewer treeViewer = new TreeViewer(sashForm, SWT.BORDER);
-		Tree tree = treeViewer.getTree();
+		Tree root = new Tree(sashForm, SWT.BORDER);
+		formToolkit.adapt(root);
+		formToolkit.paintBordersFor(root);
+		
+		GMTreeItem trtmRoot = new GMTreeItem(root, SWT.NONE);
+		trtmRoot.setText("root");
 		
 		tabFolder = new TabFolder(sashForm, SWT.NONE);
 		
@@ -79,9 +157,58 @@ public class MainWindow {
 		tbtmNewItem = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem.setText("Layout");
 		sashForm.setWeights(new int[] {1, 1});
+		
+		Menu menu = new Menu(shell, SWT.BAR);
+		shell.setMenuBar(menu);
+		
+		MenuItem mntmLoadFile = new MenuItem(menu, SWT.CASCADE);
+		mntmLoadFile.setText("File");
+		
+		Menu menu_1 = new Menu(mntmLoadFile);
+		mntmLoadFile.setMenu(menu_1);
+		
+		MenuItem mntmOpenFile = new MenuItem(menu_1, SWT.NONE);
+		mntmOpenFile.addSelectionListener(new SelectionAdapter() {			
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				 	FileDialog fd = new FileDialog(shell, SWT.OPEN);
+			        fd.setText("Open XML file");
+			        fd.setFilterPath("C:\\");
+			        String[] filterExt = { "*.XML", "*.xml"};
+			        fd.setFilterExtensions(filterExt);
+			        String selected = fd.open();
+			        Document doc;
+			        try {
+					
+			        String fstr = readFileToString(selected, Charset.defaultCharset());
+					doc = loadXMLFromString(fstr);
+					parseXmlDocument(doc, trtmRoot);
+					
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+						
+					} catch (Exception e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+			        
+			        }
+			
+		});
+		mntmOpenFile.setText("Open File");
+		
+		MenuItem mntmAbout = new MenuItem(menu, SWT.CASCADE);
+		mntmAbout.setText("About");
+		
+		Menu menu_2 = new Menu(mntmAbout);
+		mntmAbout.setMenu(menu_2);
+		
 		m_bindingContext = initDataBindings();
 
 	}
+	
+	
 	protected DataBindingContext initDataBindings() {
 		DataBindingContext bindingContext = new DataBindingContext();
 		//

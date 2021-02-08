@@ -1,0 +1,157 @@
+{
+  "root": {
+    "menues": {
+      "item": [
+        {
+          "-name": "Pizza",
+          "option": [
+            {
+              "-id": "size",
+              "-name": "small",
+              "-price": "0.5",
+              "-uuid": "124456611"
+            },
+            {
+              "-id": "size",
+              "-name": "medium",
+              "-price": "0.8"
+            },
+            {
+              "-id": "size",
+              "-name": "large",
+              "-price": "1.2"
+            }
+          ],
+          "item": {
+            "-name": "topping",
+            "-displayname_en": "topping",
+            "-displayname_sp": "cubierta",
+            "option": [
+              {
+                "-id": "toppingammount",
+                "-name": "few",
+                "-price": "0.5"
+              },
+              {
+                "-id": "toppingammount",
+                "-name": "more",
+                "-price": "0.8"
+              },
+              {
+                "-id": "toppingammount",
+                "-name": "lots",
+                "-price": "1.2"
+              }
+            ],
+            "item": {
+              "-name": "margarita",
+              "option": [
+                {
+                  "-id": "size",
+                  "-name": "small",
+                  "-overwrite_price": "5.5"
+                },
+                {
+                  "-id": "size",
+                  "-name": "medium",
+                  "-overwrite_price": "5.8"
+                },
+                {
+                  "-id": "size",
+                  "-name": "large",
+                  "-price": "1.2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "-name": "Drink",
+          "-displayname_en": "Drink",
+          "-displayname_de": "Getränk",
+          "option": [
+            {
+              "-id": "size",
+              "-name": "small",
+              "-price": "0.5"
+            },
+            {
+              "-id": "size",
+              "-name": "medium",
+              "-price": "0.8"
+            },
+            {
+              "-id": "size",
+              "-name": "large",
+              "-price": "1.2"
+            }
+          ],
+          "ingridients": { "-name": "suggar,water" },
+          "item": [
+            {
+              "-name": "Coca Cola",
+              "-displayname_en": "Coce",
+              "option": [
+                {
+                  "-id": "size",
+                  "-name": "small",
+                  "-displayname_de": "klein",
+                  "-overwrite_price": "2.0"
+                },
+                {
+                  "-id": "size",
+                  "-name": "medium",
+                  "-displayname_de": "mittel"
+                },
+                {
+                  "-id": "size",
+                  "-name": "large",
+                  "-displayname_de": "gross",
+                  "-overwrite_price": "2.5"
+                }
+              ]
+            },
+            {
+              "-name": "Fanta",
+              "-displayname_en": "Fanta",
+              "-price": "0.5"
+            }
+          ]
+        }
+      ]
+    },
+    "layout": {
+      "level": {
+        "-value": "1",
+        "-name": "firstfloor",
+        "-displayname_de": "erster stock",
+        "image": {
+          
+        },
+        "table": {
+          "-value": "1",
+          "-displayname_de": "Tisch",
+          "-name": "table",
+          "x": "0",
+          "y": "0",
+          "rot": "0",
+          "width": "100",
+          "height": "100"
+        }
+      }
+    },
+    "reservations": {
+      "date": {
+        "-value": "24.2.2021",
+        "table": {
+          "-id": "1",
+          "time": {
+            "-format": "utc",
+            "#text": "9pm"
+          }
+        }
+      }
+    },
+    "settings": { "language": "en" }
+  }
+}

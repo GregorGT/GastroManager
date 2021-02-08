@@ -26,6 +26,7 @@
 #include <wx/calctrl.h>
 #include <wx/timer.h>
 #include <wx/frame.h>
+#include <wx/grid.h>
 #include <wx/filedlg.h>
 #include "Tree/cWXTreeCtrl.h"
 #include "nodes/cTableNode.hpp"
@@ -71,6 +72,7 @@ protected:
 		wxMenuBar* m_menubar1;
 		wxMenu* m_menu_new;
 		wxMenu* m_menuAbout;
+		wxGrid* booking_grid;
 
 
 		//wxFilePickerCtrl *m_filePicker;
