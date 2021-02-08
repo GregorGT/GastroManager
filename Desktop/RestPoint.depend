@@ -5338,7 +5338,7 @@
 1612277286 c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
 	"cTreeNode.hpp"
 
-1612278977 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.h
+1612798924 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.h
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/statusbr.h>
@@ -5364,6 +5364,7 @@
 	<wx/calctrl.h>
 	<wx/timer.h>
 	<wx/frame.h>
+	<wx/grid.h>
 	<wx/filedlg.h>
 	"Tree/cWXTreeCtrl.h"
 	"nodes/cTableNode.hpp"
@@ -5407,13 +5408,13 @@
 1610700222 c:\workspace\restaurantepoint\gastromanager\desktop\src\math\geometry.h
 	<wx/wx.h>
 
-1611051605 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\c4polgonerectangle.cpp
+1612798924 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\c4polgonerectangle.cpp
 	"c4PolgoneRectangle.hpp"
 	<math.h>
 	<stdlib.h>
 	"../math/geometry.h"
 
-1611925171 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cbookingnode.cpp
+1612798924 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cbookingnode.cpp
 	"cBookingNode.hpp"
 
 1610628196 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\nodes\cchairnode.cpp
@@ -5538,7 +5539,7 @@
 	"wxtextinputdialog.hpp"
 	<wx/dateevt.h>
 
-1611309624 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxtextinputdialog.hpp
+1612798924 c:\workspace\restaurantepoint\gastromanager\desktop\src\wxtextinputdialog.hpp
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/string.h>
@@ -5551,7 +5552,7 @@
 	<wx/sizer.h>
 	<wx/dialog.h>
 
-1612279222 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.cpp
+1612798924 source:c:\workspace\restaurantepoint\gastromanager\desktop\src\wxcrafter.cpp
 	"wxcrafter.h"
 	"nodes/cSettingsNode.h"
 	"nodes/cLevelNode.hpp"
@@ -9061,6 +9062,24 @@
 	"wx/scopedptr.h"
 
 1595438406 c:\wxwidgets\include\wx-3.1\wx\generic\gridctrl.h
+	"wx/grid.h"
+	"wx/datetime.h"
+
+1587557368 c:\wxwidgets\include\wx\grid.h
+	"wx/generic/grid.h"
+	"wx/generic/grideditors.h"
+	"wx/generic/gridctrl.h"
+
+1587557368 c:\wxwidgets\include\wx\generic\grid.h
+	"wx/defs.h"
+	"wx/hashmap.h"
+	"wx/scrolwin.h"
+
+1587557368 c:\wxwidgets\include\wx\generic\grideditors.h
+	"wx/defs.h"
+	"wx/scopedptr.h"
+
+1587557368 c:\wxwidgets\include\wx\generic\gridctrl.h
 	"wx/grid.h"
 	"wx/datetime.h"
 
