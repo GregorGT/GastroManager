@@ -37,6 +37,7 @@ import org.xml.sax.*;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -86,15 +87,29 @@ public class MainWindow {
 	void treeBuild(GMTreeItem rootNode, Node xmlNode) {
 		
 	 GMTreeItem newNode = new GMTreeItem(rootNode, SWT.NONE);
+	 NamedNodeMap attributes = xmlNode.getAttributes();
 	 
-	 List attributes = xmlNode.getAttributes();
-	 Iterator it = attributes.iterator();
-	 while (it.hasNext()) {
-	   Attribute att = (Attribute)it.next();
-	   System.out.println(att.getName()); // att1
-	   System.out.println(att.getValue()); // value1
+	 if(attributes != null)
+	 {
+		 for(int k = 0; k<attributes.getLength(); ++k)
+		 {
+			String name = attributes.item(k).getNodeName();
+			String value = attributes.item(k).getNodeValue();
+			
+			
+			newNode.m_attributes.put(name,  value);
+			
+			if(name == "name")
+				newNode.m_name = name;
+		 }
 	 }
+	 if(xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
+		 newNode.m_value = xmlNode.getNodeValue();
 	 
+	 newNode.m_xmlname = xmlNode.getNodeName();
+	 
+	 newNode.setText( newNode.getDisplayString() );
+	  
 	 NodeList children = xmlNode.getChildNodes();
 	 
 	 for (int i = 0; i < children.getLength(); ++i) {

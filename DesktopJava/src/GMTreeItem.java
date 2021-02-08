@@ -6,10 +6,10 @@ import org.eclipse.swt.widgets.TreeItem;
 public class GMTreeItem extends TreeItem {
 	
 	
-	public String m_name;
-	public String m_value;
-	public String m_xmlname;
-	public HashMap < String, String > m_attributes;
+	public String m_name = new String();
+	public String m_value = new String();
+	public String m_xmlname = new String(); 
+	public HashMap < String, String > m_attributes = new HashMap<String, String>();
 	
 	public GMTreeItem(Tree parent, int style) {
 		super(parent, style);
