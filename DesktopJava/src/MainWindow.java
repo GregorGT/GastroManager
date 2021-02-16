@@ -324,6 +324,37 @@ public class MainWindow {
 
 	}
 	
+	String writeToString(Tree treein, GMTreeItem treeitem)
+	{
+		String result = "";
+		//TreeItem ti = treeitem.getChildren();
+		//child = treein.getChildren();
+			
+		Control[] kids = treein.getChildren();
+		
+		int ic = treeitem.getItemCount();
+		TreeItem its[] = treeitem.getItems();
+		
+		for(int j = 0; j<its.length;++j)
+		{
+			TreeItem test[] = its[j].getItems();
+			int testing = 0;
+		}
+						
+		
+		for(int i = 0; i<kids.length;++i)
+		{
+			if(kids[i] instanceof Element)
+			{
+				Element kid = (Element)kids[i];
+				int di = 0;
+				
+			}
+		}
+		
+		return result;
+	}
+	
 	
 	protected DataBindingContext initDataBindings() {
 		DataBindingContext bindingContext = new DataBindingContext();
