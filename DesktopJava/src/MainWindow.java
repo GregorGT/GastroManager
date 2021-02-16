@@ -263,14 +263,14 @@ public class MainWindow {
 	            fileSave.setFilterNames(new String[] {".XML"});
 	            fileSave.setFilterExtensions(new String[] {"*.xml"});
 	            fileSave.setFilterPath("c:\\"); // Windows path
-	            fileSave.setFileName("bepise.xml");
+	            fileSave.setFileName("new_sample_template.xml");
 	            fileSave.open();
 
 	            System.out.println("File Saved as: " + fileSave.getFileName());
 	            
-				String bepis = writeTreeIntoString(root, trtmRoot); 
+				String newString = writeTreeIntoString(root, trtmRoot); 
 				fileSave.getFileName();
-				File file = new File(bepis);
+				File file = new File(newString);
 				try {
 					file.createNewFile();
 				} catch (IOException e1) {
@@ -281,6 +281,9 @@ public class MainWindow {
 				//SAVE FEATURE 1st try
 				 
 				*/
+				
+				String newString = writeTreeIntoString(root, trtmRoot);
+				System.out.println(newString);
 			}
 		});
 		mntmSave.setText("Save");
