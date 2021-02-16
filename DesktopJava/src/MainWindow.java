@@ -1,7 +1,10 @@
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.core.databinding.DataBindingContext;
@@ -199,6 +202,8 @@ public class MainWindow {
 					doc = loadXMLFromString(fstr);
 					parseXmlDocument(doc, trtmRoot);
 					
+					writeToString(root, trtmRoot);
+					
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -221,6 +226,37 @@ public class MainWindow {
 		
 		m_bindingContext = initDataBindings();
 
+	}
+	
+	String writeToString(Tree treein, GMTreeItem treeitem)
+	{
+		String result = "";
+		//TreeItem ti = treeitem.getChildren();
+		//child = treein.getChildren();
+			
+		Control[] kids = treein.getChildren();
+		
+		int ic = treeitem.getItemCount();
+		TreeItem its[] = treeitem.getItems();
+		
+		for(int j = 0; j<its.length;++j)
+		{
+			TreeItem test[] = its[j].getItems();
+			int testing = 0;
+		}
+						
+		
+		for(int i = 0; i<kids.length;++i)
+		{
+			if(kids[i] instanceof Element)
+			{
+				Element kid = (Element)kids[i];
+				int di = 0;
+				
+			}
+		}
+		
+		return result;
 	}
 	
 	

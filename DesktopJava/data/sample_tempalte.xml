@@ -3,12 +3,15 @@
 	<!-- menues node-->
 	<menues>
 		<item name="Pizza">
-			<option id="size"  name="small" price="0.5" uuid="124456611" />
+			<option id="size"  name="small" price="0.5" uuid="124456611" >
 				<choice name="extra cheese" price="0.5" />
-			<option id="size" name="medium" price="0.8" />
+			</option>
+			<option id="size" name="medium" price="0.8" >
 				<choice name="extra cheese" price="1" />
-			<option id="size" name="large" price="1.2" />
+			</option>
+			<option id="size" name="large" price="1.2" >
 				<choice name="extra cheese" price="1.5" />
+			</option>
 			<item name="topping" displayname_en="topping">			
 				<option id="toppingammount" name="few" price="0.5" />
 				<option id="toppingammount" name="more" price="0.8" />
