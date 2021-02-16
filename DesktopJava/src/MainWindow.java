@@ -29,7 +29,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -53,6 +55,8 @@ public class MainWindow {
 	private TabItem tbtmView;
 	private TabItem tbtmNewItem;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
+
+	protected Document selected;
 
 	/**
 	 * Launch the application.
@@ -80,7 +84,7 @@ public class MainWindow {
         return builder.parse(is);
     }
 
-	static String readFileToString(String path, Charset encoding)
+	public static String readFileToString(String path, Charset encoding)
 			  throws IOException
 			{
 			  byte[] encoded = Files.readAllBytes(Paths.get(path));
@@ -89,7 +93,11 @@ public class MainWindow {
 		
 	void treeBuild(GMTreeItem rootNode, Node xmlNode) {
 		
+	 if (xmlNode.getNodeName().contains("#"))
+		return;
+	 
 	 GMTreeItem newNode = new GMTreeItem(rootNode, SWT.NONE);
+	 
 	 NamedNodeMap attributes = xmlNode.getAttributes();
 	 
 	 if(attributes != null)
@@ -99,21 +107,34 @@ public class MainWindow {
 			String name = attributes.item(k).getNodeName();
 			String value = attributes.item(k).getNodeValue();
 			
-			
 			newNode.m_attributes.put(name,  value);
-			
-			if(name == "name")
-				newNode.m_name = name;
 		 }
 	 }
-	 if(xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
-		 newNode.m_value = xmlNode.getNodeValue();
 	 
+	 if (xmlNode.getNodeName() == "x") {
+		 String emptyNode = xmlNode.getTextContent();
+	 }
+	 
+	 if (xmlNode.getChildNodes().getLength() == 1) {
+		 if (xmlNode.getFirstChild().hasChildNodes() == false)
+		 {
+			 String nodeName = xmlNode.getFirstChild().getNodeName();
+			 
+			 if (nodeName == "#text") {
+				 newNode.m_value = xmlNode.getFirstChild().getTextContent(); 
+			 }
+		 }
+	 }
+	 
+	 if(xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
+		
+	 newNode.m_value = xmlNode.getNodeValue();
 	 newNode.m_xmlname = xmlNode.getNodeName();
 	 
 	 newNode.setText( newNode.getDisplayString() );
 	  
 	 NodeList children = xmlNode.getChildNodes();
+	 
 	 
 	 for (int i = 0; i < children.getLength(); ++i) {
 		 treeBuild(newNode, children.item(i));
@@ -124,15 +145,31 @@ public class MainWindow {
 	void parseXmlDocument(Document doc, GMTreeItem root) {
 		try {
 			
-			//NodeList items = doc.getElementsByTagName("item");
-			//NodeList itemOptions = doc.getElementsByTagName("option");
 		    treeBuild(root, doc.getFirstChild());
 					    
 		    } catch (Exception e) {
 		    e.printStackTrace();
 		    }
 	}
-	
+			
+	String writeTreeIntoString(Tree treeIn, GMTreeItem treeItem) {
+		
+		//GMTreeItem neItem = new GMTreeItem(root, SWT.NONE)
+		TreeItem node[] = treeItem.getItems();
+		String result = "<" + treeItem.m_xmlname + treeItem.m_attributes + "/>";
+		
+		for (int i = 0; i < node.length; ++i) {
+		
+			if (node[i] instanceof GMTreeItem) {
+				GMTreeItem newItem = (GMTreeItem) node[i];
+				result += writeTreeIntoString(treeIn, newItem);
+			}
+			
+		}
+		
+		return result;
+	}
+
 	/**
 	 * Open the window.
 	 */
@@ -202,7 +239,6 @@ public class MainWindow {
 					doc = loadXMLFromString(fstr);
 					parseXmlDocument(doc, trtmRoot);
 					
-					writeToString(root, trtmRoot);
 					
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
@@ -217,6 +253,40 @@ public class MainWindow {
 			
 		});
 		mntmOpenFile.setText("Open File");
+		
+		MenuItem mntmSave = new MenuItem(menu_1, SWT.NONE);
+		mntmSave.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(SelectionEvent e) {
+				
+				/* FileDialog fileSave = new FileDialog(shell, SWT.SAVE);
+	            fileSave.setFilterNames(new String[] {".XML"});
+	            fileSave.setFilterExtensions(new String[] {"*.xml"});
+	            fileSave.setFilterPath("c:\\"); // Windows path
+	            fileSave.setFileName("new_sample_template.xml");
+	            fileSave.open();
+
+	            System.out.println("File Saved as: " + fileSave.getFileName());
+	            
+				String newString = writeTreeIntoString(root, trtmRoot); 
+				fileSave.getFileName();
+				File file = new File(newString);
+				try {
+					file.createNewFile();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				
+				//SAVE FEATURE 1st try
+				 
+				*/
+				
+				String newString = writeTreeIntoString(root, trtmRoot);
+				System.out.println(newString);
+			}
+		});
+		mntmSave.setText("Save");
 		
 		MenuItem mntmAbout = new MenuItem(menu, SWT.CASCADE);
 		mntmAbout.setText("About");

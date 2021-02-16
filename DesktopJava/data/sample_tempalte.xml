@@ -27,7 +27,7 @@
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
-				<ingridients name="suggar,water"/>
+				<ingridients name="sugar,water"/>
 				<item name="Coca Cola" displayname_en="Coce">
 					<option id="size" name="small" displayname_de="klein" overwrite_price="2.0" />
 					<option id="size" name="medium" displayname_de="mittel" />
