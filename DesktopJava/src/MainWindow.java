@@ -24,14 +24,18 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.FileDialog;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.nio.charset.Charset;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -156,8 +160,25 @@ public class MainWindow {
 		
 		//GMTreeItem neItem = new GMTreeItem(root, SWT.NONE)
 		TreeItem node[] = treeItem.getItems();
-		String result = "<" + treeItem.m_xmlname + treeItem.m_attributes + "/>";
+		String result = "<" + treeItem.m_xmlname + " "; //treeItem.m_attributes + ">";
 		
+		
+		Iterator it = treeItem.m_attributes.entrySet().iterator();
+	    while (it.hasNext()) {
+	        Map.Entry pair = (Map.Entry)it.next();
+	        result += pair.getKey() + "=" + "\"" + pair.getValue() + "\" ";
+	        // it.remove(); // avoids a ConcurrentModificationException
+	    }
+		
+	    if (node.length > 0 || treeItem.m_value.length() > 0) {
+	    	result += ">"; 
+	    	} else {
+	    	result += "/>";
+	    	}
+	    if (node.length == 0 && treeItem.m_value.length() > 0) {
+	    	result += treeItem.m_value;
+	    }
+	    
 		for (int i = 0; i < node.length; ++i) {
 		
 			if (node[i] instanceof GMTreeItem) {
@@ -165,6 +186,10 @@ public class MainWindow {
 				result += writeTreeIntoString(treeIn, newItem);
 			}
 			
+		}
+		
+		if (node.length > 0 || treeItem.m_value.length() > 0) {
+			result += "</" + treeItem.m_xmlname + ">";
 		}
 		
 		return result;
@@ -260,29 +285,30 @@ public class MainWindow {
 			public void widgetSelected(SelectionEvent e) {
 				
 				/* FileDialog fileSave = new FileDialog(shell, SWT.SAVE);
-	            fileSave.setFilterNames(new String[] {".XML"});
+	            fileSave.setFilterNames(new String[] {"*.xml"});
 	            fileSave.setFilterExtensions(new String[] {"*.xml"});
-	            fileSave.setFilterPath("c:\\"); // Windows path
+	            fileSave.setFilterPath("c:\\");
 	            fileSave.setFileName("new_sample_template.xml");
-	            fileSave.open();
+	            */
+				
+	            String newString = writeTreeIntoString(root, trtmRoot);
 
-	            System.out.println("File Saved as: " + fileSave.getFileName());
-	            
-				String newString = writeTreeIntoString(root, trtmRoot); 
-				fileSave.getFileName();
-				File file = new File(newString);
+				File saveFile = new File("c:\\saved_sample_template.xml");
+				
+				
 				try {
-					file.createNewFile();
+						FileWriter fileWriter = new FileWriter(saveFile);
+						fileWriter.write(newString);
+						fileWriter.flush();
+						fileWriter.close();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+		        // System.out.println("File Saved as: " + fileSave.getFileName());
 				
 				//SAVE FEATURE 1st try
-				 
-				*/
 				
-				String newString = writeTreeIntoString(root, trtmRoot);
 				System.out.println(newString);
 			}
 		});
