@@ -34,8 +34,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="325.29673"
-     inkscape:cy="168.76206"
+     inkscape:cx="198.86816"
+     inkscape:cy="197.33349"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -56,7 +56,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -185,44 +185,44 @@
        id="rect865"
        width="20.410715"
        height="8.6934528"
-       x="71.626488"
-       y="36.763393"
+       x="71.248512"
+       y="44.511906"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="74.225937"
-       y="42.371025"
+       x="73.847961"
+       y="50.119537"
        id="text869"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999"><tspan
          sodipodi:role="line"
          id="tspan867"
-         x="74.225937"
-         y="42.371025"
+         x="73.847961"
+         y="50.119537"
          style="stroke-width:0.26458332">Button 1</tspan></text>
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:1.76499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect865-2"
        width="20.410715"
        height="8.6934528"
-       x="98.462799"
-       y="36.76339"
+       x="98.084824"
+       y="44.511902"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="104.21107"
-       y="42.052349"
+       x="103.83309"
+       y="49.800861"
        id="text888"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999"><tspan
          sodipodi:role="line"
          id="tspan886"
-         x="104.21107"
-         y="42.052349"
+         x="103.83309"
+         y="49.800861"
          style="stroke-width:0.26458332">Soup</tspan></text>
     <text
        xml:space="preserve"
@@ -242,30 +242,30 @@
        id="rect865-2-6"
        width="20.410715"
        height="8.6934528"
-       x="71.815475"
-       y="50.9375"
+       x="71.4375"
+       y="58.686012"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="77.563744"
-       y="56.22646"
+       x="77.185768"
+       y="63.974972"
        id="text888-3"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999"><tspan
          sodipodi:role="line"
          id="tspan886-7"
-         x="77.563744"
-         y="56.22646"
+         x="77.185768"
+         y="63.974972"
          style="stroke-width:0.26458332">Soup</tspan></text>
     <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.06902266;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.49837542;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect827-2"
-       width="28.089092"
-       height="6.3777151"
-       x="126.84608"
-       y="19.022453"
+       width="43.912716"
+       height="5.9483624"
+       x="127.06075"
+       y="19.237129"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
@@ -280,6 +280,87 @@
          id="tspan956"
          x="131.34673"
          y="23.534225"
+         style="stroke-width:0.26458332">Create drill down GUI</tspan></text>
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.76499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect827-4"
+       width="19.510675"
+       height="6.6817379"
+       x="69.812302"
+       y="28.570032"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.76499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect829-2"
+       width="23.786989"
+       height="6.9490089"
+       x="96.8825"
+       y="28.302761"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="92.142662"
+       y="36.13427"
+       id="text833-1"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999"><tspan
+         sodipodi:role="line"
+         id="tspan831-5"
+         x="92.142662"
+         y="36.13427"
+         style="stroke-width:0.26458332">x</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="73.433754"
+       y="33.472294"
+       id="text837-1"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999"><tspan
+         sodipodi:role="line"
+         id="tspan835-6"
+         x="73.433754"
+         y="33.472294"
+         style="stroke-width:0.26458332">Width</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="103.45776"
+       y="33.181061"
+       id="text837-3-2"
+       inkscape:transform-center-x="-0.1889881"
+       inkscape:transform-center-y="-1.7953869"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999"><tspan
+         sodipodi:role="line"
+         x="103.45776"
+         y="33.181061"
+         style="stroke-width:0.26458332"
+         id="tspan857-2">Height</tspan></text>
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.06902266;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect827-2-9"
+       width="28.089092"
+       height="6.3777151"
+       x="127.42492"
+       y="28.582544"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="131.92557"
+       y="33.094318"
+       id="text958-7"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999"><tspan
+         sodipodi:role="line"
+         id="tspan956-8"
+         x="131.92557"
+         y="33.094318"
          style="stroke-width:0.26458332">Add Button</tspan></text>
   </g>
 </svg>
