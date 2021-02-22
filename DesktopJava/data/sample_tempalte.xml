@@ -49,6 +49,10 @@
 			</table>
 		</level>
 	</layout>
+	
+	<drilldownmenues>	
+	</drilldownmenues>
+	
 	<reservations>
 		<date value="24.2.2021">
 			<table id="1">

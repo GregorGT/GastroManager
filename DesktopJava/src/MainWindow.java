@@ -2,6 +2,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -34,8 +35,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.swing.tree.DefaultTreeModel;
 import javax.xml.parsers.DocumentBuilder;
@@ -51,19 +54,26 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.jface.layout.TreeColumnLayout;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.List;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.layout.RowData;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.wb.swt.SWTResourceManager;
+import org.eclipse.swt.widgets.Group;
+import org.eclipse.ui.forms.widgets.Form;
 
 public class MainWindow {
 	private DataBindingContext m_bindingContext;
@@ -76,12 +86,30 @@ public class MainWindow {
 
 	protected Document selected;
 	private Composite parentComposite;
-	private SashForm drillDownSashForm;
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
 	private Text txtHeight;
 	private Text txtWidth;
-	private Composite composite_1;
 	private Button btnButton;
+	public int nHeight, nWidth, buttonCount, nDrillDownHeight, nDrillDownWidth;
+	private Text txtHeight_1;
+	private Text txtWidth_1;
+	private Text txtText;
+	private Text text_1;
+	public String buttonName, drillDownMenuName;
+	private Composite composite;
+	private Composite composite_2;
+	private Text text;
+	private Text text_2;
+	private Text text_3;
+	private Text text_4;
+	private Text text_5;
+	private Text text_6;
+	private Button btnAddDrillDown;
+	private Composite composite_1;
+	private MenuItem mntmExpandAll;
+	private Tree root;
+	private Group grpNewDrillDownGroup;
+	private Composite grpNewDrillDownGroupComp;
 
 	/**
 	 * Launch the application.
@@ -133,6 +161,7 @@ public class MainWindow {
 			String value = attributes.item(k).getNodeValue();
 			
 			newNode.m_attributes.put(name,  value);
+			newNode.m_attributes.putIfAbsent("uuid", assignUUID()); //if it's already assigned, do not assign
 		 }
 	 }
 	 
@@ -155,7 +184,7 @@ public class MainWindow {
 		
 	 newNode.m_value = xmlNode.getNodeValue();
 	 newNode.m_xmlname = xmlNode.getNodeName();
-	 
+	
 	 newNode.setText( newNode.getDisplayString() );
 	  
 	 NodeList children = xmlNode.getChildNodes();
@@ -163,15 +192,14 @@ public class MainWindow {
 	 
 	 for (int i = 0; i < children.getLength(); ++i) {
 		 treeBuild(newNode, children.item(i));
+		 newNode.setExpanded(true);
 	 }
 	}
 	
 	
 	void parseXmlDocument(Document doc, GMTreeItem root) {
 		try {
-			
 		    treeBuild(root, doc.getFirstChild());
-					    
 		    } catch (Exception e) {
 		    e.printStackTrace();
 		    }
@@ -179,18 +207,15 @@ public class MainWindow {
 			
 	String writeTreeIntoString(Tree treeIn, GMTreeItem treeItem) {
 		
-		//GMTreeItem neItem = new GMTreeItem(root, SWT.NONE)
 		TreeItem node[] = treeItem.getItems();
-		String result = "<" + treeItem.m_xmlname + " "; //treeItem.m_attributes + ">";
-		
+		String result = "<" + treeItem.m_xmlname + " ";		
 		
 		Iterator it = treeItem.m_attributes.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry pair = (Map.Entry)it.next();
-	        result += pair.getKey() + "=" + "\"" + pair.getValue() + "\" ";
-	        // it.remove(); // avoids a ConcurrentModificationException
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry)it.next();
+	        result += " " + pair.getKey() + "=" + "\"" + pair.getValue() + "\"";
 	    }
-		
+				    
 	    if (node.length > 0 || treeItem.m_value.length() > 0) {
 	    	result += ">"; 
 	    	} else {
@@ -201,7 +226,7 @@ public class MainWindow {
 	    }
 	    
 		for (int i = 0; i < node.length; ++i) {
-		
+			
 			if (node[i] instanceof GMTreeItem) {
 				GMTreeItem newItem = (GMTreeItem) node[i];
 				result += writeTreeIntoString(treeIn, newItem);
@@ -237,7 +262,7 @@ public class MainWindow {
 	 */
 	protected void createContents() {
 		shell = new Shell();
-		shell.setSize(475, 350);
+		shell.setSize(800, 750);
 		shell.setText("GastroManager");
 		shell.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
@@ -251,14 +276,95 @@ public class MainWindow {
 		mntmLoadFile.setMenu(menu_1);
 		
 		parentComposite = new Composite(shell, SWT.NONE);
-		parentComposite.setLayout(new StackLayout());
+		parentComposite.setLayout(new FillLayout(SWT.HORIZONTAL));
 		
 		mainSashForm = new SashForm(parentComposite, SWT.NONE);
 		
-		Tree root = new Tree(mainSashForm, SWT.BORDER);
+		root = new Tree(mainSashForm, SWT.BORDER);
 		
 		GMTreeItem trtmRoot = new GMTreeItem(root, SWT.NONE);
 		trtmRoot.setText("root");
+		
+		Menu menu_3 = new Menu(root);
+		root.setMenu(menu_3);
+		menu_3.addMenuListener(new MenuAdapter() {
+			public void menuShown(MenuEvent e) {
+				MenuItem[] items = menu_3.getItems();
+				for (int i = 0; i < items.length; ++i) {
+					items[i].dispose();
+				}
+				
+				MenuItem newItem = new MenuItem(menu_3, SWT.NONE);
+				newItem.setText("Menu for " + root.getSelection()[0].getText());
+				MenuItem mntmEditValue = new MenuItem(menu_3, SWT.NONE);
+				mntmEditValue.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						//editSelectedNodeValue();
+						
+						
+					}
+				});
+				mntmEditValue.setText("Edit Value");
+				
+				MenuItem mntmEditName = new MenuItem(menu_3, SWT.NONE);
+				mntmEditName.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						//editSelectedNodeName();
+					}
+				});
+				mntmEditName.setText("Edit Name");
+				
+				mntmExpandAll = new MenuItem(menu_3, SWT.NONE);
+				mntmExpandAll.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						
+						expandAll(root);
+						
+					}
+				});
+				mntmExpandAll.setText("Expand All");
+				
+				//MenuItem mntmDeleteNode = new MenuItem(menu_3, SWT.NONE);
+				MenuItem mntmDeleteNode = new MenuItem(menu_3, SWT.NONE);
+				mntmDeleteNode.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						
+						//deleteSelectedNode();
+						trtmRoot.dispose();
+						
+					}
+				});
+				mntmDeleteNode.setText("Delete Node");
+				
+				
+				MenuItem mntmAddNewNode = new MenuItem(menu_3, SWT.NONE);
+				mntmAddNewNode.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						
+						//AddNewNode();
+						
+					}
+				});
+				mntmAddNewNode.setText("Add new Node");
+				
+				MenuItem mntmSetPrice = new MenuItem(menu_3, SWT.NONE);
+				mntmSetPrice.addSelectionListener(new SelectionAdapter() {
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						
+						//setPrice();
+						
+					}
+				});
+				mntmSetPrice.setText("Set Price");
+			}
+		});
+		
 		
 		tabFolder = new TabFolder(mainSashForm, SWT.NONE);
 		
@@ -267,105 +373,182 @@ public class MainWindow {
 		
 		tbtmNewItem = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem.setText("Layout");
-		mainSashForm.setWeights(new int[] {1, 2});
 		
-		drillDownSashForm = new SashForm(parentComposite, SWT.NONE);
+		TabItem tbtmDrillDownMenu = new TabItem(tabFolder, SWT.NONE);
+		tbtmDrillDownMenu.setText("Drill Down Menu");
 		
-		TreeViewer treeViewer = new TreeViewer(drillDownSashForm, SWT.BORDER);
-		Tree tree = treeViewer.getTree();
+		composite = new Composite(tabFolder, SWT.NONE);
+		tbtmDrillDownMenu.setControl(composite);
+		formToolkit.adapt(composite);
+		formToolkit.paintBordersFor(composite);
+		composite.setLayout(null);
 		
-		Composite composite = new Composite(drillDownSashForm, SWT.NONE);
-		composite.setLayout(new GridLayout(1, false));
-		
-		Composite composite_2 = new Composite(composite, SWT.NONE);
+		composite_2 = new Composite(composite, SWT.NONE);
+		composite_2.setBounds(0, 41, 300, 42);
 		formToolkit.adapt(composite_2);
 		formToolkit.paintBordersFor(composite_2);
-		RowLayout rl_composite_2 = new RowLayout(SWT.HORIZONTAL);
-		composite_2.setLayout(rl_composite_2);
 		
-		SashForm sashForm = new SashForm(composite_2, SWT.NONE);
-		sashForm.setLayoutData(new RowData(295, SWT.DEFAULT));
+		text = new Text(composite_2, SWT.READ_ONLY | SWT.CENTER);
+		text.setText("Height");
+		text.setBounds(0, 0, 50, 18);
+		formToolkit.adapt(text, true, true);
 		
-		txtHeight = new Text(sashForm, SWT.BORDER);
+		text_2 = new Text(composite_2, SWT.READ_ONLY | SWT.CENTER);
+		text_2.setText("Width");
+		text_2.setBounds(100, 0, 50, 18);
+		formToolkit.adapt(text_2, true, true);
+		
+		text_3 = new Text(composite_2, SWT.READ_ONLY | SWT.CENTER);
+		text_3.setText("Text");
+		text_3.setBounds(0, 20, 50, 20);
+		formToolkit.adapt(text_3, true, true);
+		
+		txtHeight = new Text(composite_2, SWT.BORDER);
+		txtHeight.setBounds(50, 0, 50, 18);
 		txtHeight.addModifyListener(new ModifyListener() {
 			public void modifyText(ModifyEvent arg0) {
 				
-				if (txtHeight.getText() != "Height") {
-				
+				if (txtHeight.getText() != null) {
 				String btnHeight = txtHeight.getText();
-				int nHeight = Integer.parseInt(btnHeight);
-				System.out.println(nHeight);
+				nHeight = Integer.parseInt(btnHeight);
 				}
 				
 			}
 		});
 		formToolkit.adapt(txtHeight, true, true);
 		
-		txtWidth = new Text(sashForm, SWT.BORDER);
+		txtWidth = new Text(composite_2, SWT.BORDER);
+		txtWidth.setBounds(150, 0, 50, 18);
 		txtWidth.addModifyListener(new ModifyListener() {
 			
 			public void modifyText(ModifyEvent arg0) {
-				if (txtHeight.getText() != "Width") {
-					
+				if (txtHeight.getText() != null) {
 					String btnWidth = txtWidth.getText();
-					int nWidth = Integer.parseInt(btnWidth);
-					sideConv(nWidth);
-					System.out.println(nWidth);
+					nWidth = Integer.parseInt(btnWidth);
 					}
 			}
 		});
 		formToolkit.adapt(txtWidth, true, true);
 		
-		Button btnAddButton = new Button(sashForm, SWT.CENTER);
+		text_1 = new Text(composite_2, SWT.BORDER);
+		text_1.setBounds(50, 20, 150, 20);
+		text_1.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+					buttonName = text_1.getText();
+			}
+		});
+		formToolkit.adapt(text_1, true, true);
+		
+		Button btnAddButton = new Button(composite_2, SWT.CENTER);
+		btnAddButton.setBounds(200, 0, 100, 42);
 		btnAddButton.addSelectionListener(new SelectionAdapter() {
 			
 			public void widgetSelected(SelectionEvent e) {
-				
-				addNewButton(50, 50, 0);
-				composite_1.layout(true);
-				
-				
+				addNewButton(nHeight, nWidth, buttonCount, buttonName);
+				putNewItemIntoTree(trtmRoot, buttonName);
+				buttonCount++;
+				composite.layout(true);
 			}
 		});
 		
 		formToolkit.adapt(btnAddButton, true, true);
 		btnAddButton.setText("Add Button");
-		sashForm.setWeights(new int[] {1, 1, 1});
 		
 		composite_1 = new Composite(composite, SWT.NONE);
-		GridData gd_composite_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1);
-		gd_composite_1.heightHint = 255;
-		gd_composite_1.widthHint = 300;
-		composite_1.setLayoutData(gd_composite_1);
-		composite_1.setLayout(null);
+		composite_1.setBounds(0, 0, 300, 42);
 		formToolkit.adapt(composite_1);
 		formToolkit.paintBordersFor(composite_1);
-		drillDownSashForm.setWeights(new int[] {1, 2});
 		
+		txtHeight_1 = new Text(composite_1, SWT.READ_ONLY | SWT.CENTER);
+		txtHeight_1.setBounds(0, 0, 50, 18);
+		txtHeight_1.setText("Height");
+		formToolkit.adapt(txtHeight_1, true, true);
 		
-		MenuItem mntmDrillDownMenu = new MenuItem(menu, SWT.CASCADE);
-		mntmDrillDownMenu.setText("Drill Down Menu");
+		txtWidth_1 = new Text(composite_1, SWT.READ_ONLY | SWT.CENTER);
+		txtWidth_1.setBounds(100, 0, 50, 18);
+		txtWidth_1.setText("Width");
+		formToolkit.adapt(txtWidth_1, true, true);
 		
-		Menu menu_3 = new Menu(mntmDrillDownMenu);
-		mntmDrillDownMenu.setMenu(menu_3);
+		txtText = new Text(composite_1, SWT.READ_ONLY | SWT.CENTER);
+		txtText.setBounds(0, 20, 50, 20);
+		txtText.setText("Text");
+		formToolkit.adapt(txtText, true, true);
 		
-		MenuItem mntmEdit = new MenuItem(menu_3, SWT.NONE);
-		mntmEdit.addSelectionListener(new SelectionAdapter() {
+		btnAddDrillDown = new Button(composite_1, SWT.CENTER);
+		btnAddDrillDown.setFont(SWTResourceManager.getFont("Tahoma", 7, SWT.NORMAL));
+		btnAddDrillDown.setBounds(202, 0, 98, 42);
+		btnAddDrillDown.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				showDrillDownMenu();
+				
+				//Add Drill Down menu to tree and represent as button on composite
+				addNewDrillDown(nDrillDownHeight, nDrillDownWidth, drillDownMenuName);
+				trtmRoot.m_attributes.put("height", nDrillDownHeight);
+				
+				putNewItemIntoTree(trtmRoot, drillDownMenuName);
+				trtmRoot.m_attributes.putIfAbsent("name", drillDownMenuName);
+				System.out.println(trtmRoot.m_attributes.get("name"));
+				composite_2.redraw();
 			}
 		});
-		mntmEdit.setText("Edit");
+		btnAddDrillDown.setText("Add Drill Down Menu");
+		formToolkit.adapt(btnAddDrillDown, true, true);
 		
-		MenuItem mntmClose = new MenuItem(menu_3, SWT.NONE);
-		mntmClose.addSelectionListener(new SelectionAdapter() {
+		text_5 = new Text(composite_1, SWT.BORDER);
+		text_5.setBounds(150, 0, 50, 18);
+		text_5.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				
+				//Drill Down menu Width
+				String drillDownMenuWidth = text_5.getText();
+				nDrillDownWidth = Integer.parseInt(drillDownMenuWidth);
+			}
+		});
+		formToolkit.adapt(text_5, true, true);
+		
+		text_4 = new Text(composite_1, SWT.BORDER);
+		text_4.setBounds(50, 0, 50, 18);
+		text_4.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				
+				//Drill Down menu Height
+				String drillDownMenuHeight = text_4.getText();
+				nDrillDownHeight = Integer.parseInt(drillDownMenuHeight);
+				
+			}
+		});
+		formToolkit.adapt(text_4, true, true);
+		
+		text_6 = new Text(composite_1, SWT.BORDER);
+		text_6.setBounds(50, 18, 150, 20);
+		text_6.addModifyListener(new ModifyListener() {
+			public void modifyText(ModifyEvent arg0) {
+				
+				//Drill Down Menu Name
+				drillDownMenuName = text_6.getText();
+			}
+		});
+		formToolkit.adapt(text_6, true, true);
+		
+		Menu menu_4 = new Menu(composite);
+		composite.setMenu(menu_4);
+		
+		Button btnClearAll = new Button(composite, SWT.NONE);
+		btnClearAll.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				closeDrillDownMenu();
+				
+				//delete all buttons/groups
+				deleteAllGroupsandButtons();
+				
 			}
 		});
-		mntmClose.setText("Close");
+		btnClearAll.setBounds(312, 0, 64, 83);
+		formToolkit.adapt(btnClearAll, true, true);
+		btnClearAll.setText("Clear All");
+		
+		
+		mainSashForm.setWeights(new int[] {1, 2});
 		
 		MenuItem mntmOpenFile = new MenuItem(menu_1, SWT.NONE);
 		mntmOpenFile.addSelectionListener(new SelectionAdapter() {			
@@ -384,7 +567,6 @@ public class MainWindow {
 					doc = loadXMLFromString(fstr);
 					parseXmlDocument(doc, trtmRoot);
 					
-					
 					} catch (IOException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
@@ -394,7 +576,7 @@ public class MainWindow {
 						e1.printStackTrace();
 					}
 			        
-			        }
+			 }
 			
 		});
 		mntmOpenFile.setText("Open File");
@@ -407,7 +589,6 @@ public class MainWindow {
 	            String newString = writeTreeIntoString(root, trtmRoot);
 
 				File saveFile = new File("c:\\saved_sample_template.xml");
-				
 				
 				try {
 						FileWriter fileWriter = new FileWriter(saveFile);
@@ -434,45 +615,108 @@ public class MainWindow {
 
 	}
 
-	public void hConv(int h) {
-		int nHeight = 0;
-		h = nHeight;
+	
+	void expandAll(Tree root) {
 		
-	}
-	public void wConv(int w) {
-		int nWidth = 0;
-		w = nWidth;
+		boolean expanded = true;
+		TreeItem [] items = root.getItems();
+		
+		for (TreeItem item : items) {
+			item.setExpanded(expanded);
+		}
+		root.setRedraw(true);
 	}
 	
-	public void addNewButton(int height, int width, int buttonCount) {
+	public void addNewButton(int height, int width, int buttonCount, String name) {
 		
-		String text = "suppe";
-		Button newButton = new Button(this.composite_1, SWT.PUSH);
+		Button newButton = new Button(this.grpNewDrillDownGroup, SWT.PUSH);
 		formToolkit.adapt(newButton, true, true);
-		int lastButtonEdges[] = {10 + height, 10 + width};
-		newButton.setText(text);
-		newButton.setBounds(10, 10, width, height);
-		buttonCount = 0;
-		if (buttonCount != 0) {
-			newButton.setBounds(lastButtonEdges[0], lastButtonEdges[1], height, width);
-		} else if (buttonCount > 0) {
-			buttonCount += 1;
+		newButton.setText(name);
+		putNewItemIntoTree(null, name);
+		if (buttonCount == 0) {
+			newButton.setBounds(4, 14, width, height);
+		} else {
+			int lastButtonHeight = height + 10;
+			newButton.setBounds(4, lastButtonHeight, width, height);
+		}
+	}
+	
+	
+	public void addNewDrillDown(int height, int width, String name) {
+		
+		grpNewDrillDownGroup = new Group(this.composite, SWT.NONE);
+		grpNewDrillDownGroup.setText(name);
+		grpNewDrillDownGroup.setBounds(0, 110, width, height);
+		//formToolkit.adapt(name);
+		formToolkit.paintBordersFor(grpNewDrillDownGroup);
+	
+		/*
+		Button newButton = new Button(this.composite, SWT.PUSH);
+		newButton.setAlignment(SWT.LEFT);
+		formToolkit.adapt(newButton, true, true);
+		newButton.setText(name);
+		if (buttonCount == 0) {
+			newButton.setBounds(0, 100, width, height);
+		} else {
+			int lastButtonHeight = height + 10;
+			newButton.setBounds(0, lastButtonHeight, width, height);
+		}
+		*/
+		
+	}
+
+	void putNewItemIntoTree(GMTreeItem treeItem, String newName) {
+		
+		TreeItem node[] = treeItem.getItems();
+		for (int i = 0; i < node.length; ++i) {
+			
+			if (node[i] instanceof GMTreeItem) {
+				GMTreeItem newItem = (GMTreeItem) node[i];
+				if (newItem.m_xmlname == "drilldownmenues")
+				{
+					GMTreeItem newDrillDownMenu = new GMTreeItem(node[i], SWT.NONE);
+					newDrillDownMenu.setText(newName);
+					//GMTreeItem newDDItem = new GMTreeItem(newDrillDownMenu, SWT.NONE);
+					//newDDItem.setText(newName);
+				}
+				//System.out.println(newItem.m_xmlname + i);
+				putNewItemIntoTree(newItem, newName);
+			}
+		}
+	}
+	
+	/*
+	void putNewButtonItemIntoTree(TreeItem treeItem, String drillDownName, String buttonName) {
+		
+		TreeItem node[] = treeItem.getItems();
+		for (int i = 0 ; i < node.length; ++i) {
+			
+			if (node[i] instanceof GMTreeItem) {
+				GMTreeItem nItem = (GMTreeItem) node[i];
+				if (nItem.m_xmlname == drillDownName) {
+				GMTreeItem newItem_1 = new GMTreeItem(treeItem, SWT.NONE);
+				newItem_1.setText(buttonName);
+				}
+				putNewButtonItemIntoTree(treeItem, drillDownName, buttonName);
+			}
+			
 		}
 		
 	}
+	*/
 	
-	private void showDrillDownMenu() {
-		StackLayout layout = (StackLayout) this.parentComposite.getLayout();
-		layout.topControl = this.drillDownSashForm;
-		this.parentComposite.layout();
+	String assignUUID() {
+		
+		final String uuid = UUID.randomUUID().toString().replace("-", "");
+		return uuid;
+		
 	}
 	
-	private void closeDrillDownMenu() {
-		StackLayout layout = (StackLayout) this.parentComposite.getLayout();
-		layout.topControl = this.mainSashForm;
-		this.parentComposite.layout();
+	void deleteAllGroupsandButtons() {
+		
+		
+		
 	}
-	
 	
 	String writeToString(Tree treein, GMTreeItem treeitem)
 	{

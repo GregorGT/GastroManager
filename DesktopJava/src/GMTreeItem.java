@@ -1,5 +1,7 @@
 import java.util.HashMap;
 
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
@@ -34,7 +36,6 @@ public class GMTreeItem extends TreeItem {
 	@Override
 	protected void checkSubclass() {
 	    //  allow subclass
-	    //	System.out.println("info   : checking menu subclass");
 	}
 	
 	String getDisplayString() {
@@ -43,15 +44,35 @@ public class GMTreeItem extends TreeItem {
 		
 		if ( m_name.length() > 0 )  
 			result = m_name;
-		else 
-			if ( m_xmlname.length() > 0) 
-				result = m_xmlname;
-		if ( m_value.length() > 0 ) {
+		else if (m_attributes.containsKey("name") == true)
+			result = m_attributes.getOrDefault("name", result);
+		
+		else if ( m_xmlname.length() > 0) 
+			result = m_xmlname;
+		
+		else if ( m_value.length() > 0 ) {
 			result += "=";
 			result += m_value;
 		}
 		
+		//System.out.println(m_attributes.containsKey("name"));
+		
 		return result;
+		
+	}
+
+	public void addListener(int menudetect, Listener listener) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public int getSelectionCount() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	public void setMenu(Menu menu_3) {
+		// TODO Auto-generated method stub
 		
 	}
 
