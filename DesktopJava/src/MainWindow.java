@@ -309,7 +309,7 @@ public class MainWindow {
 					
 					String btnWidth = txtWidth.getText();
 					int nWidth = Integer.parseInt(btnWidth);
-					sideConv(nWidth);
+				//	sideConv(nWidth);
 					System.out.println(nWidth);
 					}
 			}

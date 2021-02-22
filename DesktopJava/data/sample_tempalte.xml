@@ -2,7 +2,7 @@
 
 	<!-- menues node-->
 	<menues>
-		<item name="Pizza">
+		<item name="Pizza" uuid="1976266538">
 			<option id="size"  name="small" price="0.5" uuid="124456611" >
 				<choice name="extra cheese" price="0.5" />
 			</option>
@@ -12,7 +12,7 @@
 			<option id="size" name="large" price="1.2" >
 				<choice name="extra cheese" price="1.5" />
 			</option>
-			<item name="topping" displayname_en="topping">			
+			<item name="topping" name_en="topping">			
 				<option id="toppingammount" name="few" price="0.5" />
 				<option id="toppingammount" name="more" price="0.8" />
 				<option id="toppingammount" name="lots" price="1.2" />
@@ -23,24 +23,24 @@
 				</item>
 			</item>
 		</item>
-		<item name="Drink" displayname_en="drink">
+		<item name="Drink" name_en="drink">
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
 				<ingridients name="sugar,water"/>
-				<item name="Coca Cola" displayname_en="Coce">
-					<option id="size" name="small" displayname_de="klein" overwrite_price="2.0" />
-					<option id="size" name="medium" displayname_de="mittel" />
-					<option id="size" name="large" displayname_de="gross" overwrite_price="2.5" />
+				<item name="Coca Cola" name_en="Coce">
+					<option id="size" name="small" name_de="klein" overwrite_price="2.0" />
+					<option id="size" name="medium" name_de="mittel" />
+					<option id="size" name="large" name_de="gross" overwrite_price="2.5" />
 				</item>
 				<item name="Fanta" displayname_en="Fanta" price="0.5"/>
 				
 		</item>
 	</menues>
 	<layout>
-		<level value="1" name="firstfloor" displayname_de="erster stock" >
+		<level value="1" name="firstfloor" name_de="erster stock" >
 			<image value=""/>
-			<table value="1" displayname_de="Tisch" name="table" >
+			<table value="1" name_de="Tisch" name="table" >
 				<x>0</x>
 				<y>0</y>
 				<rot>0</rot>
@@ -56,6 +56,16 @@
 			</table>	
 		</date>
 	</reservations>
+	<drilldownmenus>
+		<drilldownmenu name="Android Tablet">
+			<height>800</height>
+			<width>400</width>
+			<button name="potato" target="124456611">
+				<height>50</height>
+				<width>80</width>
+			</button>
+		</drilldownmenu>
+	</drilldownmenus>
 	
 	<settings>
 		<language>en</language>
