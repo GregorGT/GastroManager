@@ -37,10 +37,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.979899"
-     inkscape:cx="335.26802"
+     inkscape:cx="401.99612"
      inkscape:cy="226.13849"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g916-9"
      showgrid="false"
      inkscape:window-width="1920"
      inkscape:window-height="1001"
@@ -325,20 +325,20 @@
        id="rect829-2-0-3"
        width="35.675545"
        height="6.4435868"
-       x="124.93595"
-       y="31.437664"
+       x="167.43181"
+       y="19.677805"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="129.81116"
-       y="35.594902"
+       x="172.30701"
+       y="23.835043"
        id="text1025"><tspan
          sodipodi:role="line"
          id="tspan1023"
-         x="129.81116"
-         y="35.594902"
+         x="172.30701"
+         y="23.835043"
          style="stroke-width:0.26458332">Drilldownmenu</tspan></text>
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
@@ -346,39 +346,147 @@
        width="35.675545"
        height="6.4435868"
        x="124.66868"
-       y="42.662987"
+       y="31.304031"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
        x="129.40588"
-       y="47.33358"
+       y="35.974625"
        id="text1025-7"><tspan
          sodipodi:role="line"
          id="tspan1023-4"
          x="129.40588"
-         y="47.33358"
+         y="35.974625"
          style="stroke-width:0.26458332">Order ID</tspan></text>
+    <g
+       id="g916"
+       transform="translate(0,8.5526248)">
+      <rect
+         inkscape:export-ydpi="610.10999"
+         inkscape:export-xdpi="610.10999"
+         y="55.224655"
+         x="124.26777"
+         height="6.4435868"
+         width="35.675545"
+         id="rect829-2-0-3-8-3"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text1025-7-5"
+         y="59.360706"
+         x="128.73772"
+         style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="stroke-width:0.26458332"
+           y="59.360706"
+           x="128.73772"
+           id="tspan1023-4-2"
+           sodipodi:role="line">New order id</tspan></text>
+    </g>
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect829-2-0-3-8-3"
+       id="rect829-2-0-3-8-7"
        width="35.675545"
        height="6.4435868"
-       x="125.06958"
-       y="54.289211"
+       x="167.63225"
+       y="31.370844"
        inkscape:export-xdpi="610.10999"
        inkscape:export-ydpi="610.10999" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="129.94043"
-       y="58.826168"
-       id="text1025-7-5"><tspan
+       x="172.36946"
+       y="36.041439"
+       id="text1025-7-4"><tspan
          sodipodi:role="line"
-         id="tspan1023-4-2"
-         x="129.94043"
-         y="58.826168"
-         style="stroke-width:0.26458332">New order id</tspan></text>
+         id="tspan1023-4-8"
+         x="172.36946"
+         y="36.041439"
+         style="stroke-width:0.26458332">Menu ID</tspan></text>
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect829-2-0-3-8-3-2"
+       width="35.675545"
+       height="6.4435868"
+       x="167.63226"
+       y="41.927998"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="172.5031"
+       y="46.464954"
+       id="text1025-7-5-9"><tspan
+         sodipodi:role="line"
+         id="tspan1023-4-2-4"
+         x="172.5031"
+         y="46.464954"
+         style="stroke-width:0.26458332">Select Menu ID</tspan></text>
+    <rect
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect829-2-0-3-8-3-4"
+       width="35.675545"
+       height="6.4435868"
+       x="124.66867"
+       y="42.262081"
+       inkscape:export-xdpi="610.10999"
+       inkscape:export-ydpi="610.10999" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="129.53952"
+       y="46.799038"
+       id="text1025-7-5-5"><tspan
+         sodipodi:role="line"
+         id="tspan1023-4-2-2"
+         x="129.53952"
+         y="46.799038"
+         style="stroke-width:0.26458332">Select order id</tspan></text>
+    <g
+       id="g916-9"
+       transform="translate(-0.13363219,-2.2717938)">
+      <rect
+         inkscape:export-ydpi="610.10999"
+         inkscape:export-xdpi="610.10999"
+         y="54.88905"
+         x="123.93217"
+         height="7.1147966"
+         width="14.831558"
+         id="rect829-2-0-3-8-3-3"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.41022444;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text1025-7-5-6"
+         y="59.360706"
+         x="128.73772"
+         style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="stroke-width:0.26458332"
+           y="59.360706"
+           x="128.73772"
+           id="tspan1023-4-2-6"
+           sodipodi:role="line">&lt;&lt;</tspan></text>
+      <rect
+         inkscape:export-ydpi="610.10999"
+         inkscape:export-xdpi="610.10999"
+         y="55.022686"
+         x="144.04419"
+         height="7.1147966"
+         width="14.831558"
+         id="rect829-2-0-3-8-3-3-8"
+         style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1.41022444;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+      <text
+         id="text1025-7-5-6-3"
+         y="59.494343"
+         x="148.84975"
+         style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="stroke-width:0.26458332"
+           y="59.494343"
+           x="148.84975"
+           id="tspan1023-4-2-6-5"
+           sodipodi:role="line">&gt;&gt;</tspan></text>
+    </g>
   </g>
 </svg>
