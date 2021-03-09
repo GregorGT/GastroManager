@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1612280734 source:c:\gastromanager\desktop\src\config.cpp
+1613755956 source:c:\gastromanager\desktop\src\config.cpp
 	<fstream>
 	<string>
 	<iostream>
@@ -22,27 +22,27 @@
 	"nodes/cMenuOptionNode.hpp"
 	"wxcrafter.h"
 
-1612280734 c:\gastromanager\desktop\src\config.h
+1613755956 c:\gastromanager\desktop\src\config.h
 	<unordered_map>
 	<string>
 
-1612280734 c:\gastromanager\desktop\src\filesystem\rapidxml.hpp
+1613755956 c:\gastromanager\desktop\src\filesystem\rapidxml.hpp
 	<cstdlib>
 	<cassert>
 	<new>
 	<exception>
 
-1612280734 c:\gastromanager\desktop\src\nodes\csettingsnode.h
+1613755956 c:\gastromanager\desktop\src\nodes\csettingsnode.h
 	"cTreeNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\ctreenode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\ctreenode.hpp
 	"../Tree/cWXTreeCtrl.h"
 	"../config.h"
 	<unordered_map>
 	<iostream>
 	<fstream>
 
-1612280734 c:\gastromanager\desktop\src\tree\cwxtreectrl.h
+1613755956 c:\gastromanager\desktop\src\tree\cwxtreectrl.h
 	<memory>
 	<vector>
 	<string>
@@ -2689,42 +2689,42 @@
 
 1595438406 c:\wxwidgets\include\wx-3.1\wx\qt\mdi.h
 
-1612280734 c:\gastromanager\desktop\src\nodes\clevelnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\clevelnode.hpp
 	"cTreeNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\clevelsnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\clevelsnode.hpp
 	"cTreeNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\ctablenode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\ctablenode.hpp
 	"c4PolgoneRectangle.hpp"
 	<wx/listimpl.cpp>
 	"cBookingNode.hpp"
 
-1612356814 c:\gastromanager\desktop\src\nodes\c4polgonerectangle.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\c4polgonerectangle.hpp
 	"cTreeNode.hpp"
 	<wx/wx.h>
 
 1595438406 c:\wxwidgets\include\wx-3.1\wx\listimpl.cpp
 
-1612280734 c:\gastromanager\desktop\src\nodes\cbookingnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cbookingnode.hpp
 	"c4PolgoneRectangle.hpp"
 	<wx/wx.h>
 	<wx/datetime.h>
 	<map>
 
-1612280734 c:\gastromanager\desktop\src\nodes\cchairnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cchairnode.hpp
 	"c4PolgoneRectangle.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\cmenuitemnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cmenuitemnode.hpp
 	"cTreeNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\cmenusnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cmenusnode.hpp
 	"cTreeNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cmenuoptionnode.hpp
 	"cTreeNode.hpp"
 
-1612280735 c:\gastromanager\desktop\src\wxcrafter.h
+1613755956 c:\gastromanager\desktop\src\wxcrafter.h
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/statusbr.h>
@@ -2750,6 +2750,7 @@
 	<wx/calctrl.h>
 	<wx/timer.h>
 	<wx/frame.h>
+	<wx/grid.h>
 	<wx/filedlg.h>
 	"Tree/cWXTreeCtrl.h"
 	"nodes/cTableNode.hpp"
@@ -2894,7 +2895,7 @@
 	"wx/control.h"
 	"wx/dcclient.h"
 
-1612280735 c:\gastromanager\desktop\src\wxbookingsdialog.hpp
+1613755956 c:\gastromanager\desktop\src\wxbookingsdialog.hpp
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/string.h>
@@ -2965,16 +2966,16 @@
 	"wx/containr.h"
 	"wx/compositewin.h"
 
-1612280734 source:c:\gastromanager\desktop\src\main.cpp
+1613755956 source:c:\gastromanager\desktop\src\main.cpp
 	<wx/app.h>
 	<wx/event.h>
 	"MainFrame.h"
 	<wx/image.h>
 
-1612280734 c:\gastromanager\desktop\src\mainframe.h
+1613755956 c:\gastromanager\desktop\src\mainframe.h
 	"wxcrafter.h"
 
-1612280734 source:c:\gastromanager\desktop\src\mainframe.cpp
+1613755956 source:c:\gastromanager\desktop\src\mainframe.cpp
 	"MainFrame.h"
 	<wx/aboutdlg.h>
 
@@ -2983,76 +2984,76 @@
 	"wx/app.h"
 	"wx/icon.h"
 
-1612280734 source:c:\gastromanager\desktop\src\math\geometry.cpp
+1613755956 source:c:\gastromanager\desktop\src\math\geometry.cpp
 	"geometry.h"
 	<math.h>
 
-1612280734 c:\gastromanager\desktop\src\math\geometry.h
+1613755956 c:\gastromanager\desktop\src\math\geometry.h
 	<wx/wx.h>
 
-1612356814 source:c:\gastromanager\desktop\src\nodes\c4polgonerectangle.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\c4polgonerectangle.cpp
 	"c4PolgoneRectangle.hpp"
 	<math.h>
 	<stdlib.h>
 	"../math/geometry.h"
 
-1612289597 source:c:\gastromanager\desktop\src\nodes\cbookingnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cbookingnode.cpp
 	"cBookingNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\cchairnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cchairnode.cpp
 	"cChairNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\clevelnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\clevelnode.cpp
 	"cLevelNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\clevelsnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\clevelsnode.cpp
 	"cLevelsNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\clinkernode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\clinkernode.cpp
 	"cLinkerNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\clinkernode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\clinkernode.hpp
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\cmenuesnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cmenuesnode.cpp
 	"cMenusNode.hpp"
 	"../config.h"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\cmenuitemnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cmenuitemnode.cpp
 	"cMenuItemNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\cmenuoptionnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cmenuoptionnode.cpp
 	"cMenuOptionNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\cpropertynode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\cpropertynode.cpp
 	"cPropertyNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\nodes\cpropertynode.hpp
+1613755956 c:\gastromanager\desktop\src\nodes\cpropertynode.hpp
 	"cTreeNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\csettingsnode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\csettingsnode.cpp
 	"../config.h"
 	"cSettingsNode.h"
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\ctablenode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\ctablenode.cpp
 	"cTableNode.hpp"
 	<string>
 
-1612280734 source:c:\gastromanager\desktop\src\nodes\ctreenode.cpp
+1613755956 source:c:\gastromanager\desktop\src\nodes\ctreenode.cpp
 	"cTreeNode.hpp"
 	"cPropertyNode.hpp"
 
-1612280734 source:c:\gastromanager\desktop\src\sqlite\gj_mysql.cpp
+1613755956 source:c:\gastromanager\desktop\src\sqlite\gj_mysql.cpp
 	"gj_mysql.hpp"
 	"../config.h"
 	"sqlite3.h"
 	"../nodes/cBookingNode.hpp"
 
-1612280734 c:\gastromanager\desktop\src\sqlite\gj_mysql.hpp
+1613755956 c:\gastromanager\desktop\src\sqlite\gj_mysql.hpp
 
-1612280735 c:\gastromanager\desktop\src\sqlite\sqlite3.h
+1613755956 c:\gastromanager\desktop\src\sqlite\sqlite3.h
 	<stdarg.h>
 
-1612280735 source:c:\gastromanager\desktop\src\sqlite\sqlite3.c
+1613755956 source:c:\gastromanager\desktop\src\sqlite\sqlite3.c
 	"config.h"
 	<vxWorks.h>
 	<pthread.h>
@@ -3111,17 +3112,17 @@
 	<unicode/utf16.h>
 	<math.h>
 
-1612280734 source:c:\gastromanager\desktop\src\tree\cwxtreectrl.cpp
+1613755956 source:c:\gastromanager\desktop\src\tree\cwxtreectrl.cpp
 	"cWXTreeCtrl.h"
 	"../nodes/cTreeNode.hpp"
 	<memory>
 
-1612280735 source:c:\gastromanager\desktop\src\wxbookingsdialog.cpp
+1613755956 source:c:\gastromanager\desktop\src\wxbookingsdialog.cpp
 	"wxbookingsdialog.hpp"
 	"wxtextinputdialog.hpp"
 	<wx/dateevt.h>
 
-1612280735 c:\gastromanager\desktop\src\wxtextinputdialog.hpp
+1613755956 c:\gastromanager\desktop\src\wxtextinputdialog.hpp
 	<wx/artprov.h>
 	<wx/xrc/xmlres.h>
 	<wx/string.h>
@@ -3134,7 +3135,7 @@
 	<wx/sizer.h>
 	<wx/dialog.h>
 
-1612290124 source:c:\gastromanager\desktop\src\wxcrafter.cpp
+1613755956 source:c:\gastromanager\desktop\src\wxcrafter.cpp
 	"wxcrafter.h"
 	"nodes/cSettingsNode.h"
 	"nodes/cLevelNode.hpp"
@@ -3148,7 +3149,7 @@
 	"wx/sizer.h"
 	<sys/stat.h>
 
-1612280735 source:c:\gastromanager\desktop\src\wxcrafter_bitmaps.cpp
+1613755956 source:c:\gastromanager\desktop\src\wxcrafter_bitmaps.cpp
 	<wx/wxprec.h>
 	<wx/filesys.h>
 	<wx/fs_mem.h>
@@ -3465,6 +3466,25 @@
 1595438406 c:\wxwidgets\include\wx-3.1\wx\xrc\xh_wizrd.h
 	"wx/xrc/xmlres.h"
 
-1612280735 source:c:\gastromanager\desktop\src\wxtextinputdialog.cpp
+1613755956 source:c:\gastromanager\desktop\src\wxtextinputdialog.cpp
 	"wxtextinputdialog.hpp"
+
+1595438406 c:\wxwidgets\include\wx-3.1\wx\grid.h
+	"wx/generic/grid.h"
+	"wx/generic/grideditors.h"
+	"wx/generic/gridctrl.h"
+
+1595438406 c:\wxwidgets\include\wx-3.1\wx\generic\grid.h
+	"wx/defs.h"
+	"wx/hashmap.h"
+	"wx/scrolwin.h"
+	<iterator>
+
+1595438406 c:\wxwidgets\include\wx-3.1\wx\generic\grideditors.h
+	"wx/defs.h"
+	"wx/scopedptr.h"
+
+1595438406 c:\wxwidgets\include\wx-3.1\wx\generic\gridctrl.h
+	"wx/grid.h"
+	"wx/datetime.h"
 

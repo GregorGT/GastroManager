@@ -16,14 +16,13 @@ public class EditDialog extends Dialog {
 	String value;
 	String newValue;
 	
-	public String open(GMTreeItem item, String attribute) {
+	public void open(GMTreeItem item, String attribute) {
 	    Shell parent = getParent();
 	    final Shell shell = new Shell(parent, SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL);
-	    shell.setText("Edit value: " + item.m_attributes.get(attribute));
+	    shell.setText("Edit value: " + attribute);
 	    shell.setLayout(new GridLayout(2, true));
 	    
 	    Label label = new Label(shell, SWT.NULL);
-	    
 	    label.setText("Please enter the new value: ");
 	    
 	    final Text text = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -66,7 +65,8 @@ public class EditDialog extends Dialog {
 	      }
 	    });
 
-	    text.setText(item.m_attributes.get(attribute));
+//	    item.setText(newValue);
+	    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	    shell.pack();
 	    shell.open();
 
@@ -76,8 +76,15 @@ public class EditDialog extends Dialog {
 	        display.sleep();
 	    }
 
-	    return newValue;
+	    //return newValue;
 	  }
+	
+//	void openEditDialog(GMTreeItem selectedItem, String attribute, Shell shell) {
+//		
+//		EditDialog d = new EditDialog(shell);
+//		d.open(selectedItem, attribute);
+//		
+//	}
 	
 	
 	public EditDialog(Shell parent) {

@@ -7,7 +7,6 @@ import org.eclipse.swt.widgets.TreeItem;
 
 public class GMTreeItem extends TreeItem {
 	
-	
 	public String m_name = new String();
 	public String m_value = new String();
 	public String m_xmlname = new String(); 
@@ -38,11 +37,21 @@ public class GMTreeItem extends TreeItem {
 	    //  allow subclass
 	}
 	
+	public void assignAttributes() {
+		
+	}
+	
+	public void newItemToTree() {
+		
+		
+		
+	}
+	
 	String getDisplayString() {
 		
 		String result = new String();
 		
-		if ( m_name.length() > 0 )  
+		if ( m_name.length() > 0 )
 			result = m_name;
 		else if (m_attributes.containsKey("name") == true)
 			result = m_attributes.getOrDefault("name", result);
@@ -55,12 +64,9 @@ public class GMTreeItem extends TreeItem {
 			result += m_value;
 		}
 		
-		//System.out.println(m_attributes.containsKey("name"));
-		
 		return result;
 		
 	}
-	
 
 	public void addListener(int menudetect, Listener listener) {
 		// TODO Auto-generated method stub
@@ -74,7 +80,6 @@ public class GMTreeItem extends TreeItem {
 
 	public void setMenu(Menu menu_3) {
 		// TODO Auto-generated method stub
-		
 	}
 
 }
