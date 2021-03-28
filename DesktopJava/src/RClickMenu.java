@@ -2,6 +2,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Decorations;
 import org.eclipse.swt.widgets.Group;
@@ -15,6 +17,7 @@ public class RClickMenu extends Menu {
 	
 	//private EditDialog dialog;
 	private String valueToEdit;
+	
 	
 	public void openTreeMenu(Menu menu, Tree tree,  EditDialog dialog) {
 		
@@ -39,9 +42,7 @@ public class RClickMenu extends Menu {
 		mntmEditName.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-//				GMTreeItem g_treeitem = new GMTreeItem(tree, SWT.NONE);
 				valueToEdit = "name";
-//				System.out.println("!!!!!!!!!!!!");
 				dialog.open((GMTreeItem) tree.getSelection()[0], valueToEdit);
 				tree.redraw();
 			}
@@ -92,20 +93,31 @@ public class RClickMenu extends Menu {
 		
 	}
 	
-	public void openDrillDownMenu(Menu menu, EditDialog dialog, Group clickedGroup) {
-		
-		//System.out.println("########################");
-		
+	public void openDrillDownMenu(RClickMenu menu, DrillDownGroup grp) {
+				
 		MenuItem[] items = menu.getItems();
 		for (int i = 0; i < items.length; ++i) {
 			items[i].dispose();
 		}
 		
+		MenuItem mntmActive = new MenuItem(menu, SWT.CHECK);
+		mntmActive.addSelectionListener(new SelectionAdapter() {
+			@Override 
+			public void widgetSelected(SelectionEvent e) {
+				Color selectedColor = new Color(0,255,0);
+				grp.setBackground(selectedColor);
+				grp.setEnabled(true);
+			}
+		});
+		mntmActive.setText("Active");
+		
 		MenuItem mntmTranslate = new MenuItem(menu, SWT.NONE);
 		mntmTranslate.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-
+				if (grp.getEnabled() == true) {
+					grp.drag(grp);
+				}
 			}
 		});
 		mntmTranslate.setText("Translate");

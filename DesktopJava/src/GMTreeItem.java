@@ -37,16 +37,6 @@ public class GMTreeItem extends TreeItem {
 	    //  allow subclass
 	}
 	
-	public void assignAttributes() {
-		
-	}
-	
-	public void newItemToTree() {
-		
-		
-		
-	}
-	
 	String getDisplayString() {
 		
 		String result = new String();
