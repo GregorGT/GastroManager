@@ -11,7 +11,10 @@ public class OrderingMenuDropdown extends CCombo {
 	
 	public void init(OrderingMenuDropdown dropdown) {
 		
-				
+				dropdown.add("A");
+				dropdown.add("B");
+				dropdown.add("C");
+				dropdown.add("D");
 	}	
 	
 	public void addItemsFromTree() {

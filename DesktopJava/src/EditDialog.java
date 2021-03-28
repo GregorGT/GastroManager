@@ -66,7 +66,7 @@ public class EditDialog extends Dialog {
 	    });
 
 //	    item.setText(newValue);
-	    System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+	    
 	    shell.pack();
 	    shell.open();
 

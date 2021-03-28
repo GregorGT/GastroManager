@@ -1,7 +1,5 @@
 import java.util.Random;
-
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
@@ -10,10 +8,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.w3c.dom.NamedNodeMap;
@@ -60,8 +55,7 @@ public class OrderingMenu extends Composite {
 		@Override
 		public void handleEvent(Event arg0) {
 			
-//			gmTree.dispose();
-			gmTree.clearAll(true);
+			//add menu and edit dialog for menu
 			
 		}
 		
@@ -178,7 +172,7 @@ public class OrderingMenu extends Composite {
     lblSeparator1.setLayoutData(fd_lblSeparator1);
     formToolkit.adapt(lblSeparator1, true, true);
 
-    dropdown = new OrderingMenuDropdown(ordMenu, SWT.FLAT | SWT.RIGHT);
+    dropdown = new OrderingMenuDropdown(ordMenu, SWT.FLAT | SWT.LEFT);
     FormData fd_ordMenuDropdown = new FormData();
     fd_ordMenuDropdown.top = new FormAttachment(txtTable, 0, SWT.TOP);
     fd_ordMenuDropdown.left = new FormAttachment(lblDDMenu, 0, SWT.LEFT);
@@ -186,9 +180,7 @@ public class OrderingMenu extends Composite {
     dropdown.setLayoutData(fd_ordMenuDropdown);
     formToolkit.adapt(dropdown);
     formToolkit.paintBordersFor(dropdown);
-    dropdown.add("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     dropdown.init(dropdown);
-    
     
     Text text_7 = new Text(ordMenu, SWT.BORDER);
     FormData fd_text_7 = new FormData();

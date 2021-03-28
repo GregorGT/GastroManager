@@ -60,7 +60,6 @@ public class DrillDownButton extends Button {
 		
 	}
 	public void activatedDrillDown(DrillDownButton b) {
-		System.out.println("BENIS PRINTED");
 		Color aktiv = new Color(0,255,0);
 		b.setBackground(aktiv);		
 	}
