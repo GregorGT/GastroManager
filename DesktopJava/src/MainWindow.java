@@ -102,8 +102,8 @@ public class MainWindow {
 			String value = attributes.item(k).getNodeValue();
 			
 			newNode.m_attributes.put(name,  value);
-			newNode.m_attributes.putIfAbsent("uuid", assignUUID()); //if it's already assigned, do not assign
-			
+			newNode.m_attributes.putIfAbsent("uuid", assignUUID()); 
+			//if it's already assigned, do not assign
 			}
 		}
 	 
@@ -137,7 +137,7 @@ public class MainWindow {
 	void parseXmlDocument(Document doc, GMTreeItem root) {
 		try {
 		    	treeBuild(root, doc.getFirstChild());
-		    	orderingMenu.getTreeItems(doc.getFirstChild(), orderingMenu.gmTree);
+		    	orderingMenu.getTreeItems(doc.getFirstChild(), orderingMenu.m_gmTree);
 		} catch (Exception e) {
 		    	e.printStackTrace();
 		    }

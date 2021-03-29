@@ -1,5 +1,7 @@
 import java.util.Random;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
@@ -19,9 +21,14 @@ import org.w3c.dom.NodeList;
 public class OrderingMenu extends Composite {
 
 	private final FormToolkit formToolkit = new FormToolkit(Display.getDefault());
-	public GMTreeItem gmTree;
-	public Tree tree;
-	public OrderingMenuDropdown dropdown;
+	public GMTreeItem m_gmTree;
+	public Tree m_tree;
+	public OrderingMenuDropdown m_dropdown;
+	public String m_tableText;
+	public String m_chairText;
+	public String m_waiterText;
+	public String m_floorText;
+	
 	
 	public void init(OrderingMenu ordMenu) {
 	
@@ -32,7 +39,7 @@ public class OrderingMenu extends Composite {
     lblTable.setText("Table: ");
 	
 	Text txtTable = new Text(ordMenu, SWT.BORDER);
-	txtTable.setText("Table");
+//	txtTable.setText("Table");
 	FormData fd_txtTable = new FormData();
 	fd_lblTable.bottom = new FormAttachment(txtTable, -6);
 	fd_txtTable.left = new FormAttachment(0, 10);
@@ -41,17 +48,30 @@ public class OrderingMenu extends Composite {
 	fd_txtTable.width = 40;
 	txtTable.setLayoutData(fd_txtTable);
 	formToolkit.adapt(txtTable, true, true);
+	txtTable.addListener(SWT.Modify, new Listener() {
+		@Override 
+		public void handleEvent(Event event) {
+			try {
+				m_tableText = txtTable.getText();
+				System.out.println(m_tableText);
+			} catch (Exception e) {
+				System.out.println("Table text field");
+			}
+			
+			
+		}
+	});
 	
-	tree = new Tree(ordMenu, SWT.BORDER);
+	m_tree = new Tree(ordMenu, SWT.BORDER);
 
 	FormData fd_tree = new FormData();
 	fd_tree.left = new FormAttachment(0, 10);
 	fd_tree.top = new FormAttachment(txtTable, 6);
 	fd_tree.bottom = new FormAttachment(100, -213);
-	tree.setLayoutData(fd_tree);
-	formToolkit.adapt(tree);
-	formToolkit.paintBordersFor(tree);	
-	tree.addListener(SWT.MenuDetect, new Listener() {
+	m_tree.setLayoutData(fd_tree);
+	formToolkit.adapt(m_tree);
+	formToolkit.paintBordersFor(m_tree);	
+	m_tree.addListener(SWT.MenuDetect, new Listener() {
 		@Override
 		public void handleEvent(Event arg0) {
 			
@@ -62,9 +82,15 @@ public class OrderingMenu extends Composite {
 		
 	});
 	
-	gmTree = new GMTreeItem(tree, SWT.NONE);
-	gmTree.setText("root");
-	gmTree.setExpanded(true);
+	m_gmTree = new GMTreeItem(m_tree, SWT.NONE);
+	m_gmTree.setText("Orders");
+	m_gmTree.setExpanded(true);
+	
+	Composite ordMenuComposite = new Composite(ordMenu, getStyle());
+	FormData fd_ordMenuComposite = new FormData();
+	fd_ordMenuComposite.top = new FormAttachment(m_tree);
+	
+	ordMenuComposite.setLayoutData(fd_ordMenuComposite);
 	
 	Text txtChair = new Text(ordMenu, SWT.BORDER);
 	FormData fd_txtChair = new FormData();
@@ -72,18 +98,44 @@ public class OrderingMenu extends Composite {
 	fd_txtChair.bottom = new FormAttachment(txtTable, 19); //, SWT.BOTTOM);
 	fd_txtChair.top = new FormAttachment(txtTable, 0, SWT.TOP);
 	txtChair.setLayoutData(fd_txtChair);
-	txtChair.setText("Chair");
+//	txtChair.setText("Chair");
 	formToolkit.adapt(txtChair, true, true);
+	txtChair.addListener(SWT.Modify, new Listener() {
+		@Override 
+		public void handleEvent(Event event) {
+			try {
+				m_chairText = txtChair.getText();
+				System.out.println(m_chairText);
+			} catch (Exception e) {
+				System.out.println("Chair text field");
+			}
+			
+			
+		}
+	});
 	
 	Text txtWaiter = new Text(ordMenu, SWT.BORDER);
 	fd_txtChair.right = new FormAttachment(100, -365);
-	txtWaiter.setText("Waiter");
+//	txtWaiter.setText("Waiter");
 	FormData fd_txtWaiter = new FormData();
 	fd_txtWaiter.right = new FormAttachment(txtChair, 60, SWT.RIGHT);
 	fd_txtWaiter.top = new FormAttachment(txtTable, 0, SWT.TOP);
 	fd_txtWaiter.left = new FormAttachment(txtChair, 6);
 	txtWaiter.setLayoutData(fd_txtWaiter);
 	formToolkit.adapt(txtWaiter, true, true);
+	txtWaiter.addListener(SWT.Modify, new Listener() {
+		@Override 
+		public void handleEvent(Event event) {
+			try {
+				m_waiterText = txtWaiter.getText();
+				System.out.println(m_waiterText);
+			} catch (Exception e) {
+				System.out.println("Waiter text field");
+			}
+			
+			
+		}
+	});
 	
 	Text txtFloor = new Text(ordMenu, SWT.BORDER);
 	txtFloor.setText("Floor");
@@ -92,6 +144,19 @@ public class OrderingMenu extends Composite {
 	fd_txtFloor.right = new FormAttachment(100, -260);
 	txtFloor.setLayoutData(fd_txtFloor);
 	formToolkit.adapt(txtFloor, true, true);
+	txtFloor.addListener(SWT.Modify, new Listener() {
+		@Override 
+		public void handleEvent(Event event) {
+			try {
+				m_floorText = txtFloor.getText();
+				System.out.println(m_floorText);
+			} catch (Exception e) {
+				System.out.println("Floor text field");
+			}
+			
+			
+		}
+	});
 	
 	Text txtOrderId = new Text(ordMenu, SWT.BORDER);
 	fd_tree.right = new FormAttachment(100, -260);
@@ -99,13 +164,13 @@ public class OrderingMenu extends Composite {
 	FormData fd_txtOrderId = new FormData();
 	fd_txtOrderId.top = new FormAttachment(0, 61);
 	fd_txtOrderId.right = new FormAttachment(100, -156);
-	fd_txtOrderId.left = new FormAttachment(tree, 17);
+	fd_txtOrderId.left = new FormAttachment(m_tree, 17);
 	txtOrderId.setLayoutData(fd_txtOrderId);
 	formToolkit.adapt(txtOrderId, true, true);
 	
 	Button button = new Button(ordMenu, SWT.NONE);
 	FormData fd_button = new FormData();
-	fd_button.left = new FormAttachment(tree, 17);
+	fd_button.left = new FormAttachment(m_tree, 17);
 	fd_button.top = new FormAttachment(txtOrderId, 31);
 	button.setLayoutData(fd_button);
 	formToolkit.adapt(button, true, true);
@@ -149,7 +214,7 @@ public class OrderingMenu extends Composite {
     
     Button btnSelectOrderId = new Button(ordMenu, SWT.NONE);
     FormData fd_btnSelectOrderId = new FormData();
-    fd_btnSelectOrderId.left = new FormAttachment(tree, 17);
+    fd_btnSelectOrderId.left = new FormAttachment(m_tree, 17);
     fd_btnSelectOrderId.top = new FormAttachment(txtOrderId, 6);
     btnSelectOrderId.setLayoutData(fd_btnSelectOrderId);
     formToolkit.adapt(btnSelectOrderId, true, true);
@@ -158,11 +223,29 @@ public class OrderingMenu extends Composite {
     Button btnNewOrderId = new Button(ordMenu, SWT.NONE);
     FormData fd_btnNewOrderId = new FormData();
     fd_btnNewOrderId.right = new FormAttachment(100, -156);
-    fd_btnNewOrderId.left = new FormAttachment(tree, 17);
+    fd_btnNewOrderId.left = new FormAttachment(m_tree, 17);
     fd_btnNewOrderId.top = new FormAttachment(button, 16);
     btnNewOrderId.setLayoutData(fd_btnNewOrderId);
     formToolkit.adapt(btnNewOrderId, true, true);
     btnNewOrderId.setText("New Order ID");
+    btnNewOrderId.addSelectionListener(new SelectionAdapter() {
+    	@Override 
+    	public void widgetSelected(SelectionEvent event) {
+    		
+    		try {
+    			GMTreeItem newitemtable = new GMTreeItem(m_gmTree, SWT.NONE);
+    			newitemtable.setText("Table: " + m_tableText);
+    			GMTreeItem newitemchair = new GMTreeItem(newitemtable, SWT.NONE); 
+    			newitemchair.setText("Chair: " + m_chairText);
+    			GMTreeItem newitemwaiter = new GMTreeItem(newitemchair, SWT.NONE);
+    			newitemwaiter.setText("Waiter: " + m_waiterText);
+    		} catch (Exception e) {
+    			System.out.println("NEW ORDER ID");
+    		}
+    	}
+    	
+    	
+    });
     
     Label lblSeparator1 = new Label(ordMenu, SWT.SEPARATOR | SWT.VERTICAL);
     FormData fd_lblSeparator1 = new FormData();
@@ -172,15 +255,15 @@ public class OrderingMenu extends Composite {
     lblSeparator1.setLayoutData(fd_lblSeparator1);
     formToolkit.adapt(lblSeparator1, true, true);
 
-    dropdown = new OrderingMenuDropdown(ordMenu, SWT.FLAT | SWT.LEFT);
+    m_dropdown = new OrderingMenuDropdown(ordMenu, SWT.FLAT | SWT.LEFT);
     FormData fd_ordMenuDropdown = new FormData();
     fd_ordMenuDropdown.top = new FormAttachment(txtTable, 0, SWT.TOP);
     fd_ordMenuDropdown.left = new FormAttachment(lblDDMenu, 0, SWT.LEFT);
     fd_ordMenuDropdown.width = 100;
-    dropdown.setLayoutData(fd_ordMenuDropdown);
-    formToolkit.adapt(dropdown);
-    formToolkit.paintBordersFor(dropdown);
-    dropdown.init(dropdown);
+    m_dropdown.setLayoutData(fd_ordMenuDropdown);
+    formToolkit.adapt(m_dropdown);
+    formToolkit.paintBordersFor(m_dropdown);
+    m_dropdown.init(m_dropdown, m_gmTree);
     
     Text text_7 = new Text(ordMenu, SWT.BORDER);
     FormData fd_text_7 = new FormData();
@@ -220,7 +303,8 @@ public class OrderingMenu extends Composite {
 					String value = attributes.item(k).getNodeValue();
 				
 					newNode.m_attributes.put(name,  value);
-					newNode.m_attributes.putIfAbsent("uuid", assignUUID()); //if it's already assigned, do not assign
+					newNode.m_attributes.putIfAbsent("uuid", assignUUID());
+					//if it's already assigned, do not assign
 				}
 			}
 		 

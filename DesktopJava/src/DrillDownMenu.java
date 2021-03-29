@@ -57,8 +57,10 @@ public class DrillDownMenu extends Composite {
 			public void widgetSelected(SelectionEvent e) {
 				try {				
 					DDGroup = new DrillDownGroup(composite, SWT.NONE);
-					DDGroup.addNewDrillDownGroup(nDrillDownHeight, nDrillDownWidth, drillDownMenuName, composite);
-					toTree(treeItem, drillDownMenuName, "drilldownmenus", nDrillDownHeight, nDrillDownWidth);
+					DDGroup.addNewDrillDownGroup(nDrillDownHeight, nDrillDownWidth, 
+													drillDownMenuName, composite);
+					toTree(treeItem, drillDownMenuName, "drilldownmenus", 
+										nDrillDownHeight, nDrillDownWidth);
 				} catch (Exception a) {
 					System.out.println("Empty drill down text fields");
 				}

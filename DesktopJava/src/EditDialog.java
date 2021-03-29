@@ -13,8 +13,8 @@ import org.w3c.dom.Attr;
 
 public class EditDialog extends Dialog {
 
-	String value;
-	String newValue;
+	String m_sValue;
+	String m_sNewValue;
 	
 	public void open(GMTreeItem item, String attribute) {
 	    Shell parent = getParent();
@@ -36,7 +36,7 @@ public class EditDialog extends Dialog {
 	    text.addListener(SWT.Modify, new Listener() {
 	      public void handleEvent(Event event) {
 	        try {
-	          newValue = new String(text.getText());
+	          m_sNewValue = new String(text.getText());
 	          buttonOK.setEnabled(true);
 	        } catch (Exception e) {
 	          buttonOK.setEnabled(false);
@@ -46,14 +46,18 @@ public class EditDialog extends Dialog {
 
 	    buttonOK.addListener(SWT.Selection, new Listener() {
 	      public void handleEvent(Event event) {
-	    	  item.m_attributes.replace(attribute, newValue);
+	    	  item.m_attributes.replace(attribute, m_sNewValue);
+	    	  
+	    	  if (attribute == "name") 
+	    		    item.setText(m_sNewValue);
+	    	  
 	    	  shell.dispose();
 	      }
 	    });
 
 	    buttonCancel.addListener(SWT.Selection, new Listener() {
 	      public void handleEvent(Event event) {
-	        value = null;
+	        m_sValue = null;
 	        shell.dispose();
 	      }
 	    });
@@ -65,7 +69,7 @@ public class EditDialog extends Dialog {
 	      }
 	    });
 
-//	    item.setText(newValue);
+	   
 	    
 	    shell.pack();
 	    shell.open();

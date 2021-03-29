@@ -17,7 +17,6 @@ public class DrillDownButton extends Button {
 		btn.setBounds(5, 25, w, h);
 		btn.addListener(SWT.MenuDetect, new Listener() {
 			@Override
-			
 			public void handleEvent(Event arg0) {
 				
 					btn.addMouseListener(new MouseListener() {
@@ -26,7 +25,8 @@ public class DrillDownButton extends Button {
 						public void mouseUp(MouseEvent arg0) {
 							// TODO Auto-generated method stub
 							Point cursorLocation = Display.getCurrent().getCursorLocation();
-							Point relativeCursorLocation = Display.getCurrent().getFocusControl().toControl(cursorLocation);
+							Point relativeCursorLocation = 
+								Display.getCurrent().getFocusControl().toControl(cursorLocation);
 							btn.drop(btn, relativeCursorLocation);
 						}
 						

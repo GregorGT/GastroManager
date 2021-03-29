@@ -42,22 +42,21 @@ public class RClickMenu extends Menu {
 		mntmEditName.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				valueToEdit = "name";
-				dialog.open((GMTreeItem) tree.getSelection()[0], valueToEdit);
+				dialog.open((GMTreeItem) tree.getSelection()[0], "name");
 				tree.redraw();
 			}
 		});
 		mntmEditName.setText("Edit Name");
 		
-		MenuItem mntmExpandAll = new MenuItem(menu, SWT.NONE);
-		mntmExpandAll.addSelectionListener(new SelectionAdapter() {
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				
-				//expandAll(root);
-			}
-		});
-		mntmExpandAll.setText("Expand All");
+//		MenuItem mntmExpandAll = new MenuItem(menu, SWT.NONE);
+//		mntmExpandAll.addSelectionListener(new SelectionAdapter() {
+//			@Override
+//			public void widgetSelected(SelectionEvent e) {
+//				
+//				//expandAll(root);
+//			}
+//		});
+//		mntmExpandAll.setText("Expand All");
 		
 		MenuItem mntmDeleteNode = new MenuItem(menu, SWT.NONE);
 		mntmDeleteNode.addSelectionListener(new SelectionAdapter() {
@@ -84,7 +83,8 @@ public class RClickMenu extends Menu {
 		mntmSetPrice.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				
+				EditDialog d = new EditDialog(menu.getShell());
+				d.open((GMTreeItem) tree.getSelection()[0], "price");
 			}
 		});
 		mntmSetPrice.setText("Set Price");
@@ -96,33 +96,42 @@ public class RClickMenu extends Menu {
 	public void openDrillDownMenu(RClickMenu menu, DrillDownGroup grp) {
 				
 		MenuItem[] items = menu.getItems();
-		for (int i = 0; i < items.length; ++i) {
+		for (int i = 0; i < items.length; i++) {
 			items[i].dispose();
 		}
 		
-		MenuItem mntmActive = new MenuItem(menu, SWT.CHECK);
-		mntmActive.addSelectionListener(new SelectionAdapter() {
-			@Override 
-			public void widgetSelected(SelectionEvent e) {
-				Color selectedColor = new Color(0,255,0);
-				grp.setBackground(selectedColor);
-				grp.setEnabled(true);
-			}
-		});
-		mntmActive.setText("Active");
+		activeItem(grp);
 		
-		MenuItem mntmTranslate = new MenuItem(menu, SWT.NONE);
+//		MenuItem mntmActive = new MenuItem(menu, SWT.CHECK);
+//		mntmActive.addSelectionListener(new SelectionAdapter() {
+//			private int selectedNum = 2;
+//			@Override 
+//			public void widgetSelected(SelectionEvent e) {
+//				if (selectedNum % 2 == 0) {
+//				Color selectedColor = new Color(0,255,0);
+//				grp.setBackground(selectedColor);
+////				grp.setEnabled(true);
+//				System.out.println("a");
+//				}
+//				else if (selectedNum % 2 != 0) {
+//					Color unselectedColor = new Color(100,0,0);
+//					grp.setBackground(unselectedColor);
+//				}
+//				selectedNum++;
+//			}
+//		});
+//		mntmActive.setText("Active");
+		
+		MenuItem mntmTranslate = new MenuItem(menu, SWT.CHECK);
 		mntmTranslate.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
-				if (grp.getEnabled() == true) {
-					grp.drag(grp);
-				}
+				
 			}
 		});
 		mntmTranslate.setText("Translate");
 		
-		MenuItem mntmResize = new MenuItem(menu, SWT.NONE);
+		MenuItem mntmResize = new MenuItem(menu, SWT.CHECK);
 		mntmResize.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -131,7 +140,7 @@ public class RClickMenu extends Menu {
 		});
 		mntmResize.setText("Resize");
 		
-		MenuItem mntmRemove = new MenuItem(menu, SWT.NONE);
+		MenuItem mntmRemove = new MenuItem(menu, SWT.CHECK);
 		mntmRemove.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(SelectionEvent e) {
@@ -140,6 +149,13 @@ public class RClickMenu extends Menu {
 		});
 		mntmRemove.setText("Remove");
 		
+	
+		
+	}
+	
+	public void activeItem(DrillDownGroup grp) {
+		
+			
 		
 	}
 	

@@ -16,8 +16,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class DrillDownGroup extends Group {
 	
-	public DrillDownGroup group;
-	
+	public DrillDownGroup m_group;
+	public boolean m_bActivationTracker = true;
 	
 	public void drag(DrillDownGroup a) {
 		Point originalPoint = new Point(a.getBounds().x, a.getBounds().y);
@@ -32,35 +32,48 @@ public class DrillDownGroup extends Group {
 	
 	public void addNewDrillDownGroup(int height, int width, String name, Composite comp) {
 		
-		group = new DrillDownGroup(comp, SWT.NONE);
-		group.setText(name);
-		group.setLayout(new GridLayout(1,  true));
-//		FormData fd_group = new FormData();
-//		group.setLayoutData(fd_group);
-		group.setBounds(comp.getBounds().x, comp.getBounds().y + 80, width, height);
-		RClickMenu drillDownMenu = new RClickMenu(group);
-		group.setMenu(drillDownMenu);
+		m_group = new DrillDownGroup(comp, SWT.NONE);
+		m_group.setText(name);
+		m_group.setLayout(new GridLayout(1,  true));
+		m_group.setBounds(comp.getBounds().x, comp.getBounds().y + 80, width, height);
+		RClickMenu drillDownMenu = new RClickMenu(m_group);
+		m_group.setMenu(drillDownMenu);
 		
-		group.addListener(SWT.MenuDetect, new Listener() {
+		
+		m_group.addListener(SWT.Selection, new Listener() {
+			@Override 
+			public void handleEvent(Event arg0) {
+				
+				System.out.println("Group selected: " + m_group.getText());
+				
+			}
+			
+			
+		});
+		
+		m_group.addListener(SWT.MenuDetect, new Listener() {
 			@Override
 			public void handleEvent(Event arg0) {
 				
-				drillDownMenu.openDrillDownMenu(drillDownMenu, group);
-				if (group.getEnabled() == true) {
-					group.addMouseListener(new MouseListener() {
+				drillDownMenu.openDrillDownMenu(drillDownMenu, m_group);
+				m_bActivationTracker = true;
+				
+				if (m_bActivationTracker == true) {
+					m_group.addMouseListener(new MouseListener() {
 						
 						@Override
 						public void mouseUp(MouseEvent arg0) {
 							// TODO Auto-generated method stub
 							Point cursorLocation = Display.getCurrent().getCursorLocation();
-							Point relativeCursorLocation = Display.getCurrent().getFocusControl().toControl(cursorLocation);
-							group.drop(group, relativeCursorLocation);
+							Point relativeCursorLocation = 
+							Display.getCurrent().getFocusControl().toControl(cursorLocation);
+							m_group.drop(m_group, relativeCursorLocation);
 						}
 						
 						@Override
 						public void mouseDown(MouseEvent arg0) {
 							// TODO Auto-generated method stub
-							group.drag(group);
+							m_group.drag(m_group);
 						}
 						
 						@Override
@@ -69,8 +82,6 @@ public class DrillDownGroup extends Group {
 							
 						}
 					});
-				} else {
-					
 				}
 				
 			}
@@ -79,14 +90,14 @@ public class DrillDownGroup extends Group {
 	}
 	
 	public void addButtonToDrillDown(int height, int width, String name) {
-		DrillDownButton btn = new DrillDownButton(group, SWT.PUSH); //add 
+		DrillDownButton btn = new DrillDownButton(m_group, SWT.PUSH); //add 
 		btn.init(height, width, name, btn);
-		group.redraw();
+		m_group.redraw();
 	}
 	
 	public void activatedDrillDown(DrillDownGroup a) {
 
-		Color aktiv = new Color(0,255,0);
+		Color aktiv = new Color(0,150,0);
 		a.setBackground(aktiv);		
 	}
 	
