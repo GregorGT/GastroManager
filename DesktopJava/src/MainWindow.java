@@ -22,16 +22,23 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -58,6 +65,7 @@ public class MainWindow {
 	public DrillDownGroup activeDrillDownGroup;
 	private TabItem tbtmOrdering;
 	public OrderingMenu orderingMenu;
+
 	
 	/**
 	 * Launch the application.
@@ -238,9 +246,6 @@ public class MainWindow {
 		
 		tabFolder = new TabFolder(mainSashForm, SWT.NONE);
 		
-		tbtmView = new TabItem(tabFolder, SWT.NONE);
-		tbtmView.setText("View");
-		
 		tbtmNewItem = new TabItem(tabFolder, SWT.NONE);
 		tbtmNewItem.setText("Layout");
 		
@@ -263,7 +268,16 @@ public class MainWindow {
 		orderingMenu.setLayout(new FormLayout());
 		orderingMenu.init(orderingMenu);
 		
-        		
+		tbtmView = new TabItem(tabFolder, SWT.NONE);
+		tbtmView.setText("View");
+		
+		
+		//test
+		
+		{	
+		}
+		
+        //endtest		
 		mainSashForm.setWeights(new int[] {1, 2});
 		
 		MenuItem mntmOpenFile = new MenuItem(menu_1, SWT.NONE);

@@ -34,7 +34,7 @@ public class DrillDownMenu extends Composite {
 		composite_1.setLayoutData(fd_composite_1);
 		formToolkit.adapt(composite_1);
 		formToolkit.paintBordersFor(composite_1);
-		
+
 		Text ddTextHeight = new Text(composite_1, SWT.READ_ONLY | SWT.CENTER);
 		ddTextHeight.setBounds(0, 0, 50, 18);
 		ddTextHeight.setText("Height");

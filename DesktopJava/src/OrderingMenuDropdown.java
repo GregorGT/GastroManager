@@ -9,20 +9,8 @@ public class OrderingMenuDropdown extends CCombo {
 	
 	public void init(OrderingMenuDropdown dropdown, GMTreeItem gmtree) {
 		
-//		GMTreeItem orderRoot = new GMTreeItem(gmtree, SWT.NONE);
-//		orderRoot.setText("Orders");
-		GMTreeItem newNode = new GMTreeItem(gmtree, SWT.NONE);
 		
 		
-		for (int i = 0; i < gmtree.getItemCount(); i++) {
-			dropdown.add(gmtree.getItem(i).getText());
-		}
-		
-		
-//		dropdown.add("A");
-//		dropdown.add("B");
-//		dropdown.add("C");
-//		dropdown.add("D");
 	}	
 	
 	public void addItemsFromTree() {
