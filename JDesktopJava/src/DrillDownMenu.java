@@ -165,13 +165,6 @@ public class DrillDownMenu extends JPanel {
 //			
 //		}
 		
-//		for (Enumeration<TreeNode> penis = treeItem.preorderEnumeration(); penis.hasMoreElements();)
-//		      if (penis.nextElement().toString() == "drilldownmenus") {
-		    	 
-//		    	  System.out.println("Found drilldown menu at: " + penis.nextElement().getIndex(treeItem));
-		    	  
-		    	  
-//		      }
 		
 //		System.out.println(epin.nextElement());
 		
