@@ -213,7 +213,7 @@ public class MainWindow extends JFrame {
                 
                 int returnVal = fc.showDialog(null, "Open XML File...");
                 if(returnVal == JFileChooser.APPROVE_OPTION) {
-                	System.out.println("Die zu öffnende Datei ist: " +
+                	System.out.println("Die zu Ã¶ffnende Datei ist: " +
                             fc.getSelectedFile().toString());
                 }
                 String selected = fc.getSelectedFile().toString();
@@ -248,7 +248,6 @@ public class MainWindow extends JFrame {
 				try {
 					fstr = readFileToString("C:\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
                 	doc = loadXMLFromString(fstr);
-                	System.out.println("penis");
                 	parseXmlDocument(doc, root);
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
