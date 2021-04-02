@@ -20,7 +20,6 @@ public class DrillDownButton extends JButton {
 	public void init(int width, int height, String name, DrillDownGroup grp) {
 		
 		Button = new DrillDownButton(name);
-//		Button.setText(name);
 		JPopupMenu popupMenu = new JPopupMenu();
 		addPopup(Button, popupMenu);
 		
@@ -57,11 +56,6 @@ public class DrillDownButton extends JButton {
 		});
 		popupMenu.add(mntmRename);
 		
-		
-//	    newpanel.setBackground(Color.blue);
-//	    btn
-//	    .setBorder(new TitledBorder(null,
-//	    		name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		Button.setBounds(10,20,width,height);
 		Button.addActionListener(new ActionListener() {
 			@Override

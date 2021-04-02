@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Vector;
@@ -13,6 +14,8 @@ import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.text.Document;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
 import org.w3c.dom.Node;
@@ -23,14 +26,13 @@ public class DrillDownMenu extends JPanel {
 	private JTextField txtDDHeight;
 	private JTextField txtDDWidth;
 	private JTextField txtDDName;
+	public String ddName;
 	private JTextField txtButtonHeight;
 	private JTextField txtButtonWidth;
 	private JTextField txtButtonName;
 	private DrillDownGroup drillDownGroup;
-//	private DrillDownButton ddButton;
-	
-	public void init(DrillDownMenu ddmenu, GMTreeItem treeitem) {
-		
+
+	public void init(DrillDownMenu ddmenu, GMTreeItem treeitem, DefaultTreeModel model) {		
 		JPanel panelDrillDown = new JPanel();
 		panelDrillDown
 		.setBorder(new TitledBorder(null, "Drill Down", TitledBorder.LEADING,
@@ -78,12 +80,10 @@ public class DrillDownMenu extends JPanel {
             	int nDDHeight = Integer.parseInt(ddheight);
             	String ddwidth = txtDDWidth.getText();
             	int nDDWidth = Integer.parseInt(ddwidth);
-            	String ddName = txtDDName.getText();
+            	ddName = txtDDName.getText();
             	
             	drillDownGroup.newDrillDown(nDDWidth, nDDHeight, ddName, ddmenu);
-            	toTree(treeitem); // , ddName, "drilldownmenus", nDDHeight, nDDWidth);
-            	
-            	 	
+            	toTree(treeitem, model, ddName, "drilldownmenus", nDDHeight, nDDWidth);            	
             }
             
 		});
@@ -135,76 +135,37 @@ public class DrillDownMenu extends JPanel {
             	String btnwidth = txtButtonWidth.getText();
             	int nBtnWidth = Integer.parseInt(btnwidth);
             	String btnName = txtButtonName.getText();
-            	
             	drillDownGroup.newButton(nBtnWidth, nBtnHeight, btnName, drillDownGroup);
-				
+            	toTree(treeitem, model, btnName, ddName, nBtnHeight, nBtnWidth);
+            	
 			}
 			
-		});
-		
-		
-		
+		});		
 	}
 	
-	public void toTree(GMTreeItem treeItem) { //, String newName, String parent, int height, int width) {
-		
-		Enumeration epin = treeItem.children();
-		
-		if(epin != null) {
-			while (epin.hasMoreElements()) {
-				System.out.println(epin.nextElement());
-				toTree((GMTreeItem) epin.nextElement());
-			}
+	public void toTree(GMTreeItem treeItem, DefaultTreeModel model, String newName, String parent, int height, int width) {	
+		Enumeration enum1 = treeItem.children();
+	
+		if (treeItem.toString() == parent) {
+			GMTreeItem newItem = new GMTreeItem();
+			newItem.setUserObject(newName);
+			GMTreeItem heightItem = new GMTreeItem();
+			heightItem.setUserObject("Height :" + String.valueOf(height));
+			GMTreeItem widthItem = new GMTreeItem();
+			widthItem.setUserObject("Width :" + String.valueOf(width));
+			model.insertNodeInto(newItem, treeItem, 0);
+			model.insertNodeInto(heightItem, newItem, 0);
+			model.insertNodeInto(widthItem, newItem, 0);
 		}
 		
-		
-//		for (Enumeration<TreeNode> epin = treeItem.preorderEnumeration(); epin.hasMoreElements();) {
-//			
-//			
-//			
-//			
-//		}
-		
-		
-//		System.out.println(epin.nextElement());
-		
-		
-//		Iterator<TreeNode> it = node.asIterator();
-		
-		
-//		for (Enumeration<TreeNode> node = v.elements(); e.hasMoreElements();)
-//		       System.out.println(e.nextElement());
-//				
+		if(enum1 != null) {
+			while (enum1.hasMoreElements()) {
+				toTree((GMTreeItem)enum1.nextElement(), model, newName, parent, height, width);
+			}
+		}
 	}
 	
-	
-//public void toTree(GMTreeItem treeItem, String newName, String parent, int height, int width) {
-//		
-//		TreeItem node[] = treeItem.getItems();
-//		for (int i = 0; i < node.length; ++i) {
-//		
-//		if (node[i] instanceof GMTreeItem) {
-//			GMTreeItem newItem = (GMTreeItem) node[i];
-//			if (newItem.getText() == parent) {
-//				GMTreeItem newtreeitem = new GMTreeItem(node[i], SWT.NONE);
-//				newtreeitem.setText(newName);
-//				GMTreeItem newitemheight = new GMTreeItem(newtreeitem, SWT.NONE);
-//				newitemheight.setText("height = " + height);
-//				GMTreeItem itemdrillDownWidth = new GMTreeItem(newtreeitem, SWT.NONE);
-//				itemdrillDownWidth.setText("width = " + width);
-//				newtreeitem.m_xmlname = "drilldownmenu";
-//				newtreeitem.m_attributes.putIfAbsent("name", newName);
-//				newtreeitem.m_attributes.putIfAbsent("height", Integer.toString(height));
-//				newtreeitem.m_attributes.putIfAbsent("width", Integer.toString(width));
-//			}
-//			toTree(newItem, newName, parent, height, width);
-//		}
-//	}
-//		
-//		
-//	}
-	
-	
+		
 	public DrillDownMenu() {
 		// TODO Auto-generated constructor stub
 	}

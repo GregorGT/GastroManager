@@ -11,11 +11,8 @@ public class DrillDownGroup extends JPanel {
 	public int buttonIndex = 0;
 	
 	public void newDrillDown(int width, int height, String name, DrillDownMenu menu) {
-		
-		FlowLayout lo = new FlowLayout();
 		newpanel = new DrillDownGroup();
 		newpanel.setLayout(new FlowLayout());
-//    	newpanel.setBackground(Color.blue);
     	newpanel
     	.setBorder(new TitledBorder(null,
     			name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -27,7 +24,6 @@ public class DrillDownGroup extends JPanel {
 	
 	
 	public void newButton(int width, int height, String name, DrillDownGroup grp) {
-			
 		DrillDownButton btn = new DrillDownButton();
 		btn.init(width, height, name, newpanel);
 		buttonIndex++;
