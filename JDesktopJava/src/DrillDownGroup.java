@@ -1,4 +1,5 @@
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
 import java.awt.LayoutManager;
 
 import javax.swing.JButton;
@@ -12,7 +13,9 @@ public class DrillDownGroup extends JPanel {
 	
 	public void newDrillDown(int width, int height, String name, DrillDownMenu menu) {
 		newpanel = new DrillDownGroup();
-		newpanel.setLayout(new FlowLayout());
+
+			newpanel.setLayout(new GridLayout(5, 5));
+
     	newpanel
     	.setBorder(new TitledBorder(null,
     			name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -22,21 +25,14 @@ public class DrillDownGroup extends JPanel {
     	newpanel.setVisible(true);   		
 	}
 	
-	
 	public void newButton(int width, int height, String name, DrillDownGroup grp) {
 		DrillDownButton btn = new DrillDownButton();
+		
 		btn.init(width, height, name, newpanel);
 		buttonIndex++;
+		System.out.println(buttonIndex + " <--- number of buttons");
 		
 	}
-	
-	public void deletBtn() {
-		
-		
-		
-	}
-	
-	
 	
 	public DrillDownGroup() {
 		// TODO Auto-generated constructor stub

@@ -38,6 +38,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -60,6 +61,8 @@ import javax.swing.border.TitledBorder;
 import java.awt.FlowLayout;
 import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 
 public class MainWindow extends JFrame {
 
@@ -68,7 +71,7 @@ public class MainWindow extends JFrame {
 	private JTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
-
+	private JTextField textField;
 	
 	public static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -175,8 +178,6 @@ public class MainWindow extends JFrame {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 		
-		JFrame frame = new JFrame("Edit name: ");
-		
 		JMenu mnFileMenu = new JMenu("File");
 		menuBar.add(mnFileMenu);
 		
@@ -243,7 +244,6 @@ public class MainWindow extends JFrame {
 		});
 		menuBar.add(btnDebugLoadFile);
 		
-		
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -258,6 +258,7 @@ public class MainWindow extends JFrame {
 	    tree = new JTree(root);
 	    splitPane.setLeftComponent(tree);
 	    tree.setEditable(true);
+	   
 	    treeScroll = new JScrollPane();
 	    defaultModel = (DefaultTreeModel) tree.getModel();    
 		
@@ -266,9 +267,7 @@ public class MainWindow extends JFrame {
 		
 		JPanel tabView = new JPanel();
 		tabbedPane.addTab("View", null, tabView, null);
-		FlowLayout fl_tabView = new FlowLayout(FlowLayout.CENTER, 5, 5);
-		fl_tabView.setAlignOnBaseline(true);
-		tabView.setLayout(fl_tabView);
+		tabView.setLayout(null);
 		
 		
 		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);

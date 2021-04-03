@@ -1,9 +1,8 @@
 import java.awt.BorderLayout;
 import java.awt.Dialog;
-import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
-import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -14,38 +13,57 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 public class EditDialog extends JDialog {
 
-	public EditDialog(JFrame parent, String title) {
-		super(parent, title, true);
-		if (parent != null) {
-		      Dimension parentSize = parent.getSize(); 
-		      Point p = parent.getLocation(); 
-		      setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
-		    }
-		 JPanel messagePane = new JPanel();
-		    messagePane.add(new JLabel("Value" ));
-		    getContentPane().add(messagePane);
-		    JPanel buttonPane = new JPanel();
-		    JButton button = new JButton("OK"); 
-		    buttonPane.add(button); 
-		    button.addActionListener(new ActionListener() {
-				
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					  setVisible(false); 
-					    dispose(); 
-					
-				}
-			});
-		    getContentPane().add(buttonPane, BorderLayout.SOUTH);
-		    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		    pack(); 
-		    setVisible(true);
+	public void openRename(DrillDownButton btn) {
+		
+		JDialog d = new JDialog();
+		d.setLayout(null);
+//		d.setBounds(X, Y, WIDTH, HEIGHT);
+		
+		JLabel lblValue = new JLabel("New value: ");
+		lblValue.setBounds(10, 10, 70, 14);
+		d.add(lblValue);
+		
+		JTextField tfValue = new JTextField();
+		tfValue.setBounds(80, 8, 120, 20);
+		d.add(tfValue);
+		tfValue.setColumns(10);
+		
+		JButton btnOk = new JButton("OK");
+		btnOk.setBounds(20, 36, 55, 22);
+		btnOk.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btn.setText(tfValue.getText());
+				btn.repaint();
+				d.dispose();
+			}
+			
+		});
+		d.add(btnOk);
+		
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.setBounds(90, 36, 90, 22);
+		d.add(btnCancel);
+		
+		d.setDefaultCloseOperation(EditDialog.DISPOSE_ON_CLOSE);
+		d.setBounds(100, 100, 250, 100);
+		d.setVisible(true);		
+	}
+	
+	
+	public void returnNewVal() {
 		
 	}
 	
+	
+	public EditDialog() {
+		
+	}
 
 	public EditDialog(Frame owner) {
 		super(owner);
