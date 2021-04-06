@@ -1,3 +1,4 @@
+package com.gastromanager.mainwindow;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
@@ -20,7 +21,7 @@ public class DrillDownButton extends JButton {
 	public void init(int width, int height, String name, DrillDownGroup grp) {
 		
 		Button = new DrillDownButton(name);
-//		Button.setText(name);
+		Button.setSize(height, width);
 		JPopupMenu popupMenu = new JPopupMenu();
 		addPopup(Button, popupMenu);
 		
@@ -29,8 +30,7 @@ public class DrillDownButton extends JButton {
 			
 			public void actionPerformed(ActionEvent e) {
 				
-				
-				
+				// move the button around 
 				
 			}
 			
@@ -43,7 +43,9 @@ public class DrillDownButton extends JButton {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				
-				mntmDelete.removeAll();
+				grp.remove(Button);
+				grp.revalidate();
+				grp.repaint();
 				
 			}			
 		});
@@ -52,36 +54,23 @@ public class DrillDownButton extends JButton {
 		mntmRename.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EditDialog d = new EditDialog(new JFrame(), "Edit button name: ");
+				EditDialog d = new EditDialog();
+				d.openRename(Button);
 			}			
 		});
 		popupMenu.add(mntmRename);
 		
-		
-//	    newpanel.setBackground(Color.blue);
-//	    btn
-//	    .setBorder(new TitledBorder(null,
-//	    		name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		Button.setBounds(10,20,width,height);
 		Button.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				java.awt.Toolkit.getDefaultToolkit().beep();
 			}
-			
 		});
 		grp.add(Button);
-	    
-//	    	
+	    grp.repaint();
 	    Button.setVisible(true);
 	    
-	}
-	
-	private void buttonDelete(DrillDownButton btn) {
-		
-		
-		
-		
 	}
 	
 	
