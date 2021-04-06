@@ -144,6 +144,7 @@ public class DrillDownMenu extends JPanel {
 	}
 	
 	public void toTree(GMTreeItem treeItem, DefaultTreeModel model, String newName, String parent, int height, int width) {	
+
 		Enumeration enum1 = treeItem.children();
 	
 		if (treeItem.toString() == parent) {

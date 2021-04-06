@@ -27,6 +27,7 @@ import org.xml.sax.InputSource;
 
 import javax.swing.JSplitPane;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JMenuItem;
@@ -68,7 +69,7 @@ public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
 	private GMTreeItem root;
-	private JTree tree;
+	private GMTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
 	private JTextField textField;
@@ -214,10 +215,7 @@ public class MainWindow extends JFrame {
 		JMenuItem mntmNewMenuItem = new JMenuItem("Save");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
 				System.out.println(writeTreeIntoString(root));
-				
-				
 			}
 		});
 		mnFileMenu.add(mntmNewMenuItem);
@@ -237,9 +235,7 @@ public class MainWindow extends JFrame {
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
-				}
-				
-				
+				}			
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
@@ -255,10 +251,11 @@ public class MainWindow extends JFrame {
 		
 		root = new GMTreeItem("Root");
 
-	    tree = new JTree(root);
+	    tree = new GMTree(root);
+	    tree.init(tree);
 	    splitPane.setLeftComponent(tree);
 	    tree.setEditable(true);
-	   
+	    
 	    treeScroll = new JScrollPane();
 	    defaultModel = (DefaultTreeModel) tree.getModel();    
 		
@@ -268,7 +265,6 @@ public class MainWindow extends JFrame {
 		JPanel tabView = new JPanel();
 		tabbedPane.addTab("View", null, tabView, null);
 		tabView.setLayout(null);
-		
 		
 		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addTab("Layout", null, tabLayout, null);
@@ -282,6 +278,9 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 	}
 	
+	public void showSelectedDrillDown() {
+		
+	}
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
