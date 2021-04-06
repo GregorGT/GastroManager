@@ -1,3 +1,4 @@
+package com.gastromanager.mainwindow;
 import java.awt.Color;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;

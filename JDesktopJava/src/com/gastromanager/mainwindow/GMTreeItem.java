@@ -1,3 +1,4 @@
+package com.gastromanager.mainwindow;
 import java.util.HashMap;
 import javax.swing.tree.DefaultMutableTreeNode;
 

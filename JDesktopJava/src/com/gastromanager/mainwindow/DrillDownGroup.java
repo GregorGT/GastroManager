@@ -1,3 +1,4 @@
+package com.gastromanager.mainwindow;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.LayoutManager;
