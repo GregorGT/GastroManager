@@ -1,0 +1,11 @@
+restaurante_layout=Restaurante Layout
+restaurante_floor=Floor
+restaurante_table=Table
+restaurante_chair=chair
+menu=Menu
+category=Category
+dish=Dish
+drink=Drink
+menues=menu
+layout=layout
+new floor=new floor
