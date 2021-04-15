@@ -45,14 +45,19 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import java.util.Vector;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -65,15 +70,20 @@ import javax.swing.JEditorPane;
 import javax.swing.JTextPane;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JDialog;
+import javax.swing.JSeparator;
+import java.awt.Choice;
 
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
+//	private DrillDownMenu drillDownMenu;
 	private GMTreeItem root;
 	private GMTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
 	private JTextField textField;
+	private boolean treeLoaded = false;
+	
 	
 	public static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -91,8 +101,7 @@ public class MainWindow extends JFrame {
 		if (xmlNode.getNodeName().contains("#"))
 		return;
 	 
-		GMTreeItem newNode = new GMTreeItem(rootNode);
-		rootNode.add(newNode);
+		GMTreeItem newNode = new GMTreeItem();
 		
 		NamedNodeMap attributes = xmlNode.getAttributes();
 	 
@@ -101,9 +110,15 @@ public class MainWindow extends JFrame {
 			String name = attributes.item(k).getNodeName();
 			String value = attributes.item(k).getNodeValue();
 			
-			newNode.m_attributes.put(name,  value);
-			newNode.m_attributes.putIfAbsent("uuid", assignUUID()); 
-			//if it's already assigned, do not assign
+			
+//			newNode.m_attributes.put(name,  value);
+//			newNode.m_attributes.putIfAbsent("uuid", assignUUID());
+			
+			newNode.setAttributes(name, value);
+			newNode.setUUID(assignUUID());
+			
+//			System.out.println(name  + "  ====  " + value);
+			
 			}
 		}
 	 
@@ -121,11 +136,22 @@ public class MainWindow extends JFrame {
 	 }
 	 
 	 if (xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
-	 newNode.m_value = xmlNode.getNodeValue();
+
+	 newNode.setValue(xmlNode.getNodeValue());
+
+	 newNode.setXmlName(xmlNode.getNodeName());
 	 
-	 newNode.m_xmlname = xmlNode.getNodeName();
 	 newNode.setUserObject(newNode.getDisplayString());
 	 NodeList children = xmlNode.getChildNodes();
+	 rootNode.add(newNode);
+	 
+	 System.out.println( "NODE NAME " + newNode.m_name);
+
+     System.out.println( "NODE VALUE " + newNode.m_value);
+
+	 System.out.println( "NODE XML NAME  " + newNode.m_xmlname);
+		
+	 System.out.println("ATTRIBUTES " + newNode.getAttributes());
 	 
 	 for (int i = 0; i < children.getLength(); ++i) {
 		 treeBuild(newNode, children.item(i));
@@ -140,9 +166,43 @@ public class MainWindow extends JFrame {
 		    }
 	}
 	
-	String writeTreeIntoString(GMTreeItem treeItem) {
+	String writeTreeIntoString(GMTree tree, GMTreeItem treeItem) {
+		
+		int node = treeItem.getChildCount();
 		
 		String result = "";
+		
+		result += "<" + treeItem.getXmlName();
+		
+		Iterator it = treeItem.getAttributes().entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pair = (Map.Entry)it.next();
+	        result += " " + pair.getKey() + "=" + "\"" + pair.getValue() + "\"";
+	    }
+		
+		if (node > 0 || treeItem.m_value.length() > 0) {
+	    	result += ">";
+	    	} else {
+	    	result += "/>";
+	    	}
+	    if (node == 0 && treeItem.m_value.length() > 0) {
+	    	result += treeItem.m_value;
+	    }
+		
+		result += treeItem.m_name;
+		result += treeItem.m_value;
+		
+		int children = treeItem.getChildCount();
+		
+		
+		for (int j = 0; j< children; j++) {
+			
+//			System.out.println(children);
+			GMTreeItem newItem = (GMTreeItem) treeItem.getChildAt(j);
+			writeTreeIntoString(tree, newItem);
+			
+		}
+		
 		//Write saving function
 		return result;
 	}
@@ -185,12 +245,11 @@ public class MainWindow extends JFrame {
 		
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");
-		mntmLoad.addActionListener(new java.awt.event.ActionListener() {
+		mntmLoad.addActionListener(new ActionListener() {
             
-            public void actionPerformed(java.awt.event.ActionEvent e) {
+            public void actionPerformed(ActionEvent e) {
                 
                 JFileChooser fc = new JFileChooser();
-                fc.showOpenDialog(null);
                 FileNameExtensionFilter filterExt = new FileNameExtensionFilter("XML Docs", "xml");
                 fc.setFileFilter(filterExt);
                 
@@ -204,7 +263,8 @@ public class MainWindow extends JFrame {
                 try {
                 	String fstr = readFileToString(selected, Charset.defaultCharset());
                 	doc = loadXMLFromString(fstr);
-                	parseXmlDocument(doc, root);               	
+                	parseXmlDocument(doc, root);
+                	treeLoaded = true;
                 } catch (Exception e1) {
                 	e1.printStackTrace();
                 }
@@ -216,7 +276,7 @@ public class MainWindow extends JFrame {
 		JMenuItem mntmNewMenuItem = new JMenuItem("Save");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				System.out.println(writeTreeIntoString(root));
+				System.out.println(writeTreeIntoString(tree, root));
 			}
 		});
 		mnFileMenu.add(mntmNewMenuItem);
@@ -230,6 +290,7 @@ public class MainWindow extends JFrame {
 					fstr = readFileToString("C:\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
                 	doc = loadXMLFromString(fstr);
                 	parseXmlDocument(doc, root);
+                	treeLoaded = true;
 				} catch (IOException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -250,15 +311,6 @@ public class MainWindow extends JFrame {
 		splitPane.setDividerLocation(200);
 		contentPane.add(splitPane, BorderLayout.CENTER);
 		
-		root = new GMTreeItem("Root");
-
-	    tree = new GMTree(root);
-	    tree.init(tree);
-	    splitPane.setLeftComponent(tree);
-	    tree.setEditable(true);
-	    
-	    treeScroll = new JScrollPane();
-	    defaultModel = (DefaultTreeModel) tree.getModel();    
 		
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		splitPane.setRightComponent(tabbedPane);
@@ -269,14 +321,28 @@ public class MainWindow extends JFrame {
 		
 		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);
 		tabbedPane.addTab("Layout", null, tabLayout, null);
+	
+		root = new GMTreeItem("Root");
+	    tree = new GMTree(root);
+	    splitPane.setLeftComponent(tree);
+	    tree.setEditable(true);
+	    
+	    treeScroll = new JScrollPane();
+	    defaultModel = (DefaultTreeModel) tree.getModel(); 
+	    
+		DrillDownMenu drillDownMenu = new  DrillDownMenu();
+		drillDownMenu.init(drillDownMenu, root, defaultModel, tree);
 		
-		DrillDownMenu tabDrillDown = new DrillDownMenu();
-		tabbedPane.addTab("Drill Down Menu", null, tabDrillDown, null);
-		tabDrillDown.setLayout(null);
-		tabDrillDown.init(tabDrillDown, root, defaultModel);
+		tabbedPane.addTab("Drill Down Menu", null, drillDownMenu, null);
+		drillDownMenu.setLayout(null);
+		   
+	    tree.init(tree , drillDownMenu, defaultModel, root);
 		
-		JTabbedPane tabOrdering = new JTabbedPane(JTabbedPane.TOP);
+		
+	    OrderingMenu tabOrdering = new OrderingMenu();
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
+	    tabOrdering.setLayout(null);	    
+	    
 	}
 	
 	public void showSelectedDrillDown() {

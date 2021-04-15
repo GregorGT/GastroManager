@@ -7,51 +7,42 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-public class DrillDownGroup extends JPanel {
+public class DrillDownGroup extends JPanel{
 
-	public DrillDownGroup newpanel;
-	public int buttonIndex = 0;
+	public DrillDownGroup group;
+	public int xCoord, yCoord;
 	
-	public void newDrillDown(int width, int height, String name, DrillDownMenu menu) {
-		newpanel = new DrillDownGroup();
+	public void init(int width, int height, String name, DrillDownMenu ddmenu) {
+		group = new DrillDownGroup();
+		
+		group.setLayout(null);
+//			newpanel.setLayout(new GridLayout(5, 5));
 
-			newpanel.setLayout(new GridLayout(5, 5));
-
-    	newpanel
-    	.setBorder(new TitledBorder(null,
-    			name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
-    	menu.add(newpanel);
-    	newpanel.setBounds(10, 150, width, height);
-    	
-    	newpanel.setVisible(true);   		
+    	group
+    	.setBorder(new TitledBorder(null, name,
+    			TitledBorder.LEADING, TitledBorder.TOP, null, null));
+    	ddmenu.add(group);
+    	group.setBounds(10, 150, width, height);
+    	this.xCoord = 10;
+    	this.yCoord = 150;
+    	ddmenu.add(group);
+    	group.setVisible(true);   		
 	}
 	
-	public void newButton(int width, int height, String name, DrillDownGroup grp) {
+	public void newButton(int width, int height, int x, int y, String name, DrillDownGroup drillDownGroup) {
 		DrillDownButton btn = new DrillDownButton();
-		
-		btn.init(width, height, name, newpanel);
-		buttonIndex++;
-		System.out.println(buttonIndex + " <--- number of buttons");
-		
+		btn.init(width, height, x, y, name, group);		
 	}
 	
 	public DrillDownGroup() {
-		// TODO Auto-generated constructor stub
+		
 	}
 
-	public DrillDownGroup(LayoutManager layout) {
-		super(layout);
-		// TODO Auto-generated constructor stub
+	public void clear() {
+		this.group = null;
+		
+//		buttonIndex = 0;
 	}
 
-	public DrillDownGroup(boolean isDoubleBuffered) {
-		super(isDoubleBuffered);
-		// TODO Auto-generated constructor stub
-	}
-
-	public DrillDownGroup(LayoutManager layout, boolean isDoubleBuffered) {
-		super(layout, isDoubleBuffered);
-		// TODO Auto-generated constructor stub
-	}
 
 }

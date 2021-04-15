@@ -9,7 +9,6 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 	public String m_xmlname = new String(); 
 	public HashMap < String, String > m_attributes = new HashMap<String, String>();
 	
-	
 	String getDisplayString() {
 		
 		String result = new String();
@@ -31,8 +30,36 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 		
 	}
 	
+	public HashMap<String, String> getAttributes() {
+		
+		return m_attributes;
+	}
+	
+	public void setAttributes(String name, String value) {
+		this.m_attributes.put(name, value);
+	}
+	
+
+	public void setUUID(String uuid) {
+		this.m_attributes.putIfAbsent("uuid", uuid);
+	}
+	
+	public void setValue(String value) {
+		this.m_value = value;
+	}
+	
+	public void setName(String name) {
+		this.m_name = name;
+	}
+	
+	public String getXmlName() {
+		return this.m_xmlname;
+	}
+	public void setXmlName(String xmlName) {
+		this.m_xmlname = xmlName;
+	}
 	public GMTreeItem() {
-		// TODO Auto-generated constructor stub
+	
 	}
 
 	public GMTreeItem(Object userObject) {
