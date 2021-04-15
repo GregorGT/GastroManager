@@ -1,5 +1,6 @@
 package com.gastromanager.mainwindow;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,15 +32,16 @@ public class DrillDownMenu extends JPanel {
 	private JTextField txtButtonHeight;
 	private JTextField txtButtonWidth;
 	private JTextField txtButtonName;
-	private DrillDownGroup drillDownGroup;
-
-	public void init(DrillDownMenu ddmenu, GMTreeItem treeitem, DefaultTreeModel model) {		
+	public DrillDownGroup drillDownGroup;
+	
+	public void init(DrillDownMenu ddmenu, GMTreeItem treeitem, DefaultTreeModel model, GMTree tree) {		
+				
 		JPanel panelDrillDown = new JPanel();
 		panelDrillDown
 		.setBorder(new TitledBorder(null, "Drill Down", TitledBorder.LEADING,
 					TitledBorder.TOP, null, null));
 		panelDrillDown.setBounds(6, 0, 368, 71);
-		ddmenu.add(panelDrillDown);
+		this.add(panelDrillDown);
 		panelDrillDown.setLayout(null);
 		
 		JLabel lblDDHeight = new JLabel("Height");
@@ -71,23 +73,47 @@ public class DrillDownMenu extends JPanel {
 		
 		JButton btnAddDrillDown = new JButton("Add Drill Down Menu");
 		btnAddDrillDown.setBounds(221, 16, 141, 46);
+		
+		
+		ActionListener addDrillDownButton = new ActionListener() {
+		    
+		    public void actionPerformed(ActionEvent e) {       	
+		    	
+		    	if (drillDownGroup == null) {
+		    	drillDownGroup = new DrillDownGroup();
+		    	String ddheight = txtDDHeight.getText();
+		    	int nDDHeight = Integer.parseInt(ddheight);
+		    	String ddwidth = txtDDWidth.getText();
+		    	int nDDWidth = Integer.parseInt(ddwidth);
+		    	ddName = txtDDName.getText();
+
+		    	drillDownGroup.init(nDDWidth, nDDHeight, ddName, ddmenu);	
+		    	toTree(treeitem, model, ddName, "drilldownmenus", nDDHeight, nDDWidth);
+		    	
+		    	} else if (drillDownGroup != null) {
+		    		ddmenu.remove(drillDownGroup.group);
+		    		ddmenu.revalidate();
+		    		ddmenu.repaint();
+		    		drillDownGroup = new DrillDownGroup();
+		    		
+		        	String ddheight = txtDDHeight.getText();
+		        	int nDDHeight = Integer.parseInt(ddheight);
+		        	String ddwidth = txtDDWidth.getText();
+		        	int nDDWidth = Integer.parseInt(ddwidth);
+		        	ddName = txtDDName.getText();
+		        	System.out.println(drillDownGroup.toString());
+		        	drillDownGroup.init(nDDWidth, nDDHeight, ddName, ddmenu);
+		        	toTree(treeitem, model, ddName, "drilldownmenus", nDDHeight, nDDWidth);
+		    		
+		    	}
+		    }
+		};
+		
+			
+		
+		btnAddDrillDown.addActionListener(addDrillDownButton);
 		panelDrillDown.add(btnAddDrillDown);
-		btnAddDrillDown.addActionListener(new ActionListener() {
-            
-            public void actionPerformed(ActionEvent e) {
-            	
-            	drillDownGroup = new DrillDownGroup();
-            	String ddheight = txtDDHeight.getText();
-            	int nDDHeight = Integer.parseInt(ddheight);
-            	String ddwidth = txtDDWidth.getText();
-            	int nDDWidth = Integer.parseInt(ddwidth);
-            	ddName = txtDDName.getText();
-            	
-            	drillDownGroup.newDrillDown(nDDWidth, nDDHeight, ddName, ddmenu);
-            	toTree(treeitem, model, ddName, "drilldownmenus", nDDHeight, nDDWidth);            	
-            }
-            
-		});
+		
 		
 		JPanel panelButtons = new JPanel();
 		panelButtons.setLayout(null);
@@ -95,7 +121,7 @@ public class DrillDownMenu extends JPanel {
 		.setBorder(new TitledBorder(null, "Button", TitledBorder.LEADING,
 					TitledBorder.TOP, null, null));
 		panelButtons.setBounds(6, 73, 368, 71);
-		ddmenu.add(panelButtons);
+		this.add(panelButtons);
 		
 		JLabel lblButtonHeight = new JLabel("Height");
 		lblButtonHeight.setBounds(6, 20, 46, 14);
@@ -127,7 +153,8 @@ public class DrillDownMenu extends JPanel {
 		JButton btnAddButton = new JButton("Add Button");
 		btnAddButton.setBounds(221, 16, 141, 46);
 		panelButtons.add(btnAddButton);
-		btnAddButton.addActionListener(new ActionListener() {
+		
+		ActionListener addButton = new ActionListener() {
 			
 			public void actionPerformed(ActionEvent e) {
 				
@@ -136,14 +163,33 @@ public class DrillDownMenu extends JPanel {
             	String btnwidth = txtButtonWidth.getText();
             	int nBtnWidth = Integer.parseInt(btnwidth);
             	String btnName = txtButtonName.getText();
-            	drillDownGroup.newButton(nBtnWidth, nBtnHeight, btnName, drillDownGroup);
+            	drillDownGroup.newButton(nBtnWidth, nBtnHeight, 10, 20, btnName, drillDownGroup);
             	toTree(treeitem, model, btnName, ddName, nBtnHeight, nBtnWidth);
             	
 			}
-			
-		});		
+		};
+		
+		
+		btnAddButton.addActionListener(addButton);	
+		
+		
+		JButton btnClear = new JButton("Clear");
+		ActionListener clearFromEditor = new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				ddmenu.remove(drillDownGroup.group);
+				ddmenu.revalidate();
+				ddmenu.repaint();
+			}
+		};
+
+		
+		btnClear.addActionListener(clearFromEditor);
+		btnClear.setBounds(400, 16, 100, 60);
+		this.add(btnClear);
 	}
-	
+
+		
 	public void toTree(GMTreeItem treeItem, DefaultTreeModel model, String newName, String parent, int height, int width) {	
 
 		Enumeration enum1 = treeItem.children();
@@ -155,6 +201,7 @@ public class DrillDownMenu extends JPanel {
 			heightItem.setUserObject("Height :" + String.valueOf(height));
 			GMTreeItem widthItem = new GMTreeItem();
 			widthItem.setUserObject("Width :" + String.valueOf(width));
+			
 			model.insertNodeInto(newItem, treeItem, 0);
 			model.insertNodeInto(heightItem, newItem, 0);
 			model.insertNodeInto(widthItem, newItem, 0);
@@ -187,4 +234,9 @@ public class DrillDownMenu extends JPanel {
 		// TODO Auto-generated constructor stub
 	}
 
+
+	public void addActionListeners(DrillDownMenu menu) {
+
+		
+	}
 }
