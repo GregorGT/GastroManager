@@ -1,0 +1,12 @@
+>sqlite3 gastrodb.db
+SQLite version 3.35.3 2021-03-26 12:12:52
+Enter ".help" for usage hints.
+sqlite> create table member(id INT primary key, firstName TEXT, lastName TEXT, contact TEXT, email TEXT UNIQUE);
+sqlite> create table staff(id INT primary key, firstName TEXT, lastName TEXT, authority TEXT, position TEXT, contact TEXT, email TEXT UNIQUE);
+sqlite> create table orders(id INT primary key, amount REAL, menu_id INT, staff_id INT, location_id INT, transaction_id INT, member_id TEXT, humanreadable_id INT, datetime NUMERIC);
+sqlite> create table transactions(id INT primary key, total_amount REAL, payment_method TEXT, tips REAL);
+sqlite> create table orderitem(order_id INT,item_id INT, quantity INT, remark TEXT, xml TEXT,price REAL, print_status INT, payed NUMERIC, datetime NUMERIC, status INT);
+sqlite> create table orderlocation(order_id INT,location_id INT, primary key(order_id,location_id));
+sqlite> create table location(id INT primary key, description TEXT, capacity TEXT, created_by TEXT, created_date NUMERIC, last_modified_by NUMERIC,last_midified_date NUMERIC, floor_id INT, table_id INT);
+sqlite> create table floor(id INT primary key,name TEXT, floor_id INT,created_by TEXT, created_date NUMERIC);
+sqlite> create table tabledetails(id INT primary key,name TEXT, table_id INT, created_by TEXT, created_date NUMERIC);
