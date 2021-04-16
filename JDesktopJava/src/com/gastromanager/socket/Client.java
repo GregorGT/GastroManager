@@ -1,7 +1,10 @@
 package com.gastromanager.socket;
 
+import com.gastromanager.util.XmlUtil;
+
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.Charset;
 
 public class Client {
 
@@ -9,31 +12,39 @@ public class Client {
     BufferedReader bufferedReader = null;
     DataOutputStream out = null;
 
+
     public Client(String address, int port) {
         try {
 
             socket = new Socket(address, port);
-
-            bufferedReader = new BufferedReader(new InputStreamReader(System.in));
             out = new DataOutputStream(socket.getOutputStream());
-            String line = "";
 
-            while(!line.equals("Done")) {
-                //line = in.readLine();
-                line  = bufferedReader.readLine();
-                //System.out.println(line);
-                out.writeUTF(line);
-
-            }
+            sendXMLData(null, out);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         try {
-            bufferedReader.close();
             out.close();
             socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void sendXMLData(String xmlContent, DataOutputStream out) {
+        try {
+            xmlContent = XmlUtil.readFileToString(
+                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
+           /* BufferedReader bufferedReader = new BufferedReader(
+                    new InputStreamReader(
+                            new ByteArrayInputStream(xmlContent.getBytes())));*/
+            System.out.println(Charset.defaultCharset());
+            System.out.println(xmlContent);
+           out.writeChars(xmlContent);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,5 +1,8 @@
 package com.gastromanager.socket;
 
+import com.gastromanager.util.XmlUtil;
+import org.w3c.dom.Document;
+
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -22,6 +25,7 @@ public class Server {
 
             while(!line.equals("Done")) {
                 line  = in.readUTF();
+                Document doc = XmlUtil.loadXMLFromString(line);
                 System.out.println(line);
 
             }
@@ -30,6 +34,8 @@ public class Server {
             in.close();
 
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
