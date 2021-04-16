@@ -10,7 +10,7 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 	public HashMap < String, String > m_attributes = new HashMap<String, String>();
 	
 	
-	public String getDisplayString() {
+	String getDisplayString() {
 		
 		String result = new String();
 		
