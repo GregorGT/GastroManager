@@ -18,7 +18,7 @@
 				<option id="toppingammount" name="lots" price="1.2" />
 				<item name="margarita" menu_id="100">
 					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="100a" />
-					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b"/>
+					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b" uuid="1284887162" />
 					<option id="size" name="large" 	price="1.2" menu_id="100c"/>
 				</item>
 			</item>
@@ -52,7 +52,7 @@
 				<item name="Coca Cola" name_en="Coce" menu_id="10">
 					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" />
 					<option id="size" name="medium" name_de="mittel" menu_id="10b"/>
-					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" />
+					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
 				</item>
 				<item name="Fanta" displayname_en="Fanta" price="0.5"/>
 				
