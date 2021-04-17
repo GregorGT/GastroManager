@@ -9,7 +9,6 @@ import org.xml.sax.InputSource;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.nio.charset.Charset;
@@ -22,9 +21,7 @@ public class XmlUtil {
     public static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        //InputSource is = new InputSource(new StringReader(xml));
-        InputSource is = new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8")));
-        //Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(xml.getBytes("UTF-8"))))
+        InputSource is = new InputSource(new StringReader(xml));
         return builder.parse(is);
     }
 

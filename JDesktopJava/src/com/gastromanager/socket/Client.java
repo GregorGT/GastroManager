@@ -39,12 +39,8 @@ public class Client {
         try {
             xmlContent = XmlUtil.readFileToString(
                     "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
-           /* BufferedReader bufferedReader = new BufferedReader(
-                    new InputStreamReader(
-                            new ByteArrayInputStream(xmlContent.getBytes())));*/
-            System.out.println(Charset.defaultCharset());
-            System.out.println(xmlContent);
-           out.writeChars(xmlContent);
+            //System.out.println(xmlContent);
+            out.writeUTF(xmlContent);
         } catch (IOException e) {
             e.printStackTrace();
         }

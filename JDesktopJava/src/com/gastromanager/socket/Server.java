@@ -21,15 +21,11 @@ public class Server {
             socket = serverSocket.accept();
 
             in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            String line = "";
-
-            while(!line.equals("Done")) {
-                line  = in.readUTF();
-                Document doc = XmlUtil.loadXMLFromString(line);
-                System.out.println(line);
-
-            }
-
+            String xmlContent = in.readUTF();
+            Document doc = XmlUtil.loadXMLFromString(xmlContent);
+            System.out.println(doc.getElementsByTagName("item").getLength());
+            doc = null;
+            xmlContent = null;
             socket.close();
             in.close();
 
@@ -42,8 +38,6 @@ public class Server {
     }
 
     public static void main(String[] args) {
-
         Server server = new Server(5001);
-
     }
 }
