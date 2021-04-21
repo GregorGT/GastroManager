@@ -1,4 +1,4 @@
-package com.gastromanager.gui;
+package com.gastromanager.mainwindow;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

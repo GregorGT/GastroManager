@@ -9,7 +9,7 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 	public String m_xmlname = new String(); 
 	public HashMap < String, String > m_attributes = new HashMap<String, String>();
 	
-	String getDisplayString() {
+	public String getDisplayString() {
 		
 		String result = new String();
 		
