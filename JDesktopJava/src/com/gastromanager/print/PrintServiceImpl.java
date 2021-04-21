@@ -24,6 +24,7 @@ public class PrintServiceImpl implements PrintService {
 
     private String formatOrderText(List<OrderItem> orderItems) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
+        orderDetailsBuilder.append("******* Order Details: ******** \n");
         orderItems.forEach(orderItem -> {
             Document xml = orderItem.getXml();
             NodeList items  = xml.getElementsByTagName("item");

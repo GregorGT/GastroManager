@@ -7,16 +7,19 @@ import java.util.Properties;
 
 public class PropertiesUtil {
 
+    public static Properties properties;
+
     public static String getPropertyValue(String propertyKey) {
         String value = null;
         try {
-            InputStream is =  new FileInputStream(System.getProperty("user.dir")+"\\resources\\gastromanager.properties");
-            //InputStream is = PropertiesUtil.class.getClassLoader().getResourceAsStream("gastromanager.properties");
-            Properties properties = new Properties();
-            properties.load(is);
+            if(properties == null) {
+                InputStream is = new FileInputStream(System.getProperty("user.dir") + "\\resources\\gastromanager.properties");
+                //InputStream is = PropertiesUtil.class.getClassLoader().getResourceAsStream("gastromanager.properties");
+                properties = new Properties();
+                properties.load(is);
+            }
             value = properties.getProperty(propertyKey);
-            System.out.println(value);
-            System.out.println(System.getProperty("user.dir")+"\\resources\\gastromanager.properties");
+            //System.out.println(value);
             } catch (IOException e) {
             e.printStackTrace();
         }

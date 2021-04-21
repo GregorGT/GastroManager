@@ -15,11 +15,10 @@ public class DbUtil {
         List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
-            System.out.println("Connection to SQLite has been established.");
             PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
-            System.out.println(stmt.executeQuery().findColumn("quantity"));
+            //System.out.println(stmt.executeQuery().findColumn("quantity"));
             orderItems = loadResults(result);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
