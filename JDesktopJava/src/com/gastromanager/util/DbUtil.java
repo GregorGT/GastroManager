@@ -39,6 +39,7 @@ public class DbUtil {
                     orderItem.setItemId(result.getInt("item_id"));
                     orderItem.setRemark(result.getString("remark"));
                     orderItem.setXml(XmlUtil.loadXMLFromString(result.getString("xml")));
+                    orderItem.setPrice(result.getDouble("price"));
                     orderItems.add(orderItem);
                 }
 
