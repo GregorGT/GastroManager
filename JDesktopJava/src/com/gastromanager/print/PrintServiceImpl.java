@@ -1,5 +1,6 @@
 package com.gastromanager.print;
 
+import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
@@ -25,16 +26,20 @@ public class PrintServiceImpl implements PrintService {
     @Override
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
-
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
         //return executePrint(formatOrderText(orderItems));
-        return executePrintOverNetwork(formatOrderText(orderItems));
+        return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
-    private String formatOrderText(List<OrderItem> orderItems) {
+    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
         AtomicReference<Double> total = new AtomicReference<>(new Double(0));
-        orderDetailsBuilder.append("        RESTAURANT            \n");
-        orderDetailsBuilder.append("******* Order Details: *******\n");
+        orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
+        orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"\n");
+        orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() +"\n");
+        orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() +"\n");
+        orderDetailsBuilder.append("Time: "+ orderInfo.getTimestamp() +"\n");
+        orderDetailsBuilder.append("*************************\n");
         orderItems.forEach(orderItem -> {
             Document xml = orderItem.getXml();
             total.updateAndGet(v -> v + orderItem.getPrice());
