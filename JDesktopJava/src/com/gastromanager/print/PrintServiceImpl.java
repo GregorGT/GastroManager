@@ -2,13 +2,18 @@ package com.gastromanager.print;
 
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
+import io.github.escposjava.PrinterService;
+import io.github.escposjava.print.NetworkPrinter;
+import io.github.escposjava.print.Printer;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import javax.print.*;
 import javax.print.attribute.HashPrintRequestAttributeSet;
 import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
+import javax.print.attribute.PrintServiceAttributeSet;
+import javax.print.attribute.standard.*;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 import java.io.*;
@@ -19,7 +24,8 @@ public class PrintServiceImpl implements PrintService {
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
 
-        return executePrint(formatOrderText(orderItems));
+        //return executePrint(formatOrderText(orderItems));
+        return executePrintOverNetwork(formatOrderText(orderItems));
     }
 
     private String formatOrderText(List<OrderItem> orderItems) {
@@ -27,14 +33,39 @@ public class PrintServiceImpl implements PrintService {
         orderDetailsBuilder.append("******* Order Details: ******** \n");
         orderItems.forEach(orderItem -> {
             Document xml = orderItem.getXml();
-            NodeList items  = xml.getElementsByTagName("item");
-            for(int i=0; i < items.getLength(); i++) {
-                orderDetailsBuilder.append("Item = " +items.item(i).getAttributes().getNamedItem("name").getNodeValue());
+            //Main Item
+            Node item  = xml.getDocumentElement();
+            if(item.getNodeName() == "item") {
+                orderDetailsBuilder.append("Item = " + item.getAttributes().getNamedItem("name").getNodeValue());
+                //Linked items
+                addChildItems(item, orderDetailsBuilder);
                 orderDetailsBuilder.append("\n");
+
             }
         });
-
+        System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString();
+    }
+
+    private void addChildItems(Node node,StringBuilder orderDetailsBuilder) {
+        NodeList childItems = node.getChildNodes();
+        for (int childItemIndex = 0; childItemIndex < childItems.getLength(); childItemIndex++) {
+            Node childItem = childItems.item(childItemIndex);
+            String childItemName  = childItem.getNodeName();
+            switch (childItemName) {
+                case "item" :
+                    orderDetailsBuilder.append("\n\t" + childItem.getAttributes().getNamedItem("name").getNodeValue());
+                    addChildItems(childItem, orderDetailsBuilder);
+                    break;
+                case "option" :
+                    orderDetailsBuilder.append(" - " + childItem.getAttributes().getNamedItem("name").getNodeValue());
+                    orderDetailsBuilder.append(" - " + (childItem.getAttributes().getNamedItem("price") == null ?
+                            childItem.getAttributes().getNamedItem("overwrite_price").getNodeValue():
+                            childItem.getAttributes().getNamedItem("price").getNodeValue()));
+                    //TODO add choice
+                    break;
+            }
+        }
     }
 
     private static boolean jobRunning = true;
@@ -88,10 +119,28 @@ public class PrintServiceImpl implements PrintService {
         return isPrintSuccessful;
     }
 
+    private Boolean executePrintOverNetwork(String text) {
+        Boolean isPrintSuccessful = false;
+        try {
+            Printer printer = new NetworkPrinter("127.0.0.1", 9100);
+            PrinterService printerService = new PrinterService(printer);
+
+            printerService.print(text);
+
+            printerService.close();
+            isPrintSuccessful = true;
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        return isPrintSuccessful;
+    }
+
 
     public static void main(String[] args) throws Exception {
         PrintServiceImpl printService = new PrintServiceImpl();
         printService.print("1");
+        //printService.checkPrint();
     }
 
     private static class JobCompleteMonitor extends PrintJobAdapter {
@@ -115,5 +164,34 @@ public class PrintServiceImpl implements PrintService {
             e.printStackTrace();
         }
         return isAutCutDone;
+    }
+
+    //TODO edit/remove after test
+    private void checkPrint() {
+        // TODO code application logic here
+
+        javax.print.PrintService[] printServices = PrintServiceLookup.lookupPrintServices(null,null);
+
+        for ( javax.print.PrintService printService : printServices ){
+
+            System.out.println("******************************************************************" );
+            System.out.println("Printer Name is (" + printService.getName()+ ")" );
+
+
+            PrintServiceAttributeSet printServiceAttributeSet = printService.getAttributes();
+
+            System.out.println("PrinterLocation is (" + printServiceAttributeSet.get(PrinterLocation.class));
+            System.out.println("PrinterInfo is (" + printServiceAttributeSet.get(PrinterInfo.class));
+
+            System.out.println("PrinterState is (" + printServiceAttributeSet.get(PrinterState.class));
+
+            System.out.println("Destination is (" + printServiceAttributeSet.get(Destination.class));
+
+            System.out.println("PrinterMakeAndModel is (" + printServiceAttributeSet.get(PrinterMakeAndModel.class));
+
+            System.out.println("PrinterIsAcceptingJobs is (" + printServiceAttributeSet.get(PrinterIsAcceptingJobs.class));
+
+        }
+
     }
 }
