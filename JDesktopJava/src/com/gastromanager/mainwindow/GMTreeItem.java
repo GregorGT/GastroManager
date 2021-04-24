@@ -37,13 +37,6 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 		return result;
 	}
 	
-//	public void setId(String uuid) {
-//		if (this.id == null)
-//		this.id = uuid;
-//		else if (this.id != null) 
-//			return;
-//	}
-	
 	public void setTree(GMTree parent) {
 		this.treeParent = parent;
 	}

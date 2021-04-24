@@ -17,7 +17,6 @@ public class EditDialog extends JDialog {
 
 	JTextField tfValue;
 	
-	
 	public void renameDrillDownButton(DrillDownButton btn) {
 		btn.setText(tfValue.getText());
 		btn.repaint();

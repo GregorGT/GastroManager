@@ -115,26 +115,10 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(1);
 				b.setUserObject("X: " + String.valueOf(position.x));
 				
-				
-				
 				DefaultTreeModel model =
 						(DefaultTreeModel) associatedTreeItem.treeParent.getModel();				
 				model.reload(a);
 				model.reload(b);
-//				associatedTreeItem.m_attributes.remove("y-position");
-//				associatedTreeItem.m_attributes.remove("x-position");
-//				associatedTreeItem.addAttributes("y-position", String.valueOf(position.y));
-//				associatedTreeItem.addAttributes("x-position", String.valueOf(position.x));
-//				
-//				associatedTreeItem.remove(0);
-//				associatedTreeItem.remove(1);
-//				GMTreeItem yPosAct = new GMTreeItem("Y Position: " + String.valueOf(position.y));
-//				GMTreeItem xPosAct = new GMTreeItem("X Position: " + String.valueOf(position.x));
-//				
-//				model.removeNodeFromParent((GMTreeItem) associatedTreeItem.getChildAt(0));
-//				model.removeNodeFromParent((GMTreeItem) associatedTreeItem.getChildAt(1));
-//				model.insertNodeInto(yPosAct, associatedTreeItem, 0);
-//				model.insertNodeInto(xPosAct, associatedTreeItem, 0);
 				
 				if (overlapping) {
 					getParent().setComponentZOrder(DrillDownButton.this, 0);
@@ -168,12 +152,6 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 				grp.revalidate();
 				grp.repaint();
 				
-				//remove from tree as well
-				//get path from associatedTI, 
-//				DefaultTreeModel model = (DefaultTreeModel) 
-//						associatedTreeItem.treeParent.getModel();
-//				model.removeNodeFromParent(associatedTreeItem);
-				
 				DefaultTreeModel model = (DefaultTreeModel)
 				associatedTreeItem.treeParent.getModel();
 				
@@ -192,7 +170,6 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		popupMenu.add(mntmRename);
 		
 		JMenu mntmTarget = new JMenu("Select target menu");
-		
 		
 		MouseListener hover = new MouseListener() {
 
@@ -224,10 +201,7 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 			}
 			
 		};
-		
 		mntmTarget.addMouseListener(hover);
-		
-		
 		
 		popupMenu.add(mntmTarget);		
 		

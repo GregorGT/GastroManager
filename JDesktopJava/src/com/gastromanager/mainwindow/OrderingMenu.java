@@ -49,10 +49,6 @@ public class OrderingMenu extends JPanel {
 	    this.add(txtFieldWaiter);
 	    txtFieldWaiter.setColumns(10);
 	    
-//	    JTree tree_1 = new JTree();
-//	    tree_1.setBounds(10, 55, 236, 276);
-//	    this.add(tree_1);
-	    
 	    JList list = new JList();
 	    list.setBounds(10, 55, 236, 276);
 	    this.add(list);

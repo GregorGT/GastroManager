@@ -32,40 +32,6 @@ public class DrillDownGroup extends JPanel{
     	this.yCoord = 150;
     	this.name = name;
     	
-    	MouseListener clicke = new MouseListener() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				System.out.println(DrillDownGroup.this.id);	
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-    		
-    	};
-    	
-    	this.addMouseListener(clicke);
-    	
     	ddmenu.add(this);
     	this.setVisible(true);   		
 	}
@@ -83,13 +49,10 @@ public class DrillDownGroup extends JPanel{
 	}
 	
 	public DrillDownGroup() {
-		
 	}
 
 	public void clear() {
 		this.group = null;
-		
-//		buttonIndex = 0;
 	}
 
 

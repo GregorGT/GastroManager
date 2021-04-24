@@ -67,7 +67,6 @@ public class DrillDownMenu extends JPanel {
 		JButton btnAddDrillDown = new JButton("Add Drill Down Menu");
 		btnAddDrillDown.setBounds(221, 16, 141, 46);
 
-
 		ActionListener addDrillDownButton = new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {       	
@@ -80,7 +79,6 @@ public class DrillDownMenu extends JPanel {
 					ddName = txtDDName.getText();
 
 					drillDownGroup = new DrillDownGroup(nDDWidth, nDDHeight, ddName, DrillDownMenu.this);
-
 					componentToTree(treeitem, model, "drilldownmenus", drillDownGroup);
 
 				} else if (drillDownGroup != null) {
@@ -96,14 +94,11 @@ public class DrillDownMenu extends JPanel {
 					System.out.println(drillDownGroup.toString());
 
 					drillDownGroup = new DrillDownGroup(nDDWidth, nDDHeight, ddName, DrillDownMenu.this);
-
 					componentToTree(treeitem, model, "drilldownmenus", drillDownGroup);
 
 				}
 			}
 		};
-
-
 
 		btnAddDrillDown.addActionListener(addDrillDownButton);
 		panelDrillDown.add(btnAddDrillDown);
@@ -158,12 +153,10 @@ public class DrillDownMenu extends JPanel {
 				int nBtnWidth = Integer.parseInt(btnwidth);
 				String btnName = txtButtonName.getText();
 
-				//            	drillDownGroup.newButton(nBtnWidth, nBtnHeight, 10, 20, btnName, drillDownGroup);
-
 				DrillDownButton newBtn = new DrillDownButton(nBtnWidth, nBtnHeight, 10, 20, btnName, drillDownGroup);
 				newBtn.addMenuElements(menuE);
 				drillDownGroup.add(newBtn);
-//				buttonToTree(treeitem, model, ddName, newBtn);
+				
 				componentToTree(treeitem, model, ddName, newBtn);
 				
 			}
@@ -252,7 +245,6 @@ public class DrillDownMenu extends JPanel {
 			}
 		}
 	}
-
 
 	public String assignUUID() {
 		Random rd = new Random(); // creating Random object

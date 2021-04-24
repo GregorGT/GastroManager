@@ -104,7 +104,6 @@ public class GMTree extends JTree {
 						System.out.println(ex.getAttributes().toString());
 						System.out.println(ex.getBtnAssociatedId());
 						
-//						System.out.println();
 					}
 
 					//in here it's possible to add different popup
@@ -165,7 +164,6 @@ public class GMTree extends JTree {
 			else if (!firstParent.getChildAt(j).toString().contains("Width") 
 					&& !firstParent.getChildAt(j).toString().contains("Height")) {
 
-				//				menu.drillDownGroup.newButton(j, j, children, j, TOOL_TIP_TEXT_KEY, null);
 				//button to editor
 				//add button and coordinates x and y  
 			}
