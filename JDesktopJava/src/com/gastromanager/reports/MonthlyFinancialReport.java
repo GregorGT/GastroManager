@@ -4,7 +4,15 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import com.gastromanager.db.DbConnection;
 import com.gastromanager.util.PropertiesUtil;
@@ -36,7 +44,7 @@ public class MonthlyFinancialReport {
 
 	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		
-//		retreiveItemsFromDB();
+		Connection connectionDB = connectDB();
 //		System.exit(0);
 		
 		xContext = null;
@@ -57,31 +65,49 @@ public class MonthlyFinancialReport {
 		System.out.println("Writing title...");
 		putTitle("Monthly Financial Report");
 		
-		System.out.println("Inserting a table...");
-		putTable("Income", 3, 3);
-		putTable("Exepenses", 3, 3);
-		putTable("Most bought items", 3, 4);
-		putTable("Lest bough items", 3, 4);
+		System.out.println("Inserting tables...");
+		
+		Calendar gc = new GregorianCalendar();
+        gc.set(Calendar.MONTH, gc.get(Calendar.MONTH));
+        gc.set(Calendar.DAY_OF_MONTH, 1);
+        Date monthStart = gc.getTime();
+        gc.add(Calendar.MONTH, 1);
+        gc.add(Calendar.DAY_OF_MONTH, -1);
+        Date monthEnd = gc.getTime();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String startDate = format.format(monthStart) + " 00:00:00";
+        String endDate = format.format(monthEnd) + " 23:59:59";
+        
+        System.out.println(startDate);
+        System.out.println(endDate);
+        
+        int totalItems=0;
+        
+		try {
+			PreparedStatement stmt = connectionDB.prepareStatement("SELECT quantity, xml, price FROM orderitem WHERE datetime>=? and datetime<=?");
+		    stmt.setString(1, startDate);
+		    stmt.setString(2, endDate);
+
+	        ResultSet rs = stmt.executeQuery();
+	        while (rs.next()) {
+	            String quantity = rs.getString("quantity");
+	            String xml = rs.getString("xml");
+	            String price = rs.getString("price");
+	            System.out.println(quantity +" "+xml+ " " + price);
+	            ++totalItems;
+	        }
+	        
+	    } catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		putTable("Income", totalItems);
+		putTable("Expenses", totalItems);
+		putTable("Most bought items", 5);
+		putTable("Least bough items", 5);
 
 		System.exit(0);		
 	}
-	
-	public static void retreiveItemsFromDB() {
-//		try {
-//            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
-//            System.out.println(connection);
-//            PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
-//            
-////            stmt.setInt(1,1);
-////            ResultSet result = stmt.executeQuery();
-//            //System.out.println(stmt.executeQuery().findColumn("quantity"));
-////            orderItems = loadResults(result);
-//        } catch (Exception sqlException) {
-//            sqlException.printStackTrace();
-////            orderItems = null;
-//        }
-	}
-	
 	
 	public static void putTitle(String title) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
@@ -92,7 +118,7 @@ public class MonthlyFinancialReport {
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
 	}
 	
-	public static void putTable(String title, int rows, int columns) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+	public static void putTable(String title, int rows) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
 		propertiesOfTextCursor.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.LEFT);
 		xText.insertString(xTextCursor, "\n"+title, false);
@@ -109,18 +135,49 @@ public class MonthlyFinancialReport {
             e.printStackTrace(System.err);
 		}
 		
-		xTextTable.initialize(rows, columns);
+		xTextTable.initialize(rows+1, 3);
 		
-		XPropertySet firstRowProperties = null;
+//		XPropertySet firstRowProperties = null;
 		try {
 			xText.insertTextContent(xTextCursor, xTextTable, false);
-		
+			insertTitles("A1","Item Name", xTextTable);
+//			insertTitles("B1","Item Id", xTextTable);
+			insertTitles("B1","Amount Sold", xTextTable);
+			insertTitles("C1","Income", xTextTable);
+			
+			//TODO: fill the tables with values
+			
 		} catch (Exception e) {
 			System.err.println("Couldn't insert the table " + e);
             e.printStackTrace(System.err);
 		}
 
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+	}
+	
+	public static void insertTitles(String CellName, String theText,
+            com.sun.star.text.XTextTable xTTbl) {
+
+		XText xTableText = (XText) UnoRuntime.queryInterface(XText.class,
+		         xTTbl.getCellByName(CellName));
+		
+		//create a cursor object
+		XTextCursor xTC = xTableText.createTextCursor();
+		
+		XPropertySet xTPS = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTC);
+		
+		try {
+			xTPS.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
+			xTPS.setPropertyValue("CharHeight", 14);
+			xTPS.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.CENTER);
+		} catch (Exception e) {
+			System.err.println(" Exception " + e);
+			e.printStackTrace(System.err);
+		}
+		
+		//inserting some Text
+		xTableText.setString( theText );
+		
 	}
 	
 	public static XTextDocument openWriter(XComponentContext xContext) {
@@ -148,4 +205,40 @@ public class MonthlyFinancialReport {
 		
 		return xDocument;
 	}
+	
+	public static Connection connectDB() {
+		Connection connection = null;
+        try {
+            connection = PDbConnection.getDbConnection().gastroDbConnection;//DriverManager.getConnection(url);
+            System.out.println("Connection to SQLite has been established.");
+        } catch (Exception sqlException) {
+            sqlException.printStackTrace();
+        }
+        return connection;
+	}
+	
+	/*Added another same class for dbconnection because the other one is not working on linux.*/
+	private static class PDbConnection {
+	    private static PDbConnection dbConnection = null;
+	    public Connection gastroDbConnection;
+
+	    private PDbConnection() {
+	        try {
+	            String url = "jdbc:sqlite:"+ System.getProperty("user.dir")+ "/gastrodb/gastromanager.db";
+	            gastroDbConnection = DriverManager.getConnection(url);
+	            System.out.println("Connection to Gastro Database has been established.");
+	        } catch (SQLException sqlException) {
+	            sqlException.printStackTrace();
+	        }
+	    }
+
+	    public static  PDbConnection getDbConnection() {
+	        if(null == dbConnection) {
+	            dbConnection = new PDbConnection();
+	        }
+
+	        return dbConnection;
+	    }
+	}
+	
 }
