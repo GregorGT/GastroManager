@@ -1,62 +1,97 @@
 package com.gastromanager.mainwindow;
-import java.awt.Color;
+
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
 
 import javax.swing.Action;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
+import javax.swing.ButtonModel;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.border.Border;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 public class DrillDownButton extends JButton implements ActionListener, MouseMotionListener {
 
-	
-	private DrillDownButton Button;
-	protected Point origPoint;
-//	private Point whereToDrop;
+	protected  Point origPoint;
 	protected Cursor draggingCursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR);
-//	private boolean draggable = true;
 	protected boolean overlapping = false;
-	private int width, height, xCoord, yCoord;
-	private String name;
-	protected boolean readyToMove = false;
 	
+	public String name, id, targetID;
+	public int height, width, x, y;
+	public HashSet<GMTreeItem> elements = new HashSet<GMTreeItem>();
+	public GMTreeItem associatedTreeItem;
 	
-	public void init(int width, int height, int x, int y, String name, DrillDownGroup grp) {
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getId() {
+		return this.id;
+	}
+	
+	public DrillDownButton getButton() {
+		return this;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public int getHeight() {
+		return this.height;
+	}
+	
+	public int getWidth() {
+		return this.width;
+	}
+	
+	public int getXPos() {
+		return this.x;
+	}
+	public int getYPos() {
+		return this.y;
+	}
+	
+	public DrillDownButton(int width, int height, int x, int y, String name, DrillDownGroup grp) {
 
-		Button = new DrillDownButton(name);
-		Button.setSize(height, width);
+		this.setName(name);
+		this.setText(name);
+		this.setSize(height, width);
 		JPopupMenu popupMenu = new JPopupMenu();
-		addPopup(Button, popupMenu);
+		addPopup(this, popupMenu);
 				
-		Button.setBounds(x,y,width,height);
-//		this.height = height;
-//		this.width = width;
-//		this.xCoord = x;
-//		this.yCoord = y;
+		this.setBounds(x,y,width,height);
+		this.width = width;
+		this.height = height;
+		this.x = x;
+		this.y = y;
+		this.name = name;
 		
 		JMenuItem mntmMove = new JCheckBoxMenuItem("Move");
 		
 		MouseMotionListener dragListener = new MouseAdapter() {
 			public void mouseMoved(MouseEvent e) {
 				origPoint = e.getPoint();
-				Button.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+				DrillDownButton.this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 			}
 			
 			public void mouseDragged(MouseEvent e) {
@@ -69,27 +104,55 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 				= new Point(mouseOnScreen.x - relativeToScreen.x - origX,
 							mouseOnScreen.y - relativeToScreen.y - origY);
 				
-				Button.setLocation(position);
-				Button.xCoord = position.x;
-				Button.yCoord = position.y;
+				DrillDownButton.this.setLocation(position);
+
+				DrillDownButton.this.x = position.x;
+				DrillDownButton.this.y = position.y;
+				// Y, X, WIDTH, HEIGHT
+				
+				GMTreeItem a = (GMTreeItem) associatedTreeItem.getChildAt(0);
+				a.setUserObject("Y: " + String.valueOf(position.y));
+				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(1);
+				b.setUserObject("X: " + String.valueOf(position.x));
+				
+				
+				
+				DefaultTreeModel model =
+						(DefaultTreeModel) associatedTreeItem.treeParent.getModel();				
+				model.reload(a);
+				model.reload(b);
+//				associatedTreeItem.m_attributes.remove("y-position");
+//				associatedTreeItem.m_attributes.remove("x-position");
+//				associatedTreeItem.addAttributes("y-position", String.valueOf(position.y));
+//				associatedTreeItem.addAttributes("x-position", String.valueOf(position.x));
+//				
+//				associatedTreeItem.remove(0);
+//				associatedTreeItem.remove(1);
+//				GMTreeItem yPosAct = new GMTreeItem("Y Position: " + String.valueOf(position.y));
+//				GMTreeItem xPosAct = new GMTreeItem("X Position: " + String.valueOf(position.x));
+//				
+//				model.removeNodeFromParent((GMTreeItem) associatedTreeItem.getChildAt(0));
+//				model.removeNodeFromParent((GMTreeItem) associatedTreeItem.getChildAt(1));
+//				model.insertNodeInto(yPosAct, associatedTreeItem, 0);
+//				model.insertNodeInto(xPosAct, associatedTreeItem, 0);
 				
 				if (overlapping) {
-					getParent().setComponentZOrder(Button, 0);
+					getParent().setComponentZOrder(DrillDownButton.this, 0);
 					repaint();
 				}
-			}
-			
+			}			
 		};
 				
-		Button.addActionListener(new ActionListener() {
+		this.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (mntmMove.isSelected() == true) {
-//					moveButton(Button, grp);
-					Button.addMouseMotionListener(dragListener);
+					DrillDownButton.this.addMouseMotionListener(dragListener);
 				} else if (mntmMove.isSelected() == false) {
-					Button.removeMouseMotionListener(dragListener);
-					Button.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					DrillDownButton.this.removeMouseMotionListener(dragListener);
+					DrillDownButton.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					
+					System.out.println(DrillDownButton.this.id);
 				}
 			}
 		});
@@ -101,11 +164,20 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				grp.remove(Button);
+				grp.remove(DrillDownButton.this);
 				grp.revalidate();
 				grp.repaint();
 				
+				//remove from tree as well
+				//get path from associatedTI, 
+//				DefaultTreeModel model = (DefaultTreeModel) 
+//						associatedTreeItem.treeParent.getModel();
+//				model.removeNodeFromParent(associatedTreeItem);
+				
+				DefaultTreeModel model = (DefaultTreeModel)
+				associatedTreeItem.treeParent.getModel();
+				
+				model.removeNodeFromParent(associatedTreeItem);
 			}			
 		});
 		popupMenu.add(mntmDelete);
@@ -113,33 +185,84 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		mntmRename.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				EditDialog d = new EditDialog();
-				d.openRename(Button);
+				EditDialog d = new EditDialog("Rename");
+				d.renameDrillDownButton(DrillDownButton.this);
 			}			
 		});
 		popupMenu.add(mntmRename);
 		
-		JMenuItem mntmTarget = new JMenuItem("Select target menu");
-		mntmTarget.addActionListener(new ActionListener() {
+		JMenu mntmTarget = new JMenu("Select target menu");
+		
+		
+		MouseListener hover = new MouseListener() {
+
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
+							
+			}
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
 				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
 				
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				addElementsToTargetMenu(mntmTarget, elements);	
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
 				
-				
-				
-			}			
-		});
-		popupMenu.add(mntmTarget);
+			}
+			
+		};
+		
+		mntmTarget.addMouseListener(hover);
 		
 		
-		grp.add(Button);
+		
+		popupMenu.add(mntmTarget);		
+		
+		grp.add(this);
 		grp.revalidate();
 	    grp.repaint();
-	    Button.setVisible(true);
+	    this.setVisible(true);
 	    
 	}
 	
+	private void addElementsToTargetMenu(JMenu menuitem, HashSet<GMTreeItem> elem) {
+
+		if (menuitem.getItemCount() == 0) {
+		System.out.println(menuitem.getItemCount());
+		elem.forEach((e) -> { 
+			 JMenuItem newItem = new JMenuItem();
+			 newItem.setText(e.getName());
+			 newItem.setText(e.getDisplayString());
+			 
+			 newItem.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent event) {
+					DrillDownButton.this.targetID = e.getId();
+					associatedTreeItem.addAttributes("target", e.getId());
+					System.out.println( e.getId() + " ID ADDED TO BUTTON ");
+				}
+			 });
+			 menuitem.add(newItem);
+		 });		
+		} else if (menuitem.getItemCount() > 0) {
+			menuitem.removeAll();
+			addElementsToTargetMenu(menuitem, elem);
+		}
+	}
+
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -156,6 +279,12 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 				popup.show(e.getComponent(), e.getX(), e.getY());
 			}
 		});
+	}
+	
+	public String assignUUID() {
+		Random rd = new Random(); // creating Random object
+		String uuid = String.valueOf(rd.nextLong());
+		return uuid;
 	}
 	
 	public DrillDownButton() {
@@ -196,6 +325,14 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 	public void mouseMoved(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void addMenuElements(MenuElement menuE) {
+		this.elements = menuE.getMenuElements();
+	}
+
+	public void setTreeItem(GMTreeItem treeItem) {
+		this.associatedTreeItem = treeItem;
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.gastromanager.mainwindow;
-import java.awt.BorderLayout;
+
 import java.awt.Dialog;
-import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.Window;
@@ -10,25 +9,40 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.tree.TreePath;
 
 public class EditDialog extends JDialog {
 
-	public void openRename(DrillDownButton btn) {
+	JTextField tfValue;
+	
+	
+	public void renameDrillDownButton(DrillDownButton btn) {
+		btn.setText(tfValue.getText());
+		btn.repaint();
+	}
+	
+	public void renameTreeItem(TreePath treePath, String string) {
+		GMTreeItem lole = new GMTreeItem(treePath);
+		lole.setName(string);
+	}
+	
+	public void returnNewVal() {
 		
+	}
+	
+	
+	public EditDialog(String string) {
 		JDialog d = new JDialog();
 		d.setLayout(null);
 //		d.setBounds(X, Y, WIDTH, HEIGHT);
 		
-		JLabel lblValue = new JLabel("New value: ");
+		JLabel lblValue = new JLabel("New " + string + ": ");
 		lblValue.setBounds(10, 10, 70, 14);
 		d.add(lblValue);
 		
-		JTextField tfValue = new JTextField();
+		tfValue = new JTextField();
 		tfValue.setBounds(80, 8, 120, 20);
 		d.add(tfValue);
 		tfValue.setColumns(10);
@@ -39,8 +53,6 @@ public class EditDialog extends JDialog {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				btn.setText(tfValue.getText());
-				btn.repaint();
 				d.dispose();
 			}
 			
@@ -54,16 +66,6 @@ public class EditDialog extends JDialog {
 		d.setDefaultCloseOperation(EditDialog.DISPOSE_ON_CLOSE);
 		d.setBounds(100, 100, 250, 100);
 		d.setVisible(true);		
-	}
-	
-	
-	public void returnNewVal() {
-		
-	}
-	
-	
-	public EditDialog() {
-		
 	}
 
 	public EditDialog(Frame owner) {

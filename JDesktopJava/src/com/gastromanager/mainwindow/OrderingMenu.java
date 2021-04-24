@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -48,9 +49,13 @@ public class OrderingMenu extends JPanel {
 	    this.add(txtFieldWaiter);
 	    txtFieldWaiter.setColumns(10);
 	    
-	    JTree tree_1 = new JTree();
-	    tree_1.setBounds(10, 55, 236, 276);
-	    this.add(tree_1);
+//	    JTree tree_1 = new JTree();
+//	    tree_1.setBounds(10, 55, 236, 276);
+//	    this.add(tree_1);
+	    
+	    JList list = new JList();
+	    list.setBounds(10, 55, 236, 276);
+	    this.add(list);
 	    
 	    JLabel lblOrderID = new JLabel("Order ID");
 	    lblOrderID.setBounds(256, 56, 68, 14);
