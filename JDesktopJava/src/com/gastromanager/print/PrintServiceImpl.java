@@ -27,8 +27,16 @@ public class PrintServiceImpl implements PrintService {
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        //return executePrint(formatOrderText(orderItems));
-        return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
+        return executePrint(formatOrderText(orderItems, orderInfo));
+        //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
+    }
+
+    @Override
+    public String getPrintInfo(String orderId) {
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
+        return formatOrderText(orderItems, orderInfo);
+        //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
     private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
@@ -212,8 +220,8 @@ public class PrintServiceImpl implements PrintService {
 
     public static void main(String[] args) throws Exception {
         PrintServiceImpl printService = new PrintServiceImpl();
-        printService.print("1");
-        //printService.checkPrint();
+        //printService.print("1");
+        printService.checkPrint();
     }
 
     private static class JobCompleteMonitor extends PrintJobAdapter {
