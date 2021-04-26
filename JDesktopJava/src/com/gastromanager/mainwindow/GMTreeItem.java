@@ -17,7 +17,7 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 	public GMTree treeParent;
 	public String id, buttonAssociatedId;
 	
-	String getDisplayString() {
+	public String getDisplayString() {
 		
 		String result = new String();
 		
