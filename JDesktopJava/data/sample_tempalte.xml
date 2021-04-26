@@ -71,8 +71,6 @@
 		</level>
 	</layout>
 	
-	<drilldownmenues>	
-	</drilldownmenues>
 	
 	<reservations>
 		<date value="24.2.2021">
@@ -82,6 +80,22 @@
 		</date>
 	</reservations>
 	<drilldownmenus>
+	
+	<drilldownmenu name="Main screens" width="700" height="600">
+		<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
+		</button>
+		<button name="Drink" width="200" x-position="9" id="5357360846491103059" y-position="196" height="100" target="-2054482951531625359">
+		</button>
+		<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" y-position="89" height="100" target="19762674635">
+		</button>
+	</drilldownmenu>
+	
+	<drilldownmenu name="Tablets" width="900" height="700">
+		<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" y-position="20" height="100" target="19762674635"/>
+		<button name="Drink" width="200" x-position="332" id="7998995850391924247" y-position="20" height="100" target="-2054482951531625359"/>
+		<button name="Pizza" width="200" x-position="688" id="7860246180633986788" y-position="20" height="100" target="1976266538"/>
+	</drilldownmenu>
+	
 		<drilldownmenu name="Android Tablet">
 			<height>800</height>
 			<width>400</width>

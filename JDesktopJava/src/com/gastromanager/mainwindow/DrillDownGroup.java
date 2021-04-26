@@ -1,47 +1,59 @@
 package com.gastromanager.mainwindow;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
 
-import javax.swing.JButton;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
 public class DrillDownGroup extends JPanel{
 
 	public DrillDownGroup group;
-	public int xCoord, yCoord;
+//	public DrillDownButton button;
+	public int xCoord, yCoord, height, width;
+	public String name, id;
+	public GMTreeItem treeItem;
+	public int buttonCount;
+//	public Set<DrillDownButton> buttons = new HashSet<DrillDownButton>();
 	
-	public void init(int width, int height, String name, DrillDownMenu ddmenu) {
-		group = new DrillDownGroup();
+	public DrillDownGroup(int width, int height, String name, DrillDownMenu ddmenu) {
 		
-		group.setLayout(null);
+		this.setLayout(null);
 //			newpanel.setLayout(new GridLayout(5, 5));
-
-    	group
+    	this
     	.setBorder(new TitledBorder(null, name,
     			TitledBorder.LEADING, TitledBorder.TOP, null, null));
-    	ddmenu.add(group);
-    	group.setBounds(10, 150, width, height);
+    	ddmenu.add(this);
+    	this.setBounds(10, 150, width, height);
     	this.xCoord = 10;
     	this.yCoord = 150;
-    	ddmenu.add(group);
-    	group.setVisible(true);   		
+    	this.name = name;
+    	
+    	ddmenu.add(this);
+    	this.setVisible(true);   		
 	}
 	
-	public void newButton(int width, int height, int x, int y, String name, DrillDownGroup drillDownGroup) {
-		DrillDownButton btn = new DrillDownButton();
-		btn.init(width, height, x, y, name, group);		
+	public void setId(String id) {
+		this.id = id;
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	
+	public void setTreeItem(GMTreeItem item) {
+		this.treeItem = item;
 	}
 	
 	public DrillDownGroup() {
-		
 	}
 
 	public void clear() {
 		this.group = null;
-		
-//		buttonIndex = 0;
 	}
 
 

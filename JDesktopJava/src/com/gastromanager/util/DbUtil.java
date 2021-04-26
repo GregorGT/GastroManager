@@ -16,7 +16,7 @@ import java.util.List;
 
 public class DbUtil {
     public static List<OrderItem> getOrderDetails(String orderId) {
-        List<OrderItem> orderItems = null;
+    	List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
