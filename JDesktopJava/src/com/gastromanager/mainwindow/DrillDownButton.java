@@ -36,6 +36,8 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 	public int height, width, x, y;
 	public HashSet<GMTreeItem> elements = new HashSet<GMTreeItem>();
 	public GMTreeItem associatedTreeItem;
+	private GMTreeItem xItem = new GMTreeItem();
+	private GMTreeItem yItem = new GMTreeItem();
 	
 	public void setId(String id) {
 		this.id = id;
@@ -78,8 +80,12 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		this.setSize(height, width);
 		JPopupMenu popupMenu = new JPopupMenu();
 		addPopup(this, popupMenu);
+		
+		
+		
 				
-		this.setBounds(x,y,width,height);
+		this.setBounds(10,10,width,height);
+		this.setLocation(x, y);
 		this.width = width;
 		this.height = height;
 		this.x = x;
@@ -107,16 +113,25 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 				DrillDownButton.this.setLocation(position);
 
 				DrillDownButton.this.x = position.x;
-				DrillDownButton.this.y = position.y;
-				// Y, X, WIDTH, HEIGHT
+				DrillDownButton.this.y = position.y;				
 				
-				GMTreeItem a = (GMTreeItem) associatedTreeItem.getChildAt(0);
+				
+				GMTreeItem a = (GMTreeItem) associatedTreeItem.getChildAt(3);
+				
 				a.setUserObject("Y: " + String.valueOf(position.y));
-				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(1);
+				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(2);
+				
 				b.setUserObject("X: " + String.valueOf(position.x));
+				associatedTreeItem.m_attributes.remove("x-position");
+				associatedTreeItem.m_attributes.remove("y-position");
+				
+				associatedTreeItem.addAttributes("x-position", String.valueOf(position.x));
+				associatedTreeItem.addAttributes("y-position", String.valueOf(position.y));
+				
 				
 				DefaultTreeModel model =
-						(DefaultTreeModel) associatedTreeItem.treeParent.getModel();				
+						(DefaultTreeModel) associatedTreeItem.treeParent.getModel();	
+				model.reload(associatedTreeItem);
 				model.reload(a);
 				model.reload(b);
 				
@@ -136,7 +151,8 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 					DrillDownButton.this.removeMouseMotionListener(dragListener);
 					DrillDownButton.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					
-					System.out.println(DrillDownButton.this.id);
+					System.out.println("THIS BUTTONS ID: " + DrillDownButton.this.id);
+					System.out.println("ASSOCIATED MENU ELEMENT ID: "+DrillDownButton.this.targetID);
 				}
 			}
 		});

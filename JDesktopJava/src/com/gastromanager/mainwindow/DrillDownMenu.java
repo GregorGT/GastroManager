@@ -25,7 +25,6 @@ public class DrillDownMenu extends JPanel {
 	public JTextField txtButtonWidth;
 	public JTextField txtButtonName;
 	public DrillDownGroup drillDownGroup;
-	public boolean selectMenuFromTree = false;
 
 	public DrillDownMenu(GMTreeItem treeitem, DefaultTreeModel model, GMTree tree, MenuElement menuE) {		
 
@@ -157,7 +156,7 @@ public class DrillDownMenu extends JPanel {
 				newBtn.addMenuElements(menuE);
 				drillDownGroup.add(newBtn);
 				
-				componentToTree(treeitem, model, ddName, newBtn);
+				componentToTree(treeitem, model, drillDownGroup.name, newBtn);
 				
 			}
 		};
@@ -189,6 +188,7 @@ public class DrillDownMenu extends JPanel {
 				GMTreeItem newItem = new GMTreeItem(comp.getName());
 				newItem.setName(comp.getName());
 				newItem.setXmlName("drilldownmenu");
+				newItem.addAttributes("name", comp.getName());
 				newItem.treeParent = treeItem.getTree();
 				System.out.println(treeItem.getTree().toString());
 				String associatedID = assignUUID();
@@ -211,17 +211,19 @@ public class DrillDownMenu extends JPanel {
 				GMTreeItem nItem = new GMTreeItem(comp.getName());
 				nItem.setName(comp.getName());
 				nItem.setXmlName("button");
+				nItem.addAttributes("name", comp.getName());
 				
 				String associatedID2 = assignUUID();
 				nItem.setBtnAssociatedId(associatedID2);
 				
 				((DrillDownButton) comp).setId(associatedID2);
+				nItem.addAttributes("id", associatedID2);
 				((DrillDownButton) comp).setTreeItem(nItem);
 				nItem.setTree(treeItem.getTree());
 				
-				GMTreeItem hItem = new GMTreeItem("Height :" + String.valueOf(comp.getHeight()));
+				GMTreeItem hItem = new GMTreeItem("Height:" + String.valueOf(comp.getHeight()));
 				nItem.addAttributes("height", String.valueOf(comp.getHeight()));
-				GMTreeItem wItem = new GMTreeItem("Width :" + String.valueOf(comp.getWidth()));
+				GMTreeItem wItem = new GMTreeItem("Width:" + String.valueOf(comp.getWidth()));
 				nItem.addAttributes("width", String.valueOf(comp.getWidth()));
 				GMTreeItem xPItem = new GMTreeItem("X: " + String.valueOf(((DrillDownButton) comp).getXPos()));
 				nItem.addAttributes("x-position", String.valueOf(((DrillDownButton) comp).getXPos()));
@@ -230,9 +232,9 @@ public class DrillDownMenu extends JPanel {
 
 				model.insertNodeInto(nItem, treeItem, 0);
 				model.insertNodeInto(hItem, nItem, 0);
-				model.insertNodeInto(wItem, nItem, 0);
-				model.insertNodeInto(xPItem, nItem, 0);
-				model.insertNodeInto(yPItem, nItem, 0);
+				model.insertNodeInto(wItem, nItem, 1);
+				model.insertNodeInto(xPItem, nItem, 2);
+				model.insertNodeInto(yPItem, nItem, 3);
 //				((DrillDownButton) comp).setTreeItem(nItem);
 				
 				break;
