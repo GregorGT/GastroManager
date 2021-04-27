@@ -1,97 +1,124 @@
 package com.gastromanager.mainwindow;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Random;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 public class GMTree extends JTree {
 	public boolean loaded = false;
-	
+	public GMTreeItem rootItem;
+	private int height, width, btnHeight, btnWidth, btnX, btnY;
+	private String drilldownName, btnName, btnTarget, btnID;
+
 	public void init(GMTree tree, DrillDownMenu menu, DefaultTreeModel model, GMTreeItem root) { //GMTreeItem root, 
-		
+
 		JPopupMenu treeContextMenu = new JPopupMenu();
-	    
-	    JMenuItem mntmTranslate = new JMenuItem("Edit name");
-	    mntmTranslate.addActionListener(new ActionListener() {
+
+		JMenuItem mntmTranslate = new JMenuItem("Edit name");
+		mntmTranslate.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				EditDialog d = new EditDialog("name");			
+				//d.renameTreeItem(tree.getSelectionPath());
+
 			}	    	
-	    });
-	    treeContextMenu.add(mntmTranslate);
-	    
-	    JMenuItem mntmSelectTarget = new JMenuItem("Show on menu editor");
-	    mntmSelectTarget.addActionListener(new ActionListener() {
+		});
+		treeContextMenu.add(mntmTranslate);
+
+		JMenuItem mntmSelectTarget = new JMenuItem("Show on menu editor");
+		mntmSelectTarget.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				showOnEditor(tree.getSelectionPath(), menu, root);				
+//				menu.remove(menu.drillDownGroup);
+//				menu.revalidate();
+//				menu.repaint();
+				GMTreeItem selectedItem = (GMTreeItem) tree.getSelectionPath().getLastPathComponent();
+				showOnEditor(selectedItem, menu);				
 			}	    	
-	    });
-	    treeContextMenu.add(mntmSelectTarget);
-	    
-	    
-	    JMenuItem mntmDelete = new JMenuItem("Delete");
-	    mntmDelete.addActionListener(new ActionListener() {
+		});
+		treeContextMenu.add(mntmSelectTarget);
+
+
+		JMenuItem mntmDelete = new JMenuItem("Delete");
+		mntmDelete.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+				selectToDelete(tree);
 			}	    	
-	    });
-	    treeContextMenu.add(mntmDelete);
-	    
-	    
-	    JMenuItem mntmSetPrice = new JMenuItem("Set Price");
-	    treeContextMenu.add(mntmSetPrice);
-	    mntmSetPrice.addActionListener(new ActionListener () {
+		});
+		treeContextMenu.add(mntmDelete);
+
+
+		JMenuItem mntmSetPrice = new JMenuItem("Set Price");
+		treeContextMenu.add(mntmSetPrice);
+		mntmSetPrice.addActionListener(new ActionListener () {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 			}
-	    	
-	    });
-	    
-	    tree.addMouseListener(new MouseListener() {
-	    	@Override
-	    	public void mouseClicked(MouseEvent e) {
-	    		
-	    		if (SwingUtilities.isLeftMouseButton(e)) {
-	    			int row = tree.getClosestRowForLocation(e.getX(), e.getY());
-	    	        tree.setSelectionRow(row);
-	    	        TreePath treePath = tree.getSelectionPath();
-	    	        GMTreeItem newItem = new GMTreeItem(treePath);
-	    	        
-//	    	        System.out.println(" a -> " + newItem.m_name + newItem.m_value);
-	    	        
-	    	        System.out.println(tree.getSelectionPath().toString());
-	    	        if (tree.getSelectionPath().toString().contains("drilldownmenus")) {
-	    	        	
-	    	        }
-	    		}
-	    		
-	    		if (SwingUtilities.isRightMouseButton(e)) {
-	    	        int row = tree.getClosestRowForLocation(e.getX(), e.getY());
-	    	        tree.setSelectionRow(row);
-	    	        
-	    	        if (tree.getSelectionPath().toString().contains("drilldownmenus")) {
-	    	        	System.out.println(tree.getSelectionPath());
-	    	        	treeContextMenu.show(e.getComponent(), e.getX(), e.getY());
-	    	        }
-	    	    }
-	    	}
-	    	
-	    			@Override
+
+		});
+
+		tree.addMouseListener(new MouseListener() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+
+//				if (SwingUtilities.isLeftMouseButton(e)) {
+//					int row = tree.getClosestRowForLocation(e.getX(), e.getY());
+//					tree.setSelectionRow(row);
+//					if (tree.getSelectionPath().toString().contains("drilldownmenus")) {
+//					}
+//				}
+
+				if (SwingUtilities.isRightMouseButton(e)) {
+					int row = tree.getClosestRowForLocation(e.getX(), e.getY());
+					tree.setSelectionRow(row);
+
+//					TreePath filter = tree.getSelectionPath();
+
+					if (tree.getSelectionPath().getLastPathComponent()
+							.toString() != "drilldownmenus" &&
+							tree.getSelectionPath().getLastPathComponent()
+							.toString() != "menues" &&
+							tree.getSelectionPath().getLastPathComponent()
+							.toString() != "layout" &&
+							tree.getSelectionPath().getLastPathComponent()
+							.toString() != "reservations" &&
+							tree.getSelectionPath().getLastPathComponent()
+							.toString() != "settings") {
+						System.out.println(tree.getSelectionPath());
+						treeContextMenu.show(e.getComponent(), e.getX(), e.getY());
+						
+						GMTreeItem ex = (GMTreeItem) tree.getLastSelectedPathComponent();
+						System.out.println(ex.getAttributes().toString());
+						System.out.println(ex.getBtnAssociatedId());
+						
+					}
+
+					//in here it's possible to add different popup
+					//menues for all the items
+
+				}
+			}
+
+			@Override
 			public void mouseExited(MouseEvent e) {
 			}
 			@Override
@@ -103,62 +130,117 @@ public class GMTree extends JTree {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 			}
-	    	
-	    });
+
+		});
 	}
-	
-	public void showOnEditor(TreePath treePath, DrillDownMenu menu, GMTreeItem root) {
-		
-		GMTreeItem firstParent = (GMTreeItem) treePath.getLastPathComponent();
-		int children = firstParent.getChildCount();
-		System.out.println(children);
-		
-		Vector<String> ddValues = new Vector<String>();
-		ddValues.add(firstParent.toString());
-		
-		for (int j= 0; j < children; j++) {
-			if (firstParent.getChildAt(j).toString().contains("Height")) {
-				String height = firstParent.getChildAt(j).toString().substring(8);
-				ddValues.add(height);
-			} else if (firstParent.getChildAt(j).toString().contains("Width")) {
-				String width = firstParent.getChildAt(j).toString().substring(7);
-				ddValues.add(width);
+
+	public void selectToDelete(GMTree tree) {
+
+		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
+
+		TreePath[] paths = tree.getSelectionPaths();
+		if (paths != null) {
+			for (TreePath path : paths) {
+				GMTreeItem node = (GMTreeItem) path.getLastPathComponent();
+				if (node.getParent() != null && node.toString() != "root") {
+					model.removeNodeFromParent(node);
+				}
 			}
-			else if (!firstParent.getChildAt(j).toString().contains("Width") 
-					 && !firstParent.getChildAt(j).toString().contains("Height")) {
-				
-//				menu.drillDownGroup.newButton(j, j, children, j, TOOL_TIP_TEXT_KEY, null);
-				//button to editor
-				//add button and coordinates x and y  
-			}
-			
 		}
 
+	}
+
+	public void showOnEditor(GMTreeItem selectedItem, DrillDownMenu menu) {
+
+		HashMap<String, String> attributes = selectedItem.getAttributes();
+
+		Enumeration children = selectedItem.children();
 		
-		String sNewName = ddValues.elementAt(0);
-		int nNewHeight = Integer.parseInt(ddValues.elementAt(1)); 
-		int nNewWidth = Integer.parseInt(ddValues.elementAt(2));
-		int x; 
-		int y;
-		menu.remove(menu.drillDownGroup);
-		menu.revalidate();
-		menu.repaint();
-		menu.drillDownGroup.init(nNewWidth, nNewHeight, sNewName, menu);
-		
-		for (int i = 0; i < ddValues.size(); i++) {
+		if (menu.drillDownGroup != null) {
+			menu.remove(menu.drillDownGroup);	
+			menu.drillDownGroup = null;
+			menu.revalidate();
+			menu.repaint();						
+			showOnEditor(selectedItem, menu);
+		} else if (menu.drillDownGroup == null) {
 			
+			attributes.forEach((k,v) -> {
+				System.out.println("key: " + k + "  -  value: " + v);
+				switch (k) {
+				case "width" : 
+					this.width = Integer.parseInt(v);
+					break;
+					
+				case "height" : 
+					this.height = Integer.parseInt(v);
+					break;
+					
+				case "name" : 
+					this.drilldownName = v;
+					break;			
+				}
+			});
+			
+			menu.drillDownGroup = 
+					new DrillDownGroup(width, height, drilldownName, menu);
+			menu.revalidate();
+			menu.repaint();
 		}
 		
-//		menu.toTree(root, model, sNewName, "drilldownmenus", nNewHeight, nNewWidth);
+		menu.drillDownGroup.removeAll();
+		menu.drillDownGroup.revalidate();
+		menu.drillDownGroup.repaint();
 		
+		if(children != null) {
+			while (children.hasMoreElements()) {
+				GMTreeItem child = (GMTreeItem) children.nextElement();
+				if (child.getXmlName() == "button") {
+					btnName = ""; btnID = ""; btnTarget = "";
+					btnWidth = 0; btnHeight = 0; btnX = 0; btnY = 0;
+					
+					HashMap<String, String> attrs = child.getAttributes();
+					
+					attrs.forEach((k,v) -> {
+						
+						switch (k) {
+						case "name" :
+							btnName = v;
+							break;
+						case "width" : 
+							btnWidth = Integer.parseInt(v);
+							break;
+						case "height" :
+							btnHeight = Integer.parseInt(v);
+							break;
+						case "x-position" :
+							btnX = Integer.parseInt(v);
+							break;
+						case "y-position" : 
+							btnY = Integer.parseInt(v);
+							break;
+						case "target" : 
+							btnTarget = v;
+							break;
+						case "id" :
+							btnID = v;
+							break;
+						}
+					});
+				
+					DrillDownButton newBtn =
+							new DrillDownButton(btnWidth, btnHeight, 10, 10, btnName, menu.drillDownGroup);
+					newBtn.associatedTreeItem = child;
+					newBtn.id = btnID;
+					newBtn.targetID = btnTarget;
+					
+					System.out.println("LOCATION TO BE ->" + btnX + " " + btnY);
+					newBtn.setLocation(btnX, btnY);
+			}		
+		  }
+		}
+			
 	}
-	
-	public void buttonToTree(DrillDownGroup grp, int height, int width, int x, int y) {
-		
-		
-		
-	}
-	
+
 	public GMTree() {
 		// TODO Auto-generated constructor stub
 	}
@@ -185,7 +267,7 @@ public class GMTree extends JTree {
 
 	public GMTree(TreeModel newModel) {
 		super(newModel);
-		
+
 	}
 
 	public GMTree(TreeNode root, boolean asksAllowsChildren) {

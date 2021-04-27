@@ -1,7 +1,10 @@
 package com.gastromanager.print;
 
+import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.GastroManagerConstants;
+import com.gastromanager.util.PropertiesUtil;
 import io.github.escposjava.PrinterService;
 import io.github.escposjava.print.NetworkPrinter;
 import io.github.escposjava.print.Printer;
@@ -18,34 +21,117 @@ import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
 import java.io.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class PrintServiceImpl implements PrintService {
     @Override
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
-
-        //return executePrint(formatOrderText(orderItems));
-        return executePrintOverNetwork(formatOrderText(orderItems));
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
+        return executePrint(formatOrderText(orderItems, orderInfo));
+        //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
-    private String formatOrderText(List<OrderItem> orderItems) {
+    @Override
+    public String getPrintInfo(String orderId) {
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
+        return formatOrderText(orderItems, orderInfo);
+        //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
+    }
+
+    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
-        orderDetailsBuilder.append("******* Order Details: ******** \n");
+        AtomicReference<Double> total = new AtomicReference<>(new Double(0));
+        String currency = PropertiesUtil.getPropertyValue("currency");
+        orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
+        orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"("+ orderInfo.getFloorName()
+                +")" + "\n");
+        orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" +"\n");
+        orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() + "("
+                + orderInfo.getStaffName() + ")"+"\n");
+        orderDetailsBuilder.append("Ordered At: "+ orderInfo.getTimestamp() +"\n");
+        orderDetailsBuilder.append("*************************\n");
         orderItems.forEach(orderItem -> {
             Document xml = orderItem.getXml();
+            total.updateAndGet(v -> v + orderItem.getPrice());
             //Main Item
             Node item  = xml.getDocumentElement();
             if(item.getNodeName() == "item") {
-                orderDetailsBuilder.append("Item = " + item.getAttributes().getNamedItem("name").getNodeValue());
+                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getPrice() + currency + "\n");
+                //addOptionOrderInfo(item, orderDetailsBuilder);
                 //Linked items
-                addChildItems(item, orderDetailsBuilder);
+                addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
+                //addChildItems(item, orderDetailsBuilder);
                 orderDetailsBuilder.append("\n");
 
             }
         });
+        addTotal(total.get(), orderDetailsBuilder, currency);
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString();
     }
+
+    private void addTotal(double total, StringBuilder orderDetailsBuilder, String currency) {
+        orderDetailsBuilder.append("------------------------------------\n");
+        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total + currency +"\n");
+        orderDetailsBuilder.append("------------------------------------");
+    }
+
+    private void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder) {
+        for (int childId = 0; childId < children.getLength(); childId++) {
+            Node child = children.item(childId);
+            String childItemName  = child.getNodeName();
+            if(childItemName == "item") {
+                orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+                addOptionOrderInfo(child, orderDetailsBuilder);
+                //orderDetailsBuilder.append("\n");
+                if(child.hasChildNodes()) {
+                    addChildItemInfo(child.getChildNodes(), orderDetailsBuilder);
+                }
+            }
+        }
+    }
+
+    private void addOptionOrderInfo(Node node, StringBuilder orderDetailsBuilder) {
+        NodeList childNodes  = node.getChildNodes();
+        for (int childId = 0; childId < childNodes.getLength(); childId++) {
+            Node child = childNodes.item(childId);
+            if(child.getNodeName() == "option") {
+                orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+                if(child.hasChildNodes()) {
+                    NodeList optionChildNodes  = child.getChildNodes();
+                    for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
+                        Node optionChild = optionChildNodes.item(optionChildId);
+                        if(optionChild.getNodeName() == "choice") {
+                            orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
+                            break;
+                        }
+                    }
+                }
+                orderDetailsBuilder.append("\n");
+                break;
+            }
+
+        }
+    }
+
+    /*private void addChildItems(Node node,StringBuilder orderDetailsBuilder) {
+        NodeList childItems = node.getChildNodes();
+        for (int childItemIndex = 0; childItemIndex < childItems.getLength(); childItemIndex++) {
+            Node childItem = childItems.item(childItemIndex);
+            String childItemName  = childItem.getNodeName();
+            switch (childItemName) {
+                case "item" :
+                    orderDetailsBuilder.append("\t" + childItem.getAttributes().getNamedItem("name").getNodeValue() + "\n");
+                    addChildItems(childItem, orderDetailsBuilder);
+                    break;
+                case "option" :
+                    //addOptionOrderInfo(chil);
+                    break;
+            }
+        }
+    }*/
 
     private void addChildItems(Node node,StringBuilder orderDetailsBuilder) {
         NodeList childItems = node.getChildNodes();
@@ -54,15 +140,14 @@ public class PrintServiceImpl implements PrintService {
             String childItemName  = childItem.getNodeName();
             switch (childItemName) {
                 case "item" :
-                    orderDetailsBuilder.append("\n\t" + childItem.getAttributes().getNamedItem("name").getNodeValue());
-                    addChildItems(childItem, orderDetailsBuilder);
+                    orderDetailsBuilder.append("\t" + childItem.getAttributes().getNamedItem("name").getNodeValue());
+                    addOptionOrderInfo(childItem, orderDetailsBuilder);
+                    if(childItem.hasChildNodes()) {
+                        addChildItems(childItem, orderDetailsBuilder);
+                    }
                     break;
                 case "option" :
-                    orderDetailsBuilder.append(" - " + childItem.getAttributes().getNamedItem("name").getNodeValue());
-                    orderDetailsBuilder.append(" - " + (childItem.getAttributes().getNamedItem("price") == null ?
-                            childItem.getAttributes().getNamedItem("overwrite_price").getNodeValue():
-                            childItem.getAttributes().getNamedItem("price").getNodeValue()));
-                    //TODO add choice
+                    //addOptionOrderInfo(chil);
                     break;
             }
         }
@@ -140,7 +225,7 @@ public class PrintServiceImpl implements PrintService {
     public static void main(String[] args) throws Exception {
         PrintServiceImpl printService = new PrintServiceImpl();
         printService.print("1");
-        //printService.checkPrint();
+        //printService.checkPrint(); //TO print all available printers
     }
 
     private static class JobCompleteMonitor extends PrintJobAdapter {

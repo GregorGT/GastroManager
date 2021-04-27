@@ -1,7 +1,11 @@
 package com.gastromanager.util;
 
 import com.gastromanager.db.DbConnection;
+import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -12,7 +16,7 @@ import java.util.List;
 
 public class DbUtil {
     public static List<OrderItem> getOrderDetails(String orderId) {
-        List<OrderItem> orderItems = null;
+    	List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
@@ -28,6 +32,43 @@ public class DbUtil {
         return orderItems;
     }
 
+    public static OrderInfo getOrderInfo(String orderId) {
+        OrderInfo orderInfo = null;
+        String query = "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME, T.NAME AS TABLE_NAME \n" +
+                "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F, TABLEDETAILS T\n" +
+                "WHERE O.ID = ?\n" +
+                "AND L.ID = O.LOCATION_ID\n" +
+                "AND O.STAFF_ID = S.ID\n" +
+                "AND L.FLOOR_ID = F.ID\n" +
+                "AND L.TABLE_ID = T.ID";
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            stmt.setInt(1,Integer.parseInt(orderId));
+            ResultSet result = stmt.executeQuery();
+            //System.out.println(stmt.executeQuery().findColumn("quantity"));
+            if(result.next()) {
+                orderInfo = new OrderInfo();
+                orderInfo.setHumanReadableId(result.getString("HUMANREADABLE_ID"));
+                orderInfo.setStaffId(result.getString("STAFF_ID"));
+                DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss");
+                DateTime dt = formatter.parseDateTime(result.getString("DATETIME"));
+                orderInfo.setTimestamp(dt.toString(formatter));
+                orderInfo.setFloorId(result.getString("FLOOR_ID"));
+                orderInfo.setTableId(result.getString("TABLE_ID"));
+                orderInfo.setFloorName((result.getString("FLOOR_NAME") != null ? result.getString("FLOOR_NAME"): ""));
+                orderInfo.setStaffName((result.getString("LASTNAME") != null ?
+                        result.getString("LASTNAME"): "") + "," +
+                        (result.getString("FIRSTNAME") != null ? result.getString("FIRSTNAME"): ""));
+                orderInfo.setTableName((result.getString("TABLE_NAME") != null ? result.getString("TABLE_NAME"): ""));
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+
+        }
+        return orderInfo;
+    }
+
     private static List<OrderItem> loadResults(ResultSet result) {
             List<OrderItem> orderItems = null;
             try {
@@ -39,6 +80,7 @@ public class DbUtil {
                     orderItem.setItemId(result.getInt("item_id"));
                     orderItem.setRemark(result.getString("remark"));
                     orderItem.setXml(XmlUtil.loadXMLFromString(result.getString("xml")));
+                    orderItem.setPrice(result.getDouble("price"));
                     orderItems.add(orderItem);
                 }
 
@@ -54,5 +96,6 @@ public class DbUtil {
     public static void main(String[] args) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails("1");
         System.out.println(orderItems.get(0).getXml().getElementsByTagName("item").getLength());
+        DbUtil.getOrderInfo("1");
     }
 }
