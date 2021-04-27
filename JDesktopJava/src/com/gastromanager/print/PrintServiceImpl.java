@@ -47,7 +47,7 @@ public class PrintServiceImpl implements PrintService {
         orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
         orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"("+ orderInfo.getFloorName()
                 +")" + "\n");
-        orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() +"\n");
+        orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" +"\n");
         orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() + "("
                 + orderInfo.getStaffName() + ")"+"\n");
         orderDetailsBuilder.append("Ordered At: "+ orderInfo.getTimestamp() +"\n");

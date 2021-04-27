@@ -34,16 +34,13 @@ public class DbUtil {
 
     public static OrderInfo getOrderInfo(String orderId) {
         OrderInfo orderInfo = null;
-        String query = /*"SELECT O.HUMANREADABLE_ID, O.STAFF_ID, O.DATETIME," +
-                "L.FLOOR_ID, L.TABLE_ID FROM ORDERS O, LOCATION L\n" +
-                "WHERE O.ID = ?\n" +
-                "AND L.ID = O.LOCATION_ID";*/
-        "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME \n" +
-                "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F\n" +
+        String query = "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME, T.NAME AS TABLE_NAME \n" +
+                "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F, TABLEDETAILS T\n" +
                 "WHERE O.ID = ?\n" +
                 "AND L.ID = O.LOCATION_ID\n" +
                 "AND O.STAFF_ID = S.ID\n" +
-                "AND L.FLOOR_ID = F.ID";
+                "AND L.FLOOR_ID = F.ID\n" +
+                "AND L.TABLE_ID = T.ID";
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -63,6 +60,7 @@ public class DbUtil {
                 orderInfo.setStaffName((result.getString("LASTNAME") != null ?
                         result.getString("LASTNAME"): "") + "," +
                         (result.getString("FIRSTNAME") != null ? result.getString("FIRSTNAME"): ""));
+                orderInfo.setTableName((result.getString("TABLE_NAME") != null ? result.getString("TABLE_NAME"): ""));
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
