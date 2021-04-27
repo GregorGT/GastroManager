@@ -4,6 +4,7 @@ import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
+import com.gastromanager.util.PropertiesUtil;
 import io.github.escposjava.PrinterService;
 import io.github.escposjava.print.NetworkPrinter;
 import io.github.escposjava.print.Printer;
@@ -42,11 +43,14 @@ public class PrintServiceImpl implements PrintService {
     private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
         AtomicReference<Double> total = new AtomicReference<>(new Double(0));
+        String currency = PropertiesUtil.getPropertyValue("currency");
         orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
-        orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"\n");
+        orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"("+ orderInfo.getFloorName()
+                +")" + "\n");
         orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() +"\n");
-        orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() +"\n");
-        orderDetailsBuilder.append("Time: "+ orderInfo.getTimestamp() +"\n");
+        orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() + "("
+                + orderInfo.getStaffName() + ")"+"\n");
+        orderDetailsBuilder.append("Ordered At: "+ orderInfo.getTimestamp() +"\n");
         orderDetailsBuilder.append("*************************\n");
         orderItems.forEach(orderItem -> {
             Document xml = orderItem.getXml();
@@ -54,7 +58,7 @@ public class PrintServiceImpl implements PrintService {
             //Main Item
             Node item  = xml.getDocumentElement();
             if(item.getNodeName() == "item") {
-                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getPrice() + "\n");
+                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getPrice() + currency + "\n");
                 //addOptionOrderInfo(item, orderDetailsBuilder);
                 //Linked items
                 addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
@@ -63,14 +67,14 @@ public class PrintServiceImpl implements PrintService {
 
             }
         });
-        addTotal(total.get(), orderDetailsBuilder);
+        addTotal(total.get(), orderDetailsBuilder, currency);
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString();
     }
 
-    private void addTotal(double total, StringBuilder orderDetailsBuilder) {
+    private void addTotal(double total, StringBuilder orderDetailsBuilder, String currency) {
         orderDetailsBuilder.append("------------------------------------\n");
-        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total +"\n");
+        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total + currency +"\n");
         orderDetailsBuilder.append("------------------------------------");
     }
 
@@ -220,8 +224,8 @@ public class PrintServiceImpl implements PrintService {
 
     public static void main(String[] args) throws Exception {
         PrintServiceImpl printService = new PrintServiceImpl();
-        //printService.print("1");
-        printService.checkPrint();
+        printService.print("1");
+        //printService.checkPrint(); //TO print all available printers
     }
 
     private static class JobCompleteMonitor extends PrintJobAdapter {

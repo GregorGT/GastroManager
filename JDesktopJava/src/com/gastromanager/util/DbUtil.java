@@ -34,10 +34,16 @@ public class DbUtil {
 
     public static OrderInfo getOrderInfo(String orderId) {
         OrderInfo orderInfo = null;
-        String query = "SELECT O.HUMANREADABLE_ID, O.STAFF_ID, O.DATETIME," +
+        String query = /*"SELECT O.HUMANREADABLE_ID, O.STAFF_ID, O.DATETIME," +
                 "L.FLOOR_ID, L.TABLE_ID FROM ORDERS O, LOCATION L\n" +
                 "WHERE O.ID = ?\n" +
-                "AND L.ID = O.LOCATION_ID";
+                "AND L.ID = O.LOCATION_ID";*/
+        "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME \n" +
+                "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F\n" +
+                "WHERE O.ID = ?\n" +
+                "AND L.ID = O.LOCATION_ID\n" +
+                "AND O.STAFF_ID = S.ID\n" +
+                "AND L.FLOOR_ID = F.ID";
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -53,6 +59,10 @@ public class DbUtil {
                 orderInfo.setTimestamp(dt.toString(formatter));
                 orderInfo.setFloorId(result.getString("FLOOR_ID"));
                 orderInfo.setTableId(result.getString("TABLE_ID"));
+                orderInfo.setFloorName((result.getString("FLOOR_NAME") != null ? result.getString("FLOOR_NAME"): ""));
+                orderInfo.setStaffName((result.getString("LASTNAME") != null ?
+                        result.getString("LASTNAME"): "") + "," +
+                        (result.getString("FIRSTNAME") != null ? result.getString("FIRSTNAME"): ""));
             }
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -88,5 +98,6 @@ public class DbUtil {
     public static void main(String[] args) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails("1");
         System.out.println(orderItems.get(0).getXml().getElementsByTagName("item").getLength());
+        DbUtil.getOrderInfo("1");
     }
 }
