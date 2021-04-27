@@ -22,7 +22,6 @@ public class DbUtil {
             PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
-            //System.out.println(stmt.executeQuery().findColumn("quantity"));
             orderItems = loadResults(result);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -46,7 +45,6 @@ public class DbUtil {
             PreparedStatement stmt=connection.prepareStatement(query);
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
-            //System.out.println(stmt.executeQuery().findColumn("quantity"));
             if(result.next()) {
                 orderInfo = new OrderInfo();
                 orderInfo.setHumanReadableId(result.getString("HUMANREADABLE_ID"));
