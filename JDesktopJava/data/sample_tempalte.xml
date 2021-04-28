@@ -2,7 +2,7 @@
 
 	<!-- menues node-->
 	<menues>
-		<item name="Pizza" uuid="1976266538">
+		<item name="Pizza" uuid="1976266538" printer="kitchen">
 			<option id="size"  name="small" price="0.5" uuid="124456611" >
 				<choice name="extra cheese" price="0.5" />
 			</option>
@@ -23,7 +23,7 @@
 				</item>
 			</item>
 		</item>
-		<item name="Pasta" uuid="19762674635">
+		<item name="Pasta" uuid="19762674635" printer="kitchen">
 			<option id="size"  name="small" price="0.5" uuid="124456611345" >
 				<choice name="extra cheese" price="0.5" />
 			</option>
@@ -44,7 +44,7 @@
 				<option id="size" name="large" 	price="1.2" menu_id="120c"/>
 			</item>
 		</item>		
-		<item name="Drink" name_en="drink">
+		<item name="Drink" name_en="drink" printer="bar" >
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
