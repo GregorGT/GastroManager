@@ -6,7 +6,6 @@ import javax.print.attribute.PrintRequestAttributeSet;
 import java.awt.*;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
-import java.awt.print.PrinterException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,23 +30,7 @@ public class MainPrintService implements Printable {
     }
 
     @Override
-    public int print(Graphics g, PageFormat pf, int page)
-            throws PrinterException {
-        /*if (page > 0) { *//* We have only one page, and 'page' is zero-based *//*
-            return NO_SUCH_PAGE;
-        }
-
-        *//*
-         * User (0,0) is typically outside the imageable area, so we must
-         * translate by the X and Y values in the PageFormat to avoid clipping
-         *//*
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.translate(pf.getImageableX(), pf.getImageableY());
-        *//* Now we perform our rendering *//*
-
-        g.setFont(new Font("Roman", 0, 8));
-        g.drawString("Hello world !", 0, 10);*/
-
+    public int print(Graphics g, PageFormat pf, int page) {
         return PAGE_EXISTS;
     }
 
@@ -78,7 +61,6 @@ public class MainPrintService implements Printable {
             job.print(doc, null);
 
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

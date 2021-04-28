@@ -43,7 +43,7 @@ public class PrintServiceImpl implements PrintService {
     private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
         AtomicReference<Double> total = new AtomicReference<>(new Double(0));
-        String currency = PropertiesUtil.getPropertyValue("currency");
+        //String currency = PropertiesUtil.getPropertyValue("currency");
         orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
         orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"("+ orderInfo.getFloorName()
                 +")" + "\n");
@@ -58,7 +58,7 @@ public class PrintServiceImpl implements PrintService {
             //Main Item
             Node item  = xml.getDocumentElement();
             if(item.getNodeName() == "item") {
-                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getPrice() + currency + "\n");
+                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
                 //addOptionOrderInfo(item, orderDetailsBuilder);
                 //Linked items
                 addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
@@ -67,14 +67,14 @@ public class PrintServiceImpl implements PrintService {
 
             }
         });
-        addTotal(total.get(), orderDetailsBuilder, currency);
+        //addTotal(total.get(), orderDetailsBuilder);
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString();
     }
 
-    private void addTotal(double total, StringBuilder orderDetailsBuilder, String currency) {
+    private void addTotal(double total, StringBuilder orderDetailsBuilder) {
         orderDetailsBuilder.append("------------------------------------\n");
-        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total + currency +"\n");
+        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total  +"\n");
         orderDetailsBuilder.append("------------------------------------");
     }
 

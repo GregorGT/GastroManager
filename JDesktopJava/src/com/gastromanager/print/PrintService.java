@@ -1,8 +1,6 @@
 package com.gastromanager.print;
 
-import org.w3c.dom.Document;
-
 public interface PrintService {
-    public boolean print(String orderInfo);
-    public String getPrintInfo(String orderInfo);
+    boolean print(String orderInfo);
+    String getPrintInfo(String orderInfo);
 }
