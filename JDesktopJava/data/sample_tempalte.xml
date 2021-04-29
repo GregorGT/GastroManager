@@ -2,7 +2,7 @@
 
 	<!-- menues node-->
 	<menues>
-		<item name="Pizza" uuid="1976266538">
+		<item name="Pizza" uuid="1976266538" printer="kitchen">
 			<option id="size"  name="small" price="0.5" uuid="124456611" >
 				<choice name="extra cheese" price="0.5" />
 			</option>
@@ -16,14 +16,14 @@
 				<option id="toppingammount" name="few" price="0.5" />
 				<option id="toppingammount" name="more" price="0.8" />
 				<option id="toppingammount" name="lots" price="1.2" />
-				<item name="margarita" menu_id="100">
+				<item name="margarita" menu_id="100" uuid="35652837">
 					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="100a" />
 					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b" uuid="1284887162" />
 					<option id="size" name="large" 	price="1.2" menu_id="100c"/>
 				</item>
 			</item>
 		</item>
-		<item name="Pasta" uuid="19762674635">
+		<item name="Pasta" uuid="19762674635" printer="kitchen">
 			<option id="size"  name="small" price="0.5" uuid="124456611345" >
 				<choice name="extra cheese" price="0.5" />
 			</option>
@@ -44,12 +44,12 @@
 				<option id="size" name="large" 	price="1.2" menu_id="120c"/>
 			</item>
 		</item>		
-		<item name="Drink" name_en="drink">
+		<item name="Drink" name_en="drink" printer="bar" >
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
 				<ingridients name="sugar,water"/>
-				<item name="Coca Cola" name_en="Coce" menu_id="10">
+				<item name="Coca Cola" name_en="Coce" menu_id="10" uuid="124453434">
 					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" />
 					<option id="size" name="medium" name_de="mittel" menu_id="10b"/>
 					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
@@ -71,8 +71,6 @@
 		</level>
 	</layout>
 	
-	<drilldownmenues>	
-	</drilldownmenues>
 	
 	<reservations>
 		<date value="24.2.2021">
@@ -82,6 +80,22 @@
 		</date>
 	</reservations>
 	<drilldownmenus>
+	
+	<drilldownmenu name="Main screens" width="700" height="600">
+		<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
+		</button>
+		<button name="Drink" width="200" x-position="9" id="5357360846491103059" y-position="196" height="100" target="-2054482951531625359">
+		</button>
+		<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" y-position="89" height="100" target="19762674635">
+		</button>
+	</drilldownmenu>
+	
+	<drilldownmenu name="Tablets" width="900" height="700">
+		<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" y-position="20" height="100" target="19762674635"/>
+		<button name="Drink" width="200" x-position="332" id="7998995850391924247" y-position="20" height="100" target="-2054482951531625359"/>
+		<button name="Pizza" width="200" x-position="688" id="7860246180633986788" y-position="20" height="100" target="1976266538"/>
+	</drilldownmenu>
+	
 		<drilldownmenu name="Android Tablet">
 			<height>800</height>
 			<width>400</width>

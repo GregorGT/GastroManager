@@ -13,10 +13,11 @@ import javax.swing.border.TitledBorder;
 public class DrillDownGroup extends JPanel{
 
 	public DrillDownGroup group;
-	public DrillDownButton button;
+//	public DrillDownButton button;
 	public int xCoord, yCoord, height, width;
 	public String name, id;
 	public GMTreeItem treeItem;
+	public int buttonCount;
 //	public Set<DrillDownButton> buttons = new HashSet<DrillDownButton>();
 	
 	public DrillDownGroup(int width, int height, String name, DrillDownMenu ddmenu) {

@@ -5,7 +5,10 @@ public class OrderInfo {
     private String floorId;
     private String tableId;
     private String staffId;
-    private String timestamp; //TODO need to check and change the data type
+    private String floorName;
+    private String staffName;
+    private String tableName;
+    private String timestamp;
 
     public String getHumanReadableId() {
         return humanReadableId;
@@ -45,5 +48,29 @@ public class OrderInfo {
 
     public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getFloorName() {
+        return floorName;
+    }
+
+    public void setFloorName(String floorName) {
+        this.floorName = floorName;
+    }
+
+    public String getStaffName() {
+        return staffName;
+    }
+
+    public void setStaffName(String staffName) {
+        this.staffName = staffName;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

@@ -27,7 +27,6 @@ public class PropertiesUtil {
                 properties.load(is);
             }
             value = properties.getProperty(propertyKey);
-            //System.out.println(value);
             } catch (IOException e) {
             e.printStackTrace();
         }

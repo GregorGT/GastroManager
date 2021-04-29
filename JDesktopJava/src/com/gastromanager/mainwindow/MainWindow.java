@@ -15,10 +15,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -66,7 +68,7 @@ public class MainWindow extends JFrame {
 		return new String(encoded, encoding);
 	}
 
-	void treeBuild(GMTreeItem rootNode, Node xmlNode) {
+	void treeBuild(GMTreeItem rootNode, Node xmlNode, DefaultTreeModel model) {
 		if (xmlNode.getNodeName().contains("#"))
 			return;
 		
@@ -114,6 +116,21 @@ public class MainWindow extends JFrame {
 		if(newNode.getUserObject() == "root") {
 			newNode.setUserObject("All");
 		}
+		if (newNode.getXmlName() == "button") {			
+			HashMap<String, String> btnAttrs = newNode.getAttributes();
+			GMTreeItem newH = new GMTreeItem(); GMTreeItem newW = new GMTreeItem();
+			GMTreeItem newX = new GMTreeItem(); GMTreeItem newY = new GMTreeItem();
+			model.insertNodeInto(newNode, rootNode, 0);
+			model.insertNodeInto(newH, newNode, 0);
+			model.insertNodeInto(newW, newNode, 1);
+			model.insertNodeInto(newX, newNode, 2);
+			model.insertNodeInto(newY, newNode, 3);
+		
+			newH.setUserObject("Height: "  + btnAttrs.get("height"));
+			newW.setUserObject("Width: " + btnAttrs.get("width"));
+			newX.setUserObject("X: " + btnAttrs.get("x-position"));
+			newY.setUserObject("Y: " + btnAttrs.get("y-position"));
+		}
 		
 		NodeList children = xmlNode.getChildNodes();
 
@@ -121,14 +138,13 @@ public class MainWindow extends JFrame {
 		rootNode.add(newNode);
 
 		for (int i = 0; i < children.getLength(); ++i) {
-			
-			treeBuild(newNode, children.item(i));
+			treeBuild(newNode, children.item(i), model);
 		}
 	}
 
 	void parseXmlDocument(Document doc, GMTreeItem root) {
 		try {
-			treeBuild(root, doc.getFirstChild());
+			treeBuild(root, doc.getFirstChild(), defaultModel);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -257,12 +273,6 @@ public class MainWindow extends JFrame {
 			}
 		});
 		mnFileMenu.add(mntmNewMenuItem);
-		
-//		JMenu mnNewMenu = new JMenu("New menu");
-//		mnFileMenu.add(mnNewMenu);
-//		
-//		JMenuItem mntmNewMenuItem_1 = new JMenuItem("New menu item");
-//		mnNewMenu.add(mntmNewMenuItem_1);
 
 		JButton btnDebugLoadFile = new JButton("Load File (Debug)");
 		btnDebugLoadFile.addActionListener(new ActionListener() {

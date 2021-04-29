@@ -1,3 +1,8 @@
 /bin/
 .classpath
 .project
+/.idea/libraries/juh.xml
+/.idea/libraries/jurt.xml
+/.idea/libraries/ridl.xml
+/.idea/libraries/unoil.xml
+/.idea/libraries/unoloader.xml
