@@ -8,12 +8,20 @@ import java.util.Properties;
 public class PropertiesUtil {
 
     public static Properties properties;
+    private static String OS = null;
 
     public static String getPropertyValue(String propertyKey) {
+    	String slash = "";
+    	if (!isWindows()) {
+    		slash = "/";
+    	} else {
+    		slash = "\\";
+    	}
+    	
         String value = null;
         try {
             if(properties == null) {
-                InputStream is = new FileInputStream(System.getProperty("user.dir") + "\\resources\\gastromanager.properties");
+                InputStream is = new FileInputStream(System.getProperty("user.dir") + slash + "resources"+slash+"gastromanager.properties");
                 //InputStream is = PropertiesUtil.class.getClassLoader().getResourceAsStream("gastromanager.properties");
                 properties = new Properties();
                 properties.load(is);
@@ -25,6 +33,16 @@ public class PropertiesUtil {
         }
         return value;
     }
+    
+    public static String getOsName()
+	   {
+	      if(OS == null) { OS = System.getProperty("os.name"); }
+	      return OS;
+	   }
+	   public static boolean isWindows()
+	   {
+	      return getOsName().startsWith("Windows");
+	   }
 
     public static void main(String[] args) {
         PropertiesUtil.getPropertyValue("dbFolder");
