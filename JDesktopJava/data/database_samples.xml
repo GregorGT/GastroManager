@@ -17,3 +17,13 @@
 					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
 				</item>				
 </item>
+
+
+<item name="Pasta" uuid="19762674635" printer="kitchen">
+			<option id="size"  name="small" price="0.5" uuid="124456611345" >
+				<choice name="extra cheese" price="0.5" />
+			</option>
+			<item name="Capellini" menu_id="110" uuid="9387616128">
+				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b"/>
+			</item>
+</item>
