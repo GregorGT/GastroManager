@@ -1,14 +1,17 @@
 package com.gastromanager.reports;
 
-public class Items implements Comparable<String>{
+public class Item {//implements Comparable<String>{
 	private String name;
 	private Integer quantity;
 	private Double price;
-	public Items(String name) {
+	private String itemId;
+	
+	public Item(String name, Integer quantity, Double price, String itemId) {
 		super();
 		this.name = name;
-		this.quantity = 0;
-		this.price = 0.0;
+		this.quantity = quantity;
+		this.price = price;
+		this.itemId = itemId;
 	}
 	public String getName() {
 		return name;
@@ -28,6 +31,12 @@ public class Items implements Comparable<String>{
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+	public String getItemId() {
+		return itemId;
+	}
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
 	@Override
 	public boolean equals(Object o) {
 		if (o == null) {
@@ -36,28 +45,10 @@ public class Items implements Comparable<String>{
 		if (o.getClass() != this.getClass()) {
 			return false;
 		}
-		final Items items = (Items) o;
-		if (this.name.equals(items.name)) {
+		final Item item = (Item) o;
+		if (this.itemId.equals(item.itemId)) {
 			return true;
 		}
 		return false;
 	}
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name==null) ? 0 : name.hashCode());
-		return result;
-	}
-	@Override
-	public int compareTo(String name) {
-		if (this.name.equals(name)) {
-			return 0;
-		}
-		if (this.name.compareTo(name) < 0) {
-			return -1;
-		}
-		return 1;
-	}
-	
 }
