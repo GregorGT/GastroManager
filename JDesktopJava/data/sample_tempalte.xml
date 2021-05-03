@@ -21,6 +21,13 @@
 					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b" uuid="1284887162" />
 					<option id="size" name="large" 	price="1.2" menu_id="100c"/>
 				</item>
+
+				<item name="pepperoni" menu_id="101" uuid="356152837">
+					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="101a" />
+					<option id="size" name="medium" overwrite_price="5.8" menu_id="101b" uuid="1284887162" />
+					<option id="size" name="large" 	price="1.2" menu_id="101c"/>
+				</item>
+				
 			</item>
 		</item>
 		<item name="Pasta" uuid="19762674635" printer="kitchen">
