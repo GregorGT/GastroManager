@@ -14,12 +14,14 @@ import com.sun.star.text.XTextTable;
 
 public class MonthlyFinancialReport {
 	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
-		FinancialReportTemplate.connectDB();
-		FinancialReportTemplate.openDocument();
-		FinancialReportTemplate.putTitle("Monthly Financial Report");
+		FinancialReportTemplate template = new FinancialReportTemplate();
+		
+		template.connectDB();
+		template.openDocument();
+		template.putTitle("Monthly Financial Report");
 		
 		Calendar gc = new GregorianCalendar();
-        gc.set(Calendar.MONTH, gc.get(Calendar.MONTH));
+        gc.set(Calendar.MONTH, gc.get(Calendar.MONTH)); // -1
         gc.set(Calendar.DAY_OF_MONTH, 1);
         Date monthStart = gc.getTime();
         gc.add(Calendar.MONTH, 1);
@@ -29,17 +31,20 @@ public class MonthlyFinancialReport {
         String startDate = format.format(monthStart) + " 00:00:00";
         String endDate = format.format(monthEnd) + " 23:59:59";  
         
+//        System.out.println(startDate);
+//        System.out.println(endDate);
+        
         SimpleDateFormat f = new SimpleDateFormat("dd/MM/yyyy");
         
         
-        FinancialReportTemplate.putDate(f.format(monthStart), f.format(monthEnd));
+        template.putDate(f.format(monthStart), f.format(monthEnd));
         System.out.println("Inserting tables...");
 		
-		XTextTable incomeTable = FinancialReportTemplate.createAndFillIncomeTable(startDate, endDate);
-		XTextTable mostBoughtItemsTable = FinancialReportTemplate.createAndFillMostBoughtItemsTable(startDate, endDate);
-		XTextTable leastBoughtItemsTable = FinancialReportTemplate.createAndFillLeastBoughtItemsTable(startDate, endDate);
+		XTextTable incomeTable = template.createAndFillIncomeTable(startDate, endDate);
+		XTextTable mostBoughtItemsTable = template.createAndFillMostBoughtItemsTable(startDate, endDate);
+		XTextTable leastBoughtItemsTable = template.createAndFillLeastBoughtItemsTable(startDate, endDate);
 		
-		FinancialReportTemplate.putRevenue(startDate, endDate);
+		template.putRevenue(startDate, endDate);
 		
 		System.exit(0);		
 	}
