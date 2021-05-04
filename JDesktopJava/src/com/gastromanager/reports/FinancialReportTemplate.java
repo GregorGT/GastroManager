@@ -43,19 +43,43 @@ import com.sun.star.uno.UnoRuntime;
 import com.sun.star.uno.XComponentContext;
 
 public class FinancialReportTemplate {
+	private static final String queryForIncomeTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
+													+ "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
+													+ "WHERE datetime>=? and datetime<=? "
+													+ "GROUP BY o.item_id";
+	private static final String queryForMostBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
+															 + "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
+															 + "WHERE datetime>=? and datetime<=? "
+															 + "GROUP BY o.item_id "
+															 + "ORDER BY quantity ASC, total_price DESC LIMIT 5";
+	private static final String queryForLeastBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
+															  + "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
+															  + "WHERE datetime>=? and datetime<=? "
+															  + "GROUP BY o.item_id "
+															  + "ORDER BY quantity DESC, total_price ASC LIMIT 5";
+	private static final String queryForTotalRevenue = "SELECT SUM(total_amount)+SUM(tips) revenue "
+													 + "FROM transactions t JOIN orderitem o ON t.id=o.transaction_id "
+													 + "WHERE datetime>=? and datetime<=?";
+	
+	
+	
 	private static XComponentContext xContext; 
 	private static XText xText;
 	private static XTextCursor xTextCursor;
 	private static XTextDocument writerDocument;
-	private static Connection connectionDB=null;
-	private static Double totalRevenue=0.0;
+	private static Connection connectionDB;
+	private static Double totalRevenue;
 
-	private static String queryForIncomeTable = "SELECT SUM(quantity) total_quantity, item_id, xml, price*(SUM(quantity)) total_price FROM orderitem WHERE datetime>=? and datetime<=? GROUP BY item_id";
-	private static String queryForMostBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, price*(SUM(quantity)) total_price FROM orderitem WHERE datetime>=? and datetime<=? GROUP BY item_id ORDER BY quantity ASC, total_price DESC LIMIT 5";
-	private static String queryForLeastBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, price*(SUM(quantity)) total_price FROM orderitem WHERE datetime>=? and datetime<=? GROUP BY item_id ORDER BY quantity DESC, total_price ASC LIMIT 5";
-	private static String queryForTotalRevenue = "SELECT SUM(total_amount)+SUM(tips) revenue FROM transactions t JOIN orderitem o ON t.id=o.transaction_id WHERE datetime>=? and datetime<=?";
+	public FinancialReportTemplate() {
+		this.xContext = null;
+		this.xText = null;
+		this.xTextCursor = null;
+		this.writerDocument = null;
+		this.connectionDB = null;
+		this.totalRevenue = 0.0;
+	}
 	
-	public static void connectDB() {
+	public void connectDB() {
 		Connection connection = null;
         try {
             connection = DbConnection.getDbConnection().gastroDbConnection;
@@ -66,7 +90,7 @@ public class FinancialReportTemplate {
         connectionDB = connection;
 	}
 	
-	public static void openDocument() {
+	public void openDocument() {
 		xContext = null;
 		
 		try {
@@ -83,25 +107,29 @@ public class FinancialReportTemplate {
 		xTextCursor = xText.createTextCursor();
 	}
 	
-	public static void putTitle(String title) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+	public void putTitle(String title) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
 		propertiesOfTextCursor.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
 		propertiesOfTextCursor.setPropertyValue("CharHeight", 14);
 		propertiesOfTextCursor.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.CENTER);
-		xText.insertString(xTextCursor, "Monthly Financial Report\n", false);
+		xText.insertString(xTextCursor, title+"\n", false);
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
 	}
 	
-	public static void putDate(String date1, String date2) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+	public void putDate(String date1, String date2) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
 		propertiesOfTextCursor.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
 		propertiesOfTextCursor.setPropertyValue("CharHeight", 14);
 		propertiesOfTextCursor.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.CENTER);
-		xText.insertString(xTextCursor, date1+" - "+date2, false);
+		if (date2 != null) {
+			xText.insertString(xTextCursor, date1+" - "+date2, false);
+		} else {
+			xText.insertString(xTextCursor, date1, false);
+		}
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
 	}
 	
-	public static void putRevenue(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+	public void putRevenue(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
 		propertiesOfTextCursor.setPropertyValue("CharWeight", com.sun.star.awt.FontWeight.BOLD);
 		propertiesOfTextCursor.setPropertyValue("CharHeight", 14);
@@ -122,14 +150,14 @@ public class FinancialReportTemplate {
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
 	}
 	
-	public static XTextTable createAndFillIncomeTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+	public XTextTable createAndFillIncomeTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForIncomeTable);
 		XTextTable incomeTable = putTable("Income", items.size());
 		fillTable(items, incomeTable);
 		return incomeTable;
 	}
 	
-	public static XTextTable createAndFillMostBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+	public XTextTable createAndFillMostBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForMostBoughtItemsTable);
 		XTextTable mbiTable = putTable("Most Bought Items", items.size());
 		fillTable(items, mbiTable);
@@ -137,14 +165,14 @@ public class FinancialReportTemplate {
 	}
 
 	
-	public static XTextTable createAndFillLeastBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+	public XTextTable createAndFillLeastBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForLeastBoughtItemsTable);
 		XTextTable lbiTable = putTable("Least Bought Items", items.size());
 		fillTable(items, lbiTable);
 		return lbiTable;
 	}
 	
-	private static void fillTable(List<Item> items, XTextTable table) {
+	private void fillTable(List<Item> items, XTextTable table) {
 		char []letters = new char[table.getColumns().getCount()];
 		char letter = 'A';
 		for (int i=0; i<letters.length; ++i, ++letter) {
@@ -163,7 +191,7 @@ public class FinancialReportTemplate {
 				
 				XPropertySet xTPS = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTC);
 				try {
-					xTPS.setPropertyValue("CharHeight", 14);
+					xTPS.setPropertyValue("CharHeight", 13);
 					xTPS.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.CENTER);
 				} catch (Exception e) {
 					System.err.println(" Exception " + e);
@@ -196,7 +224,7 @@ public class FinancialReportTemplate {
 		}
 	}
 
-	private static List< Item> retreiveItemsFromDb(String startDate, String endDate, String query) {
+	private List< Item> retreiveItemsFromDb(String startDate, String endDate, String query) {
 		List<Item> items = new LinkedList<>();
         try {
 			PreparedStatement stmt = connectionDB.prepareStatement(query);
@@ -217,7 +245,7 @@ public class FinancialReportTemplate {
         return items;
     }
 	
-	private static String parseXml(String xml) {
+	private String parseXml(String xml) {
 		String itemName = null;
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = null;
@@ -233,13 +261,13 @@ public class FinancialReportTemplate {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		System.out.println("Item name= "+itemName);
+//		System.out.println("Item name= "+itemName);
 		
 		return itemName;
 	}
 	
 
-    private static String parse(Document doc, Element e) {
+    private String parse(Document doc, Element e) {
         String itemName = "";
     	NodeList children = e.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
@@ -260,7 +288,7 @@ public class FinancialReportTemplate {
         return itemName;
     }
 
-	private static XTextTable putTable(String title, int rows) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+	private XTextTable putTable(String title, int rows) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		XPropertySet propertiesOfTextCursor = (XPropertySet) UnoRuntime.queryInterface(XPropertySet.class, xTextCursor);
 		propertiesOfTextCursor.setPropertyValue("ParaAdjust", com.sun.star.style.ParagraphAdjust.LEFT);
 		xText.insertString(xTextCursor, "\n"+title, false);
@@ -294,7 +322,7 @@ public class FinancialReportTemplate {
 		return xTextTable;
 	}
 	
-	private static void insertTitles(String CellName, String theText, XTextTable xTTbl) {
+	private void insertTitles(String CellName, String theText, XTextTable xTTbl) {
 		XText xTableText = (XText) UnoRuntime.queryInterface(XText.class,
 		         xTTbl.getCellByName(CellName));
 		
@@ -314,7 +342,7 @@ public class FinancialReportTemplate {
 		xTableText.setString( theText );
 	}
 	
-	private static XTextDocument openWriter(XComponentContext xContext) {
+	private XTextDocument openWriter(XComponentContext xContext) {
 		XComponentLoader xLoader = null;
 		XTextDocument xDocument = null;
 		XComponent xComponent = null;
@@ -338,4 +366,5 @@ public class FinancialReportTemplate {
 		
 		return xDocument;
 	}	
+	
 }

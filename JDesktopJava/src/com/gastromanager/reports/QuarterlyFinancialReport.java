@@ -3,7 +3,7 @@ package com.gastromanager.reports;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.NoSuchElementException;
 
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
@@ -11,30 +11,35 @@ import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextTable;
 
-public class DailyFinancialReport {
+public class QuarterlyFinancialReport {
 
-	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
 		FinancialReportTemplate template = new FinancialReportTemplate();
 		
 		template.connectDB();
 		template.openDocument();
-		template.putTitle("Daily Financial Report");
+		template.putTitle("Quarterly Financial Report");
 		
-
-	
-		Date date = new Date();
+		
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-3);
+		Date quarterStart = calendar.getTime();
+		calendar.add(Calendar.MONTH, 3);
+		calendar.add(Calendar.DAY_OF_MONTH, -1);
+		Date quarterEnd = calendar.getTime();
+		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String d = sdf.format(date);
-		String startDate = d + " 00:00:00";
-		String endDate = d + " 23:59:59";
-
-//		String startDate = "2021-04-16 00:00:00";
-//		String endDate = "2021-04-16 23:59:59";
+		String startDate = sdf.format(quarterStart);	
+		String endDate = sdf.format(quarterEnd);	
+		startDate += " 00:00:00";
+		endDate += " 23:59:59";
 		
-		sdf = new SimpleDateFormat("dd-MM-yyyy");
-        String today = sdf.format(date);
+		System.out.println(startDate);
+		System.out.println(endDate);
 		
-        template.putDate(today, null);
+		sdf = new SimpleDateFormat("dd/MM/yyyy");
+        template.putDate(sdf.format(quarterStart), sdf.format(quarterEnd));
+        
         System.out.println("Inserting tables...");
 		
 		XTextTable incomeTable = template.createAndFillIncomeTable(startDate, endDate);
@@ -45,4 +50,5 @@ public class DailyFinancialReport {
 		
 		System.exit(0);		
 	}
+
 }
