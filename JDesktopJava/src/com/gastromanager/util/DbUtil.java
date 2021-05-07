@@ -23,6 +23,7 @@ public class DbUtil {
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
             orderItems = loadResults(result);
+            stmt.close();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
             orderItems = null;
@@ -60,11 +61,34 @@ public class DbUtil {
                         (result.getString("FIRSTNAME") != null ? result.getString("FIRSTNAME"): ""));
                 orderInfo.setTableName((result.getString("TABLE_NAME") != null ? result.getString("TABLE_NAME"): ""));
             }
+            stmt.close();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
 
         }
         return orderInfo;
+    }
+
+    public static List<String> loadOrderItemXmlInfo(String orderId) {
+        List<String> orderItemXmlInfo = null;
+        try {
+            String query = "SELECT XML FROM ORDERITEM WHERE ORDER_ID= ?";
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            stmt.setInt(1,Integer.parseInt(orderId));
+            ResultSet result = stmt.executeQuery();
+            while(result.next()) {
+                if(null== orderItemXmlInfo) {
+                    orderItemXmlInfo = new ArrayList<>();
+                }
+                orderItemXmlInfo.add(result.getString("XML"));
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return orderItemXmlInfo;
     }
 
     private static List<OrderItem> loadResults(ResultSet result) {
@@ -93,8 +117,9 @@ public class DbUtil {
     }
 
     public static void main(String[] args) {
-        List<OrderItem> orderItems = DbUtil.getOrderDetails("1");
-        System.out.println(orderItems.get(0).getXml().getElementsByTagName("item").getLength());
-        DbUtil.getOrderInfo("1");
+        //List<OrderItem> orderItems = DbUtil.getOrderDetails("1");
+        //System.out.println(orderItems.get(0).getXml().getElementsByTagName("item").getLength());
+        //DbUtil.getOrderInfo("1");
+        System.out.println(DbUtil.loadOrderItemXmlInfo("1"));
     }
 }
