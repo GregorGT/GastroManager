@@ -86,7 +86,7 @@ public class Server {
             while (true) {
                 try {
                     //String orderId = in.readUTF();
-                    String request = in.readUTF().trim();
+                    String request = this.dis.readUTF().trim();
                     System.out.println("Received request for " + request);
 
                     if (isNumeric(request)) {
@@ -94,13 +94,13 @@ public class Server {
                             //send result to client
                             //out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
                             //out.writeUTF(DbUtil.loadOrderItemXmlInfo(orderId).toString());
-                            out.writeUTF(new PrintServiceImpl().getPrintInfo(request));
-                            out.close();
+                            this.dos.writeUTF(new PrintServiceImpl().getPrintInfo(request));
+                            this.dos.close();
                         }
                     } else {
                         if (request.equals("menu")) {
-                            sendXMLData(out);
-                            out.close();
+                            sendXMLData(this.dos);
+                            this.dos.close();
                         }
                     }
 
