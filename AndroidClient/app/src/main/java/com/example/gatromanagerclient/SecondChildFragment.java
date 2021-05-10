@@ -16,6 +16,9 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
+import com.example.gatromanagerclient.model.DrillDownMenuItemDetail;
+import com.example.gatromanagerclient.model.DrillDownMenuItemOptionChoiceDetail;
+import com.example.gatromanagerclient.model.DrillDownMenuItemOptionDetail;
 import com.example.gatromanagerclient.socket.Client;
 import com.example.gatromanagerclient.util.XmlUtil;
 
@@ -23,8 +26,12 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class SecondChildFragment extends Fragment {
 
@@ -83,6 +90,13 @@ public class SecondChildFragment extends Fragment {
                                     myNewButton.setHeight(Integer.parseInt(buttonHeight));
                                     myNewButton.setWidth(Integer.parseInt(buttonWidth));
                                     myNewButton.setVisibility(View.VISIBLE);
+                                    myNewButton.setOnClickListener(new View.OnClickListener() {
+                                        public void onClick(View v) {
+                                            // your handler code here
+                                            DrillDownMenuItemDetail menuItemDetail = loadMenuItemDetail(buttonText, menuXml);
+                                            System.out.println("Got here "+menuItemDetail);
+                                        }
+                                    });
                                     linearLayout.addView(myNewButton);
                                 }
                             }
@@ -95,6 +109,93 @@ public class SecondChildFragment extends Fragment {
             }
         }
 
+    }
+
+    private DrillDownMenuItemDetail loadMenuItemDetail(String menuItem, Document menuXml) {
+        DrillDownMenuItemDetail menuItemDetail = null;
+        Map<String, DrillDownMenuItemOptionDetail> optionsMap = null;
+        List<DrillDownMenuItemDetail> subItems = null;
+        NodeList menuItemNodeList = menuXml.getElementsByTagName("item");
+        for(int i=0; i< menuItemNodeList.getLength(); i++) {
+            Node menuItemNode  = menuItemNodeList.item(i);
+            String menuItemNodeName = menuItemNode.getAttributes().getNamedItem("name").getNodeValue();
+            if(menuItemNodeName.equals(menuItem)) {
+                menuItemDetail = loadMenuItemDetails(menuItemNode);
+                /*NodeList menuItemNodeChildren = menuItemNode.getChildNodes();
+                for(int j=0;j<menuItemNodeChildren.getLength(); j++) {
+                    Node menuItemNodeChild = menuItemNodeChildren.item(j);
+                    if(menuItemNodeChild.getNodeType() == Node.ELEMENT_NODE) {
+                        menuItemDetail = loadMenuItemDetails(menuItemNodeChild);
+                    }
+                }*/
+            }
+
+        }
+        return menuItemDetail;
+    }
+
+    private DrillDownMenuItemDetail loadMenuItemDetails(Node menuNode) {
+        DrillDownMenuItemDetail menuItemDetail = null;
+        Map<String, DrillDownMenuItemOptionDetail> optionsMap = null;
+        List<DrillDownMenuItemDetail> subItems = null;
+        String menuItemNodeName = menuNode.getAttributes().getNamedItem("name").getNodeValue(); //check and avoid by taking it from the calling function
+        NodeList menuItemNodeChildren = menuNode.getChildNodes();
+        for (int j = 0; j < menuItemNodeChildren.getLength(); j++) {
+            Node menuItemNodeChild = menuItemNodeChildren.item(j);
+            if(menuItemNodeChild.getNodeType() == Node.ELEMENT_NODE) {
+                String menuItemNodeChildName = menuItemNodeChild.getNodeName();
+                switch (menuItemNodeChildName) {
+                    case "option":
+                        if (optionsMap == null) {
+                            optionsMap = new HashMap<>();
+                        }
+                        String optionName = menuItemNodeChild.getAttributes().getNamedItem("name").getNodeValue();
+                        DrillDownMenuItemOptionDetail option = loadDrillDownMenuOption(menuItemNodeChild);
+                        optionsMap.put(optionName, option);
+                        break;
+                    case "item":
+                        DrillDownMenuItemDetail childDrillDownDetail = loadMenuItemDetails(menuItemNodeChild);
+                        if (subItems == null) {
+                            subItems = new ArrayList<>();
+                        }
+                        subItems.add(childDrillDownDetail);
+                        break;
+                }
+            }
+        }
+        menuItemDetail = new DrillDownMenuItemDetail(menuItemNodeName, optionsMap, subItems);
+
+        return menuItemDetail;
+    }
+
+    private DrillDownMenuItemOptionDetail loadDrillDownMenuOption(Node optionNode) {
+        DrillDownMenuItemOptionDetail option = null;
+        List<DrillDownMenuItemOptionChoiceDetail> optionChoices = null;
+        option =  new DrillDownMenuItemOptionDetail();
+        option.setId(optionNode.getAttributes().getNamedItem("id").getNodeValue());
+        option.setName(optionNode.getAttributes().getNamedItem("name").getNodeValue());
+        option.setPrice(Double.valueOf((optionNode.getAttributes().getNamedItem("price") != null ?
+                optionNode.getAttributes().getNamedItem("price"):optionNode.getAttributes().getNamedItem("overwrite_price")).getNodeValue()));
+        if(optionNode.hasChildNodes()) {
+            NodeList optionNodeChildren = optionNode.getChildNodes();
+            for (int i=0; i < optionNodeChildren.getLength(); i++) {
+                Node optionNodeChild = optionNodeChildren.item(i);
+                if(optionNodeChild.getNodeType() == Node.ELEMENT_NODE && optionNodeChild.getNodeName().equals("choice")) {
+                    if(optionChoices == null) {
+                        optionChoices = new ArrayList<>();
+                    }
+                    DrillDownMenuItemOptionChoiceDetail optionChoice =  new DrillDownMenuItemOptionChoiceDetail();
+                    optionChoice.setName(optionNodeChild.getAttributes().getNamedItem("name").getNodeValue());
+                    optionChoice.setPrice(Double.valueOf(optionNodeChild.getAttributes().getNamedItem("price").getNodeValue()));
+                    optionChoices.add(optionChoice);
+                }
+            }
+        }
+        if(optionChoices != null && optionChoices.size() > 0) {
+            option.setChoice(optionChoices.get(0));
+        }
+
+        return option;
     }
 
     @Override
