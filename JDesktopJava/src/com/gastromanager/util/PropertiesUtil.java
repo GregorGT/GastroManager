@@ -33,15 +33,37 @@ public class PropertiesUtil {
         return value;
     }
     
+    public static void setPropertyValue(String propertyKey, String newPropertyValue) {
+    	String slash = "";
+    	if (!isWindows()) {
+    		slash = "/";
+    	} else {
+    		slash = "\\";
+    	}
+        String value = null;
+        try {
+            if(properties == null) {
+                InputStream is = new FileInputStream(System.getProperty("user.dir") + slash + "resources"+slash+"gastromanager.properties");
+                properties = new Properties();
+                properties.load(is);
+            }
+
+            properties.setProperty(propertyKey, newPropertyValue);
+            } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
     public static String getOsName()
-	   {
-	      if(OS == null) { OS = System.getProperty("os.name"); }
-	      return OS;
-	   }
-	   public static boolean isWindows()
-	   {
-	      return getOsName().startsWith("Windows");
-	   }
+    {
+       if(OS == null) { OS = System.getProperty("os.name"); }
+       return OS;
+    }
+    public static boolean isWindows()
+    {
+       return getOsName().startsWith("Windows");
+    }
 
     public static void main(String[] args) {
         PropertiesUtil.getPropertyValue("dbFolder");

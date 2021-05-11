@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.NoSuchElementException;
 
+import com.gastromanager.util.PropertiesUtil;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.lang.IllegalArgumentException;
@@ -42,13 +43,17 @@ public class QuarterlyFinancialReport {
         
         System.out.println("Inserting tables...");
 		
-		XTextTable incomeTable = template.createAndFillIncomeTable(startDate, endDate);
-		XTextTable mostBoughtItemsTable = template.createAndFillMostBoughtItemsTable(startDate, endDate);
-		XTextTable leastBoughtItemsTable = template.createAndFillLeastBoughtItemsTable(startDate, endDate);
+        int incomeTableTotalItems = Integer.parseInt(PropertiesUtil.getPropertyValue("allItemCountReport"));
+        int mbiTableTotalItems = Integer.parseInt(PropertiesUtil.getPropertyValue("moustBoughItemsReport"));
+        int lbiTableTotalItems = Integer.parseInt(PropertiesUtil.getPropertyValue("leastBoughItemsReport"));
+        
+        
+        XTextTable incomeTable = template.createAndFillIncomeTable(startDate, endDate, incomeTableTotalItems);
+		XTextTable mostBoughtItemsTable = template.createAndFillMostBoughtItemsTable(startDate, endDate, mbiTableTotalItems);
+		XTextTable leastBoughtItemsTable = template.createAndFillLeastBoughtItemsTable(startDate, endDate, lbiTableTotalItems);
 		
 		template.putRevenue(startDate, endDate);
 		
-		System.exit(0);		
 	}
 
 }
