@@ -8,25 +8,14 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.gatromanagerclient.socket.Client;
-import com.example.gatromanagerclient.util.XmlUtil;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 public class ChildFragment extends Fragment {
 
@@ -73,7 +62,7 @@ public class ChildFragment extends Fragment {
         protected Void doInBackground(String... request) {
             Client client = new Client();//.getInstance();
             response = client.getResponse(Arrays.stream(request).findFirst().get());
-            System.out.println("Requesting for "+request);
+            System.out.println("Requesting for "+Arrays.stream(request).findFirst().get());
             return null;
         }
         @Override

@@ -27,13 +27,19 @@ import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
+import com.sun.star.chart.XChartDocument;
+import com.sun.star.chart.XDiagram;
 import com.sun.star.comp.helper.Bootstrap;
+import com.sun.star.container.XNameAccess;
+import com.sun.star.document.XEmbeddedObjectSupplier;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
+import com.sun.star.table.CellRangeAddress;
+import com.sun.star.table.XTableChartsSupplier;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
@@ -46,17 +52,20 @@ public class FinancialReportTemplate {
 	private static final String queryForIncomeTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
 													+ "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
 													+ "WHERE datetime>=? and datetime<=? "
-													+ "GROUP BY o.item_id";
+													+ "GROUP BY o.item_id "
+													+ "LIMIT ?";
 	private static final String queryForMostBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
 															 + "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
 															 + "WHERE datetime>=? and datetime<=? "
 															 + "GROUP BY o.item_id "
-															 + "ORDER BY quantity ASC, total_price DESC LIMIT 5";
+															 + "ORDER BY quantity ASC, total_price DESC "
+															 + "LIMIT ?";
 	private static final String queryForLeastBoughtItemsTable = "SELECT SUM(quantity) total_quantity, item_id, xml, SUM(total_amount)+SUM(tips) total_price "
 															  + "FROM orderitem o JOIN transactions t ON o.transaction_id=t.id "
 															  + "WHERE datetime>=? and datetime<=? "
 															  + "GROUP BY o.item_id "
-															  + "ORDER BY quantity DESC, total_price ASC LIMIT 5";
+															  + "ORDER BY quantity DESC, total_price ASC "
+															  + "LIMIT ?";
 	private static final String queryForTotalRevenue = "SELECT SUM(total_amount)+SUM(tips) revenue "
 													 + "FROM transactions t JOIN orderitem o ON t.id=o.transaction_id "
 													 + "WHERE datetime>=? and datetime<=?";
@@ -150,23 +159,23 @@ public class FinancialReportTemplate {
 		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
 	}
 	
-	public XTextTable createAndFillIncomeTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
-		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForIncomeTable);
+	public XTextTable createAndFillIncomeTable(String startDate, String endDate, int totalItems) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForIncomeTable, totalItems);
 		XTextTable incomeTable = putTable("Income", items.size());
 		fillTable(items, incomeTable);
 		return incomeTable;
 	}
 	
-	public XTextTable createAndFillMostBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
-		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForMostBoughtItemsTable);
+	public XTextTable createAndFillMostBoughtItemsTable(String startDate, String endDate, int totalItems) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForMostBoughtItemsTable, totalItems);
 		XTextTable mbiTable = putTable("Most Bought Items", items.size());
 		fillTable(items, mbiTable);
 		return mbiTable;
 	}
 
 	
-	public XTextTable createAndFillLeastBoughtItemsTable(String startDate, String endDate) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
-		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForLeastBoughtItemsTable);
+	public XTextTable createAndFillLeastBoughtItemsTable(String startDate, String endDate, int totalItems) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
+		List<Item> items = retreiveItemsFromDb(startDate, endDate, queryForLeastBoughtItemsTable, totalItems);
 		XTextTable lbiTable = putTable("Least Bought Items", items.size());
 		fillTable(items, lbiTable);
 		return lbiTable;
@@ -184,7 +193,7 @@ public class FinancialReportTemplate {
 			ltr=0;
 			for (int i=0; i<table.getColumns().getCount(); ++i) {
 				String cellName = String.valueOf(letters[ltr]);
-				
+//				Items
 				XText xTableText = (XText) UnoRuntime.queryInterface(XText.class, table.getCellByName(cellName+String.valueOf(row)));
 				
 				XTextCursor xTC = xTableText.createTextCursor();
@@ -224,12 +233,13 @@ public class FinancialReportTemplate {
 		}
 	}
 
-	private List< Item> retreiveItemsFromDb(String startDate, String endDate, String query) {
+	private List< Item> retreiveItemsFromDb(String startDate, String endDate, String query, int totalItems) {
 		List<Item> items = new LinkedList<>();
         try {
 			PreparedStatement stmt = connectionDB.prepareStatement(query);
 		    stmt.setString(1, startDate);
 		    stmt.setString(2, endDate);
+		    stmt.setInt(3, totalItems);
 	
 	        ResultSet rs = stmt.executeQuery();
 	        while (rs.next()) {
@@ -366,5 +376,4 @@ public class FinancialReportTemplate {
 		
 		return xDocument;
 	}	
-	
 }

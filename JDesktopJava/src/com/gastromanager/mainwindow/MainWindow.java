@@ -2,8 +2,13 @@ package com.gastromanager.mainwindow;
 
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -34,6 +39,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
+import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultTreeModel;
@@ -227,7 +233,7 @@ public class MainWindow extends JFrame {
 	 */
 	public MainWindow() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 750);
+		setBounds(100, 20, 1000, 700);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -337,6 +343,19 @@ public class MainWindow extends JFrame {
 		OrderingMenu tabOrdering = new OrderingMenu();
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
+		
+<<<<<<< HEAD
+		
+		ReportsMenu reportsTab = new ReportsMenu();
+//		reportsTab.setLayout(new BoxLayout());
+		tabbedPane.addTab("Reports", null, reportsTab, null);
+
+=======
+		PaymentMenu tabPayment = new PaymentMenu();
+		tabbedPane.addTab("Payment", null,tabPayment, null);
+		tabPayment.setPreferredSize(new Dimension(750,650));
+		tabPayment.setLayout(null);
+>>>>>>> c632f4ba106a185ada7cd0492b71036b0cafffa6
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
