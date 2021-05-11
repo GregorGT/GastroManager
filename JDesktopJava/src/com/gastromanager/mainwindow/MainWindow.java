@@ -3,6 +3,7 @@ package com.gastromanager.mainwindow;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -227,7 +228,7 @@ public class MainWindow extends JFrame {
 	 */
 	public MainWindow() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 800, 750);
+		setBounds(100, 20, 1000, 700);
 
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
@@ -337,6 +338,11 @@ public class MainWindow extends JFrame {
 		OrderingMenu tabOrdering = new OrderingMenu();
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
+		
+		PaymentMenu tabPayment = new PaymentMenu();
+		tabbedPane.addTab("Payment", null,tabPayment, null);
+		tabPayment.setPreferredSize(new Dimension(750,650));
+		tabPayment.setLayout(null);
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
