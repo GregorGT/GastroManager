@@ -51,7 +51,7 @@
 				<option id="size" name="large" 	price="1.2" menu_id="120c"/>
 			</item>
 		</item>		
-		<item name="Drink" name_en="drink" printer="bar" >
+		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
 				<option id="size" name="large" price="1.2" />
@@ -66,16 +66,16 @@
 		</item>
 	</menues>
 	<layout>
-		<level value="1" name="firstfloor" name_de="erster stock" >
+		<floor value="1" name="firstfloor" name_de="erster stock" >
 			<image value=""/>
-			<table value="1" name_de="Tisch" name="table" >
-				<x>0</x>
-				<y>0</y>
-				<rot>0</rot>
-				<width>100</width>
-				<height>100</height>
+			<table value="1" name_de="Tisch" name="table" x="3" y="0" width="100" heigh="100" rot="0">
+				<chair name="proper chair" x="10" y="0" width="50" height="50">
 			</table>
-		</level>
+		</floor>
+		<floor name="secondfloor" value="2">
+			<image value=""/>
+			<table value="1" name="firsttable"/>
+		</floor>
 	</layout>
 	
 	
@@ -87,29 +87,25 @@
 		</date>
 	</reservations>
 	<drilldownmenus>
-	
-	<drilldownmenu name="Main screens" width="700" height="600">
-		<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
-		</button>
-		<button name="Drink" width="200" x-position="9" id="5357360846491103059" y-position="196" height="100" target="-2054482951531625359">
-		</button>
-		<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" y-position="89" height="100" target="19762674635">
-		</button>
-	</drilldownmenu>
-	
-	<drilldownmenu name="Tablets" width="900" height="700">
-		<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" y-position="20" height="100" target="19762674635"/>
-		<button name="Drink" width="200" x-position="332" id="7998995850391924247" y-position="20" height="100" target="-2054482951531625359"/>
-		<button name="Pizza" width="200" x-position="688" id="7860246180633986788" y-position="20" height="100" target="1976266538"/>
-	</drilldownmenu>
-	
-		<drilldownmenu name="Android Tablet">
-			<height>800</height>
-			<width>400</width>
-			<button name="potato" target="124456611">
-				<height>50</height>
-				<width>80</width>
+		<drilldownmenu name="Main screens" width="700" height="600">
+			<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
 			</button>
+			<button name="Drink" width="200" x-position="9" id="5357360846491103059" y-position="196" height="100" target="381123886124">
+			</button>
+			<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" y-position="89" height="100" target="19762674635">
+			</button>
+		</drilldownmenu>
+		
+		<drilldownmenu name="Tablets" width="900" height="700">
+			<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" y-position="20" height="100" target="19762674635"/>
+			<button name="Drink" width="200" x-position="332" id="7998995850391924247" y-position="20" height="100" target="381123886124"/>
+			<button name="Pizza" width="200" x-position="688" id="7860246180633986788" y-position="20" height="100" target="1976266538"/>
+		</drilldownmenu>
+		
+		<drilldownmenu name="Android Tablet" height="800" width="400">
+				<button name="Pizza" target="1976266538" x="50" y="50" height="50" width="100"/>
+				<button name="Pasta" target="19762674635" x="50" y="150" height="50" width="100"/>
+				<button name="Drink" target="381123886124" x="50" y="250" height="50" width="100"/>
 		</drilldownmenu>
 	</drilldownmenus>
 	
