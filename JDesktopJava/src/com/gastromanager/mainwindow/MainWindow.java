@@ -344,18 +344,14 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
 		
-<<<<<<< HEAD
-		
-		ReportsMenu reportsTab = new ReportsMenu();
+		ReportsMenu tabReports = new ReportsMenu();
 //		reportsTab.setLayout(new BoxLayout());
-		tabbedPane.addTab("Reports", null, reportsTab, null);
+		tabbedPane.addTab("Reports", null, tabReports, null);
 
-=======
 		PaymentMenu tabPayment = new PaymentMenu();
 		tabbedPane.addTab("Payment", null,tabPayment, null);
 		tabPayment.setPreferredSize(new Dimension(750,650));
 		tabPayment.setLayout(null);
->>>>>>> c632f4ba106a185ada7cd0492b71036b0cafffa6
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
