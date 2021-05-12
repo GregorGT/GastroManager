@@ -5,8 +5,10 @@ import java.awt.LayoutManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
@@ -19,9 +21,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.TitledBorder;
 
-import org.jdatepicker.impl.JDatePanelImpl;
-import org.jdatepicker.impl.JDatePickerImpl;
-import org.jdatepicker.impl.UtilDateModel;
+import org.jdatepicker.JDatePanel;
+import org.jdatepicker.JDatePicker;
+import org.jdatepicker.UtilDateModel;
 
 import com.gastromanager.reports.*;
 import com.gastromanager.util.PropertiesUtil;
@@ -46,8 +48,8 @@ public class ReportsMenu extends JPanel{
 	    startDateProperties.put("text.today", "Today");
 	    startDateProperties.put("text.month", "Month");
 	    startDateProperties.put("text.year", "Year");
-		JDatePanelImpl startDatePanel = new JDatePanelImpl(startDateModel, startDateProperties);
-		JDatePickerImpl startDatePicker = new JDatePickerImpl(startDatePanel, new DateLabelFormatter());
+		JDatePanel startDatePanel = new JDatePanel(startDateModel);
+		JDatePicker startDatePicker = new JDatePicker();
 		panelDates.add(startDatePicker);
 
 		JLabel dateUntil = new JLabel("Until: ");
@@ -58,8 +60,8 @@ public class ReportsMenu extends JPanel{
 		endDateProperties.put("text.today", "Today");
 		endDateProperties.put("text.month", "Month");
 		endDateProperties.put("text.year", "Year");
-		JDatePanelImpl endDatePanel = new JDatePanelImpl(endDateModel, endDateProperties);
-		JDatePickerImpl endDatePicker = new JDatePickerImpl(endDatePanel, new DateLabelFormatter());
+		JDatePanel endDatePanel = new JDatePanel(endDateModel);
+		JDatePicker endDatePicker = new JDatePicker();
 		panelDates.add(endDatePicker);
 		
 		
@@ -74,10 +76,28 @@ public class ReportsMenu extends JPanel{
 
 			@Override
 			public void actionPerformed(ActionEvent actionEvent) {
-				Date startDate;
-				Date endDate;
-				startDate = (Date) startDatePicker.getModel().getValue();
-				endDate = (Date) endDatePicker.getModel().getValue();
+				GregorianCalendar start;
+				GregorianCalendar end;
+				
+				start = (GregorianCalendar) startDatePicker.getModel().getValue();
+				end = (GregorianCalendar) endDatePicker.getModel().getValue();
+				
+				Instant firstDate = null;
+				Instant secondDate = null;
+				
+				try {
+					firstDate = start.toInstant();
+					secondDate = end.toInstant();
+				}
+				catch  (NullPointerException e) {
+					JFrame frame = new JFrame();
+					JOptionPane.showMessageDialog(frame, "You cannot generate a report without setting the starting"
+							+ " and the ending dates first.");	
+					return;
+				}
+				
+				Date startDate = Date.from(firstDate);
+				Date endDate = Date.from(secondDate);
 				
 				String []dates = new String[2];
 				try {
@@ -88,6 +108,7 @@ public class ReportsMenu extends JPanel{
 						new UserInputReport().main(dates);
 					}
 				} catch (NullPointerException e) {
+					System.err.println("Null");
 					JFrame frame = new JFrame();
 					JOptionPane.showMessageDialog(frame, "You cannot generate a report without setting the starting"
 							+ " and the ending dates first.");	
