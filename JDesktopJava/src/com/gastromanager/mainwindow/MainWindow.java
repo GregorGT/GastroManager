@@ -60,7 +60,7 @@ import com.gastromanager.util.XmlUtil;
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
-	private GMTreeItem root = new GMTreeItem("Restaurant Name");
+	private GMTreeItem root = new GMTreeItem("Restaurant name");
 	private GMTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
@@ -145,7 +145,6 @@ public class MainWindow extends JFrame {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-					
 					System.out.println(newString);
 			}
 		});
@@ -162,10 +161,8 @@ public class MainWindow extends JFrame {
 					xmlUtil.parseXmlDocument(doc, root, newMElement);
 					tree.init(tree, drillDownMenu);
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}			
 			}

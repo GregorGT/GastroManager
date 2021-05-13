@@ -2,9 +2,11 @@ package com.gastromanager.mainwindow;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
-
+import java.util.Iterator;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -21,7 +23,7 @@ import javax.swing.tree.TreePath;
 public class MenuElement {
 	
 	public int numberOfElements = 0;
-	public HashSet<GMTreeItem> elements = new HashSet<GMTreeItem>();
+	public List<GMTreeItem> elements = new ArrayList();
 	private JScrollPane treeScroll;
 	
 	public void showSelectionList(DrillDownGroup parent, DrillDownButton btn, GMTreeItem treeItem) {
@@ -50,14 +52,22 @@ public class MenuElement {
 		
 		treeScroll.setBounds(10, 11, 280, 200);
 		
-		DefaultTreeModel epin = (DefaultTreeModel) tree.getModel();
+		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 		
-		this.elements.forEach((item) -> {
-			GMTreeItem newItem = item;
-					
-			epin.insertNodeInto(newItem, roote, 0);
-			epin.reload();
-		});
+		Iterator it = elements.iterator();
+		while (it.hasNext()) {
+			GMTreeItem newItem = (GMTreeItem) it.next();
+			
+			model.insertNodeInto(newItem, roote, 0);
+			model.reload();
+		}
+		
+//		this.elements.forEach((item) -> {
+//			GMTreeItem newItem = item;
+//					
+//			epin.insertNodeInto(newItem, roote, 0);
+//			epin.reload();
+//		});
 		
 		itemSelectFrame.add(treeScroll);
 		
@@ -93,9 +103,19 @@ public class MenuElement {
 		itemSelectFrame.add(btnCancel);
 		
 		itemSelectFrame.setVisible(true);
-		itemSelectFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		itemSelectFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		        	itemSelectFrame.dispose();
+		        	returnItemsToTree(treeItem);
+		    }
+		});
+//		itemSelectFrame.setDefaultCloseOperation();
+//		JFrame.DISPOSE_ON_CLOSE
 		
+//		itemSelectFrame
 	}
+	
 	
 	public void returnItemsToTree(GMTreeItem item) {
 		
@@ -123,7 +143,7 @@ public class MenuElement {
 		System.out.println("number of menu elements: " + numberOfElements);
 	}
 	
-	public HashSet<GMTreeItem> getMenuElements() {
+	public List<GMTreeItem> getMenuElements() {
 		return this.elements;
 	}
 	

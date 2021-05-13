@@ -54,18 +54,6 @@ public class XmlUtil {
 		}
 		
 		assignAttributes(xmlNode, newNode);
-
-		if (xmlNode.getChildNodes().getLength() == 1) {
-			if (xmlNode.getFirstChild().hasChildNodes() == false) {
-				String nodeName = xmlNode.getFirstChild().getNodeName();
-				if (nodeName == "#text") {
-					newNode.setValue(xmlNode.getFirstChild().getTextContent());
-				}
-			}
-		}
-
-		if (xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
-			newNode.setValue(xmlNode.getNodeValue());
 		
 		if (rootNode.toString().contains("menues")) {
 			menuElement.addMenuElement(newNode);
@@ -103,6 +91,18 @@ public class XmlUtil {
 				newNode.setUUID(assignUUID());
 			}
 		}
+		
+		if (xmlNode.getChildNodes().getLength() == 1) {
+			if (xmlNode.getFirstChild().hasChildNodes() == false) {
+				String nodeName = xmlNode.getFirstChild().getNodeName();
+				if (nodeName == "#text") {
+					newNode.setValue(xmlNode.getFirstChild().getTextContent());
+				}
+			}
+		}
+		
+		if (xmlNode.getNodeValue() != null && xmlNode.getNodeValue().length() > 0)
+			newNode.setValue(xmlNode.getNodeValue());
     }
     
     private static void createButton(GMTreeItem newNode, DefaultTreeModel model, GMTreeItem rootNode, com.gastromanager.mainwindow.MenuElement mElement) {
@@ -127,7 +127,6 @@ public class XmlUtil {
 
     public static void parseXmlDocument(Document doc, GMTreeItem root, com.gastromanager.mainwindow.MenuElement mElement) {
         try {
-        	
             treeBuild(root, doc.getFirstChild(),(DefaultTreeModel) root.getTree().getModel() , mElement);
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,7 +138,7 @@ public class XmlUtil {
         String result = "";  
         List<GMTreeItem> children = treeItem.children;
         
-        if (treeItem.getXmlName().isBlank()) {} 
+        if (treeItem.getXmlName().length() == 0) {} 
         else {
         	result += "<" + treeItem.getXmlName() ;
 
@@ -153,7 +152,11 @@ public class XmlUtil {
     		if (treeItem.getChildCount() == 0) {
     			result += "/>" + "\n";
     		} else {
-    			result += ">" + "\n";
+    			if (treeItem.getXmlName() == "button") {
+    				result += "/> \n"; 
+    			} else {
+    				result += ">" + "\n";
+    			}
     		}
     		
         }
@@ -162,7 +165,7 @@ public class XmlUtil {
         while (it.hasNext()) {
         	result += writeTreeIntoString((GMTreeItem) it.next());
         }
-        if (children.size() > 0 || treeItem.getXmlName() == "button") {		// node.length > 0 || treeItem.m_value.length() > 0) {
+        if (children.size() > 0) {
 			result += "</" + treeItem.getXmlName() + "> \n";
 		}
         

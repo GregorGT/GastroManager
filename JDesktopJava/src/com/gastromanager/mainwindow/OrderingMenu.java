@@ -128,7 +128,7 @@ public class OrderingMenu extends JPanel {
 	    	}
 
 	    		  public void warn() {
-	    		     if (tfOrderID.getText().isBlank()){
+	    			  if (tfOrderID.getText().length() == 0){
 	    		       JOptionPane.showMessageDialog(null,
 	    		          "Error: Please enter number bigger than 0", "Error Message",
 	    		          JOptionPane.ERROR_MESSAGE);
@@ -229,7 +229,7 @@ public class OrderingMenu extends JPanel {
 	
 	
 	ResultSet makeQuery(Connection conn, String text) {
-		if (text.isBlank())
+		if (text.length() == 0)
 			return null;
 		ResultSet epin = null;
 		if (!listModel.isEmpty()) {
