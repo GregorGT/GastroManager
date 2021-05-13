@@ -1,20 +1,25 @@
 package com.gastromanager.mainwindow;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreePath;
 
-public class GMTreeItem extends DefaultMutableTreeNode {
+public class GMTreeItem extends DefaultMutableTreeNode implements Serializable {
 
 	public String m_name = new String();
 	public String m_value = new String();
 	public String m_xmlname = new String(); 
 	public HashMap<String, String> m_attributes = new HashMap<String, String>();
-	public Set<GMTreeItem> m_children = new HashSet<GMTreeItem>();
+	public List<GMTreeItem> children = new ArrayList();
 	public DrillDownButton button;
 	public GMTree treeParent;
+	public MenuElement menuElement;
 	public String id, buttonAssociatedId;
 	
 	public String getDisplayString() {
@@ -70,12 +75,6 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 		return this.buttonAssociatedId;
 	}
 	
-	public void setChildren(GMTreeItem[] children) {
-		for (int i = 0; i < children.length; i++) {
-			this.m_children.add(children[i]);
-		}
-	}
-	
 	public HashMap<String, String> getAttributes() {
 		return m_attributes;
 	}
@@ -116,6 +115,9 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 	public GMTreeItem() {
 	
 	}
+	
+	public GMTreeItem(TreePath path) {
+	}
 
 	public GMTreeItem(Object userObject) {
 		super(userObject);
@@ -123,6 +125,14 @@ public class GMTreeItem extends DefaultMutableTreeNode {
 
 	public GMTreeItem(Object userObject, boolean allowsChildren) {
 		super(userObject, allowsChildren);
+	}
+
+	public void addMenuElements(MenuElement newMElement) {
+		this.menuElement = newMElement;
+	}
+	
+	public MenuElement getMenuElements() {
+		return this.menuElement;
 	}
 
 }
