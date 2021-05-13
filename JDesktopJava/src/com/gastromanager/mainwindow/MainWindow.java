@@ -345,10 +345,11 @@ public class MainWindow extends JFrame {
 		tabOrdering.setLayout(null);
 		
 
-		
-		ReportsMenu reportsTab = new ReportsMenu();
+
+		ReportsMenu tabReports = new ReportsMenu();
+
 //		reportsTab.setLayout(new BoxLayout());
-		tabbedPane.addTab("Reports", null, reportsTab, null);
+		tabbedPane.addTab("Reports", null, tabReports, null);
 
 
 		PaymentMenu tabPayment = new PaymentMenu();
