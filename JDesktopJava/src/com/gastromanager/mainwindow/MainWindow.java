@@ -116,7 +116,7 @@ public class MainWindow extends JFrame {
 				try {
 					String fstr = xmlUtil.readFileToString(selected, Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
-					xmlUtil.parseXmlDocument(doc, root, newMElement);
+					xmlUtil.parseXmlDocument(doc, root, newMElement, tabOrdering);
 					tree.init(tree, drillDownMenu);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -158,7 +158,7 @@ public class MainWindow extends JFrame {
 				try {
 					fstr = xmlUtil.readFileToString("C:\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
-					xmlUtil.parseXmlDocument(doc, root, newMElement);
+					xmlUtil.parseXmlDocument(doc, root, newMElement, tabOrdering);
 					tree.init(tree, drillDownMenu);
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -175,7 +175,9 @@ public class MainWindow extends JFrame {
 		setContentPane(contentPane);
 
 		JSplitPane splitPane = new JSplitPane();
+		splitPane.setEnabled(false);
 		splitPane.setDividerLocation(200);
+		splitPane.getLeftComponent().setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
 		contentPane.add(splitPane, BorderLayout.CENTER);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
@@ -191,18 +193,27 @@ public class MainWindow extends JFrame {
 		tree = new GMTree(root);
 		tree.rootItem = root;
 		root.setTree(tree);
-		splitPane.setLeftComponent(tree);
+
+		JScrollPane treeScroll = new JScrollPane(tree, 
+												 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+												 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		treeScroll.setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
+		splitPane.setLeftComponent(treeScroll);
 		tree.setEditable(true);
 		
 		treeScroll = new JScrollPane();
 		defaultModel = (DefaultTreeModel) tree.getModel(); 
 
+		
 		drillDownMenu = new DrillDownMenu(root, defaultModel, tree, newMElement);
-
-		tabbedPane.addTab("Drill Down Menu", null, drillDownMenu, null);
+		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu, 
+										   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+										   JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		
+		tabbedPane.addTab("Drill Down Menu", null, drillDownScroll, null);
 		drillDownMenu.setLayout(null);
 
-		OrderingMenu tabOrdering = new OrderingMenu(connection, drillDownItems, drillDownMenu);
+		tabOrdering = new OrderingMenu(connection, drillDownItems, drillDownMenu);
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
 		
