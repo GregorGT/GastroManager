@@ -47,6 +47,7 @@ public class MainActivity2 extends AppCompatActivity {
         fetchOrderDetailsButton = findViewById(R.id.fetchOrderInfoButton);
         fetchOrderDetailsButton.setOnClickListener(v -> {
                     System.out.println("inside get order");
+                    orderDetailsView.setText("");
             EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
             String inputOrderId = (orderIdInputTextField.getText() != null) ?
                     orderIdInputTextField.getText().toString():null;
@@ -68,6 +69,7 @@ public class MainActivity2 extends AppCompatActivity {
             Client client = new Client();//.getInstance();
             response = client.getResponse(Arrays.stream(request).findFirst().get());
             System.out.println("Requesting for "+Arrays.stream(request).findFirst().get());
+            System.out.println("Response "+response);
             client = null;
             return null;
         }

@@ -7,10 +7,10 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="142dp"
-        android:layout_height="246dp"
+        android:layout_width="187dp"
+        android:layout_height="353dp"
         android:layout_alignParentTop="true"
-        android:layout_marginTop="118dp"
+        android:layout_marginTop="39dp"
         android:background="@color/cardview_light_background"
         android:text="Order Details" />
 
@@ -18,26 +18,21 @@
         android:id="@+id/orderIdInputTextField"
         android:layout_width="67dp"
         android:layout_height="wrap_content"
-        android:layout_margin="145dp"
-        android:ems="10"
-        android:gravity="right"
+        android:layout_alignLeft="@id/textView2"
+        android:layout_marginLeft="198dp"
+        android:layout_marginTop="39dp"
         android:background="@color/cardview_light_background"
+        android:ems="10"
         android:inputType="textPersonName"
-        android:text="Name" />
+        android:text="Enter Order Id" />
 
     <Button
         android:id="@+id/fetchOrderInfoButton"
         android:layout_width="wrap_content"
         android:layout_height="38dp"
         android:layout_alignLeft="@id/textView2"
-        android:layout_marginStart="145dp"
-        android:layout_marginLeft="145dp"
-        android:layout_marginTop="175dp"
-        android:layout_marginEnd="145dp"
-        android:layout_marginRight="145dp"
-        android:layout_marginBottom="143dp"
-        android:textAlignment="center"
-        android:gravity="center_horizontal"
+        android:layout_marginLeft="198dp"
+        android:layout_marginTop="80dp"
         android:text="Get" />
 
 </RelativeLayout>
