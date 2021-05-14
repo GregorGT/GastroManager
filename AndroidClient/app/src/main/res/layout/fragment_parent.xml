@@ -13,15 +13,19 @@
 
     <FrameLayout
         android:id="@+id/child_fragment_container"
-        android:layout_width="300dp"
-        android:layout_height="500dp">
-    </FrameLayout>
+        android:layout_width="262dp"
+        android:layout_height="500dp"></FrameLayout>
 
     <FrameLayout
         android:id="@+id/second_child_fragment_container"
         android:layout_width="500dp"
         android:layout_height="300dp">
     </FrameLayout>
+
+    <Spinner
+        android:id="@+id/spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
 
 </LinearLayout>

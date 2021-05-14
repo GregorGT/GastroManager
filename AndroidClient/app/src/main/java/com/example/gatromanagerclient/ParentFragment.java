@@ -6,14 +6,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
-public class ParentFragment extends Fragment {
+public class ParentFragment extends Fragment implements
+        AdapterView.OnItemSelectedListener{
 
     private OnFragmentInteractionListener mListener;
-
+    String[] country = { "India", "USA", "China", "Japan", "Other"};
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -30,6 +35,16 @@ public class ParentFragment extends Fragment {
         Fragment secondChildFragment = new SecondChildFragment();
         FragmentTransaction secondTransaction = getChildFragmentManager().beginTransaction();
         secondTransaction.replace(R.id.second_child_fragment_container, secondChildFragment).commit();
+
+        //Getting the instance of Spinner and applying OnItemSelectedListener on it
+        Spinner spin = (Spinner) view.findViewById(R.id.spinner);
+        spin.setOnItemSelectedListener(this);
+
+        //Creating the ArrayAdapter instance having the list
+        ArrayAdapter aa = new ArrayAdapter(this.getContext(),android.R.layout.simple_spinner_item, country);
+        aa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //Setting the ArrayAdapter data on the Spinner
+        spin.setAdapter(aa);
     }
 
 
@@ -48,6 +63,17 @@ public class ParentFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(this.getContext(),country[position] , Toast.LENGTH_LONG).show();
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 
     public interface OnFragmentInteractionListener {

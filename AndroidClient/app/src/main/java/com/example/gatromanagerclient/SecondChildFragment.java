@@ -93,6 +93,8 @@ public class SecondChildFragment extends Fragment {
                                     myNewButton.setOnClickListener(new View.OnClickListener() {
                                         public void onClick(View v) {
                                             // your handler code here
+                                            List<String> drillDownMenuTupes  = XmlUtil.getDrillDownMenuTypes("drilldownmenus", menuXml);
+                                            System.out.println(drillDownMenuTupes);
                                             DrillDownMenuItemDetail menuItemDetail = loadMenuItemDetail(buttonText, menuXml);
                                             System.out.println("Got here "+menuItemDetail);
                                         }

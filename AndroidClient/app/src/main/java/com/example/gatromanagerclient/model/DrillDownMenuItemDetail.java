@@ -8,6 +8,10 @@ public class DrillDownMenuItemDetail {
     Map<String, DrillDownMenuItemOptionDetail> options;
     List<DrillDownMenuItemDetail> subItems;
 
+    public DrillDownMenuItemDetail() {
+
+    }
+
     public DrillDownMenuItemDetail(String menuItemName, Map<String, DrillDownMenuItemOptionDetail> options, List<DrillDownMenuItemDetail> subItems) {
         this.menuItemName = menuItemName;
         this.options = options;

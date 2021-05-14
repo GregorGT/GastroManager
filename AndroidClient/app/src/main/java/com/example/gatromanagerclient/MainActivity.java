@@ -1,8 +1,11 @@
 package com.example.gatromanagerclient;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
@@ -19,6 +22,19 @@ SecondChildFragment.OnFragmentInteractionListener {
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.parent_fragment_container, new ParentFragment());
         ft.commit();
+
+        Button openActvity2Button = findViewById(R.id.openActivity2);
+        openActvity2Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openActivity2();
+            }
+        });
+    }
+
+    private void openActivity2() {
+        Intent intent = new Intent(this, MainActivity2.class);
+        startActivity(intent);
     }
 
     @Override
