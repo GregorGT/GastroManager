@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.example.gatromanagerclient.socket.Client;
+import com.example.gatromanagerclient.util.Util;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.RequiresApi;
@@ -44,11 +45,12 @@ public class MainActivity2 extends AppCompatActivity {
 
         orderDetailsView = findViewById(R.id.textView2);
         System.out.println("Current order details :" + orderDetailsView.getText());
+        EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
         fetchOrderDetailsButton = findViewById(R.id.fetchOrderInfoButton);
         fetchOrderDetailsButton.setOnClickListener(v -> {
                     System.out.println("inside get order");
                     orderDetailsView.setText("");
-            EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
+            //EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
             String inputOrderId = (orderIdInputTextField.getText() != null) ?
                     orderIdInputTextField.getText().toString():null;
                     System.out.println("get details for order id "+inputOrderId);
@@ -56,7 +58,49 @@ public class MainActivity2 extends AppCompatActivity {
                 new GetOrderDetailsTask().execute(inputOrderId);
             }
         }
+        );
 
+        //Previous
+        Button prevOverButton = findViewById(R.id.prevOrderButton);
+        prevOverButton.setOnClickListener(v -> {
+                    System.out.println("inside get previous order");
+                    orderDetailsView.setText("");
+                    //EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
+                    String inputOrderId = (orderIdInputTextField.getText() != null) ?
+                            orderIdInputTextField.getText().toString():null;
+                    if(Util.isNumeric(inputOrderId)) {
+                        Integer currOrderId = Integer.valueOf(inputOrderId);
+                        currOrderId = (currOrderId-1 < 0) ? 0: currOrderId-1;
+                        orderIdInputTextField.setText(String.valueOf(currOrderId));
+                        inputOrderId = (orderIdInputTextField.getText() != null) ?
+                                orderIdInputTextField.getText().toString():null;
+                    }
+                    System.out.println("get details for order id "+inputOrderId);
+                    if(inputOrderId != null && !inputOrderId.isEmpty()) {
+                        new GetOrderDetailsTask().execute(inputOrderId.trim());
+                    }
+                }
+        );
+
+        //Next
+        Button nextOverButton = findViewById(R.id.nextOrderButton);
+        nextOverButton.setOnClickListener(v -> {
+                    System.out.println("inside get previous order");
+                    orderDetailsView.setText("");
+                    //EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
+                    String inputOrderId = (orderIdInputTextField.getText() != null) ?
+                            orderIdInputTextField.getText().toString():null;
+                    if(Util.isNumeric(inputOrderId)) {
+                        Integer currOrderId = Integer.valueOf(inputOrderId);
+                        orderIdInputTextField.setText(String.valueOf(currOrderId+1));
+                        inputOrderId = (orderIdInputTextField.getText() != null) ?
+                                orderIdInputTextField.getText().toString():null;
+                    }
+                    System.out.println("get details for order id "+inputOrderId);
+                    if(inputOrderId != null && !inputOrderId.isEmpty()) {
+                        new GetOrderDetailsTask().execute(inputOrderId.trim());
+                    }
+                }
         );
     }
 

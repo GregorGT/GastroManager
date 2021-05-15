@@ -35,4 +35,23 @@
         android:layout_marginTop="80dp"
         android:text="Get" />
 
+    <Button
+        android:id="@+id/prevOrderButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@id/textView2"
+        android:layout_marginLeft="198dp"
+        android:layout_marginTop="120dp"
+        android:text="prev" />
+
+    <Button
+        android:id="@+id/nextOrderButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignLeft="@id/textView2"
+        android:layout_marginLeft="250dp"
+        android:layout_marginTop="120dp"
+        android:text="next" />
+
+
 </RelativeLayout>
