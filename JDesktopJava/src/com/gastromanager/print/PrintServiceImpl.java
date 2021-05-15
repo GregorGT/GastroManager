@@ -42,32 +42,34 @@ public class PrintServiceImpl implements PrintService {
 
     private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
-        AtomicReference<Double> total = new AtomicReference<>(new Double(0));
-        //String currency = PropertiesUtil.getPropertyValue("currency");
-        orderDetailsBuilder.append("Order: "+ orderInfo.getHumanReadableId() +"\n");
-        orderDetailsBuilder.append("Floor: "+ orderInfo.getFloorId() +"("+ orderInfo.getFloorName()
-                +")" + "\n");
-        orderDetailsBuilder.append("Table: "+ orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" +"\n");
-        orderDetailsBuilder.append("Waitress: "+ orderInfo.getStaffId() + "("
-                + orderInfo.getStaffName() + ")"+"\n");
-        orderDetailsBuilder.append("Ordered At: "+ orderInfo.getTimestamp() +"\n");
-        orderDetailsBuilder.append("*************************\n");
-        orderItems.forEach(orderItem -> {
-            Document xml = orderItem.getXml();
-            total.updateAndGet(v -> v + orderItem.getPrice());
-            //Main Item
-            Node item  = xml.getDocumentElement();
-            if(item.getNodeName() == "item") {
-                orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
-                //addOptionOrderInfo(item, orderDetailsBuilder);
-                //Linked items
-                addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
-                //addChildItems(item, orderDetailsBuilder);
-                orderDetailsBuilder.append("\n");
+        if(orderInfo != null){
+            AtomicReference<Double> total = new AtomicReference<>(new Double(0));
+            //String currency = PropertiesUtil.getPropertyValue("currency");
+            orderDetailsBuilder.append("Order: " + orderInfo.getHumanReadableId() + "\n");
+            orderDetailsBuilder.append("Floor: " + orderInfo.getFloorId() + "(" + orderInfo.getFloorName()
+                    + ")" + "\n");
+            orderDetailsBuilder.append("Table: " + orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" + "\n");
+            orderDetailsBuilder.append("Waitress: " + orderInfo.getStaffId() + "("
+                    + orderInfo.getStaffName() + ")" + "\n");
+            orderDetailsBuilder.append("Ordered At: " + orderInfo.getTimestamp() + "\n");
+            orderDetailsBuilder.append("*************************\n");
+            orderItems.forEach(orderItem -> {
+                Document xml = orderItem.getXml();
+                total.updateAndGet(v -> v + orderItem.getPrice());
+                //Main Item
+                Node item = xml.getDocumentElement();
+                if (item.getNodeName() == "item") {
+                    orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
+                    //addOptionOrderInfo(item, orderDetailsBuilder);
+                    //Linked items
+                    addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
+                    //addChildItems(item, orderDetailsBuilder);
+                    orderDetailsBuilder.append("\n");
 
-            }
-        });
-        //addTotal(total.get(), orderDetailsBuilder);
+                }
+            });
+            //addTotal(total.get(), orderDetailsBuilder);
+        }
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString();
     }
