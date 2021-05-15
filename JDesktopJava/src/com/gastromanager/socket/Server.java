@@ -82,7 +82,7 @@ public class Server {
                 if (isNumeric(request)) {
                     //send result to client
                     String response = new PrintServiceImpl().getPrintInfo(request);
-                    dos.writeUTF(new PrintServiceImpl().getPrintInfo(request));
+                    dos.writeUTF(response);
                 } else {
                     if (request.equals("menu")) {
                         sendXMLData(dos);
