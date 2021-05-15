@@ -4,37 +4,31 @@ package com.gastromanager.socket;
 import com.gastromanager.print.PrintServiceImpl;
 import com.gastromanager.util.XmlUtil;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Server {
 
     ServerSocket serverSocket = null;
     Socket socket = null;
-    DataInputStream in = null;
-    DataOutputStream out = null;
     Integer serverSocketPort = 5000;
+
     public Server() {
         try {
             //Connection to client
             serverSocket = new ServerSocket(serverSocketPort);
 
-
-            while(true) {
+            while (true) {
                 socket = null;
-                try{
+                try {
                     socket = serverSocket.accept();
-                    in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-                    out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                    Thread t = new ClientHandler(socket, in, out);
+                    Thread t = new ClientHandler(socket);
                     t.start();
                 } catch (Exception e) {
-                    socket.close();
                     e.printStackTrace();
                 }
             }
@@ -61,7 +55,7 @@ public class Server {
         try {
             Double.parseDouble(str);
             return true;
-        } catch(NumberFormatException e){
+        } catch (NumberFormatException e) {
             return false;
         }
     }
@@ -69,57 +63,40 @@ public class Server {
     public static void main(String[] args) {
         Server server = new Server();
     }
-    // ClientHandler class
+
     class ClientHandler extends Thread {
-        final DataInputStream dis;
-        final DataOutputStream dos;
         final Socket s;
 
-        public ClientHandler(Socket s, DataInputStream dis, DataOutputStream dos) {
+        public ClientHandler(Socket s) {
             this.s = s;
-            this.dis = dis;
-            this.dos = dos;
         }
 
         @Override
         public void run() {
-            while (true) {
-                try {
-                    //String orderId = in.readUTF();
-                    String request = this.dis.readUTF().trim();
-                    System.out.println("Received request for " + request);
-
-                    if (isNumeric(request)) {
-                        while (null != request) {
-                            //send result to client
-                            //out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
-                            //out.writeUTF(DbUtil.loadOrderItemXmlInfo(orderId).toString());
-                            this.dos.writeUTF(new PrintServiceImpl().getPrintInfo(request));
-                            this.dos.close();
-                        }
-                    } else {
-                        if (request.equals("menu")) {
-                            sendXMLData(this.dos);
-                            this.dos.close();
-                        }
-                    }
-
-                    if (request.equals("Exit")) {
-                        System.out.println("Client " + this.s + " sends exit...");
-                        System.out.println("Closing this connection.");
-                        this.s.close();
-                        System.out.println("Connection closed");
-                        break;
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
             try {
-                // closing resources
-                this.dis.close();
-                this.dos.close();
+                DataInputStream dis = new DataInputStream(this.s.getInputStream());
+                String request = dis.readUTF();
+                DataOutputStream dos = new DataOutputStream(this.s.getOutputStream());
+                System.out.println("Received request for " + request);
+
+                if (isNumeric(request)) {
+                    //send result to client
+                    String response = new PrintServiceImpl().getPrintInfo(request);
+                    dos.writeUTF(new PrintServiceImpl().getPrintInfo(request));
+                } else {
+                    if (request.equals("menu")) {
+                        sendXMLData(dos);
+                    }
+                }
+
+                if (request.equals("Exit")) {
+                    System.out.println("Client " + this.s + " sends exit...");
+                    System.out.println("Closing this connection.");
+                    this.s.close();
+                    System.out.println("Connection closed");
+                }
+                dos.close();
+                dis.close();
 
             } catch (IOException e) {
                 e.printStackTrace();

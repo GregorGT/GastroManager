@@ -12,6 +12,7 @@ import java.util.Vector;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
@@ -26,7 +27,7 @@ public class GMTree extends JTree {
 	private int height, width, btnHeight, btnWidth, btnX, btnY;
 	private String drilldownName, btnName, btnTarget, btnID;
 
-	public void init(GMTree tree, DrillDownMenu menu, DefaultTreeModel model, GMTreeItem root) { //GMTreeItem root, 
+	public void init(GMTree tree, DrillDownMenu menu) { //GMTreeItem root, 
 
 		JPopupMenu treeContextMenu = new JPopupMenu();
 
@@ -45,9 +46,6 @@ public class GMTree extends JTree {
 		mntmSelectTarget.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-//				menu.remove(menu.drillDownGroup);
-//				menu.revalidate();
-//				menu.repaint();
 				GMTreeItem selectedItem = (GMTreeItem) tree.getSelectionPath().getLastPathComponent();
 				showOnEditor(selectedItem, menu);				
 			}	    	
@@ -80,18 +78,9 @@ public class GMTree extends JTree {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 
-//				if (SwingUtilities.isLeftMouseButton(e)) {
-//					int row = tree.getClosestRowForLocation(e.getX(), e.getY());
-//					tree.setSelectionRow(row);
-//					if (tree.getSelectionPath().toString().contains("drilldownmenus")) {
-//					}
-//				}
-
 				if (SwingUtilities.isRightMouseButton(e)) {
 					int row = tree.getClosestRowForLocation(e.getX(), e.getY());
 					tree.setSelectionRow(row);
-
-//					TreePath filter = tree.getSelectionPath();
 
 					if (tree.getSelectionPath().getLastPathComponent()
 							.toString() != "drilldownmenus" &&
@@ -103,21 +92,18 @@ public class GMTree extends JTree {
 							.toString() != "reservations" &&
 							tree.getSelectionPath().getLastPathComponent()
 							.toString() != "settings") {
-						System.out.println(tree.getSelectionPath());
+						
 						treeContextMenu.show(e.getComponent(), e.getX(), e.getY());
 						
-						GMTreeItem ex = (GMTreeItem) tree.getLastSelectedPathComponent();
-						System.out.println(ex.getAttributes().toString());
-						System.out.println(ex.getBtnAssociatedId());
-						
+//						GMTreeItem ex = (GMTreeItem) tree.getLastSelectedPathComponent();
+//						System.out.println(ex.getAttribute("name"));
+//						System.out.println(ex.getTree().toString());
+//						System.out.println(ex.getXmlName());						
 					}
-
 					//in here it's possible to add different popup
 					//menues for all the items
-
 				}
 			}
-
 			@Override
 			public void mouseExited(MouseEvent e) {
 			}
@@ -165,7 +151,6 @@ public class GMTree extends JTree {
 		} else if (menu.drillDownGroup == null) {
 			
 			attributes.forEach((k,v) -> {
-				System.out.println("key: " + k + "  -  value: " + v);
 				switch (k) {
 				case "width" : 
 					this.width = Integer.parseInt(v);
@@ -232,8 +217,6 @@ public class GMTree extends JTree {
 					newBtn.associatedTreeItem = child;
 					newBtn.id = btnID;
 					newBtn.targetID = btnTarget;
-					
-					System.out.println("LOCATION TO BE ->" + btnX + " " + btnY);
 					newBtn.setLocation(btnX, btnY);
 			}		
 		  }

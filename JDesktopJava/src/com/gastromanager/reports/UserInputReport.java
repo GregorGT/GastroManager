@@ -1,7 +1,7 @@
 package com.gastromanager.reports;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 import com.gastromanager.util.PropertiesUtil;
@@ -10,35 +10,27 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.text.XTextTable;
-import com.sun.star.uno.Exception;
 
-public class YearlyFinancialReport {
+public class UserInputReport {
 
-	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException {
+	public static void main(String[] args) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, ParseException {
 		FinancialReportTemplate template = new FinancialReportTemplate();
 		
 		template.connectDB();
 		template.openDocument();
-		template.putTitle("Yearly Financial Report");
+		template.putTitle("Financial Report");
 		
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH)-12);
-		Date yearStart = calendar.getTime();
-		calendar.add(Calendar.MONTH, 12);
-		calendar.add(Calendar.DAY_OF_MONTH, -1);
-		Date yearEnd = calendar.getTime();
+		Date date1 = new SimpleDateFormat("EE MMM dd HH:mm:ss z yyyy").parse(args[0]);
+		Date date2 = new SimpleDateFormat("EE MMM dd HH:mm:ss z yyyy").parse(args[1]);
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		String startDate = sdf.format(yearStart);	
-		String endDate = sdf.format(yearEnd);	
+		String startDate = sdf.format(date1);
+		String endDate = sdf.format(date2);
 		startDate += " 00:00:00";
 		endDate += " 23:59:59";
 		
-//		System.out.println(startDate);
-//		System.out.println(endDate);
-		
 		sdf = new SimpleDateFormat("dd/MM/yyyy");
-        template.putDate(sdf.format(yearStart), sdf.format(yearEnd));
+        template.putDate(sdf.format(date1), sdf.format(date2));
         
         System.out.println("Inserting tables...");
 		
@@ -52,7 +44,7 @@ public class YearlyFinancialReport {
 		XTextTable leastBoughtItemsTable = template.createAndFillLeastBoughtItemsTable(startDate, endDate, lbiTableTotalItems);
 		
 		template.putRevenue(startDate, endDate);
-		
+
 	}
 
 }

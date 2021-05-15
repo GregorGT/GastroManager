@@ -10,6 +10,7 @@ import java.util.Random;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 import javax.swing.tree.DefaultTreeModel;
@@ -25,9 +26,16 @@ public class DrillDownMenu extends JPanel {
 	public JTextField txtButtonWidth;
 	public JTextField txtButtonName;
 	public DrillDownGroup drillDownGroup;
-
+	
 	public DrillDownMenu(GMTreeItem treeitem, DefaultTreeModel model, GMTree tree, MenuElement menuE) {		
+		
+//		this.add(scrollPane);
+//		
+//		public JScrollPane scrollPane = new JScrollPane(drillDownGroup, 
+//				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+//				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+		
 		JPanel panelDrillDown = new JPanel();
 		panelDrillDown
 		.setBorder(new TitledBorder(null, "Drill Down", TitledBorder.LEADING,
@@ -76,7 +84,7 @@ public class DrillDownMenu extends JPanel {
 					String ddwidth = txtDDWidth.getText();
 					int nDDWidth = Integer.parseInt(ddwidth);
 					ddName = txtDDName.getText();
-
+					
 					drillDownGroup = new DrillDownGroup(nDDWidth, nDDHeight, ddName, DrillDownMenu.this);
 					componentToTree(treeitem, model, "drilldownmenus", drillDownGroup);
 
@@ -90,7 +98,7 @@ public class DrillDownMenu extends JPanel {
 					String ddwidth = txtDDWidth.getText();
 					int nDDWidth = Integer.parseInt(ddwidth);
 					ddName = txtDDName.getText();
-					System.out.println(drillDownGroup.toString());
+//					System.out.println(drillDownGroup.toString());
 
 					drillDownGroup = new DrillDownGroup(nDDWidth, nDDHeight, ddName, DrillDownMenu.this);
 					componentToTree(treeitem, model, "drilldownmenus", drillDownGroup);
@@ -179,6 +187,16 @@ public class DrillDownMenu extends JPanel {
 
 	}
 	
+	public DrillDownMenu(GMTree tree, GMTreeItem item, OrderingMenu parent) {
+		this.setBounds(0, 340,
+						Integer.parseInt(item.getAttribute("width")) , 
+						Integer.parseInt(item.getAttribute("height")));
+		this.setVisible(true);
+		parent.add(this);
+		
+		
+	}
+	
 	public void componentToTree(GMTreeItem treeItem, DefaultTreeModel model, String parent, Component comp) {
 		Enumeration enumer = treeItem.children();
 		if (treeItem.toString() == parent) {
@@ -189,8 +207,9 @@ public class DrillDownMenu extends JPanel {
 				newItem.setName(comp.getName());
 				newItem.setXmlName("drilldownmenu");
 				newItem.addAttributes("name", comp.getName());
+				newItem.addMenuElements(treeItem.menuElement);
 				newItem.treeParent = treeItem.getTree();
-				System.out.println(treeItem.getTree().toString());
+//				System.out.println(treeItem.getTree().toString());
 				String associatedID = assignUUID();
 				newItem.setBtnAssociatedId(associatedID);
 				((DrillDownGroup) comp).setId(associatedID);
@@ -212,7 +231,7 @@ public class DrillDownMenu extends JPanel {
 				nItem.setName(comp.getName());
 				nItem.setXmlName("button");
 				nItem.addAttributes("name", comp.getName());
-				
+				nItem.addMenuElements(treeItem.menuElement);
 				String associatedID2 = assignUUID();
 				nItem.setBtnAssociatedId(associatedID2);
 				

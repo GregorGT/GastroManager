@@ -9,9 +9,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import javax.swing.Action;
@@ -34,12 +36,18 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 	
 	public String name, id, targetID;
 	public int height, width, x, y;
-	public HashSet<GMTreeItem> elements = new HashSet<GMTreeItem>();
+	public List<GMTreeItem> elements = new ArrayList(); // = new HashSet<GMTreeItem>();
 	public GMTreeItem associatedTreeItem;
-	private GMTreeItem xItem = new GMTreeItem();
-	private GMTreeItem yItem = new GMTreeItem();
 	
 	public void setId(String id) {
+		this.targetID = id;
+	}
+	
+	public String getTargetId() {
+		return this.targetID;
+	}
+	
+	public void setTargetId(String id) {
 		this.id = id;
 	}
 	
@@ -81,9 +89,6 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		JPopupMenu popupMenu = new JPopupMenu();
 		addPopup(this, popupMenu);
 		
-		
-		
-				
 		this.setBounds(10,10,width,height);
 		this.setLocation(x, y);
 		this.width = width;
@@ -111,17 +116,15 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 							mouseOnScreen.y - relativeToScreen.y - origY);
 				
 				DrillDownButton.this.setLocation(position);
-
 				DrillDownButton.this.x = position.x;
 				DrillDownButton.this.y = position.y;				
 				
-				
 				GMTreeItem a = (GMTreeItem) associatedTreeItem.getChildAt(3);
-				
 				a.setUserObject("Y: " + String.valueOf(position.y));
-				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(2);
 				
+				GMTreeItem b = (GMTreeItem) associatedTreeItem.getChildAt(2);
 				b.setUserObject("X: " + String.valueOf(position.x));
+				
 				associatedTreeItem.m_attributes.remove("x-position");
 				associatedTreeItem.m_attributes.remove("y-position");
 				
@@ -151,8 +154,8 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 					DrillDownButton.this.removeMouseMotionListener(dragListener);
 					DrillDownButton.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 					
-					System.out.println("THIS BUTTONS ID: " + DrillDownButton.this.id);
-					System.out.println("ASSOCIATED MENU ELEMENT ID: "+DrillDownButton.this.targetID);
+//					System.out.println("THIS BUTTONS ID: " + DrillDownButton.this.id);
+//					System.out.println("ASSOCIATED MENU ELEMENT ID: "+DrillDownButton.this.targetID);
 				}
 			}
 		});
@@ -185,40 +188,17 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		});
 		popupMenu.add(mntmRename);
 		
-		JMenu mntmTarget = new JMenu("Select target menu");
-		
-		MouseListener hover = new MouseListener() {
-
+		JMenuItem mntmTarget = new JMenuItem("Select target menu");			
+		mntmTarget.addActionListener(new ActionListener() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
-							
-			}
-
-			@Override
-			public void mousePressed(MouseEvent e) {
-				// TODO Auto-generated method stub
+			public void actionPerformed(ActionEvent e) {
 				
+//				GMTreeItem parent = (GMTreeItem) associatedTreeItem.getParent();
+//				MenuElement mE = parent.getMenuElements();
+				MenuElement mE = associatedTreeItem.getMenuElements();
+				mE.showSelectionList(grp, DrillDownButton.this, DrillDownButton.this.associatedTreeItem);				
 			}
-
-			@Override
-			public void mouseReleased(MouseEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseEntered(MouseEvent e) {
-				addElementsToTargetMenu(mntmTarget, elements);	
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				
-			}
-			
-		};
-		mntmTarget.addMouseListener(hover);
-		
+		});
 		popupMenu.add(mntmTarget);		
 		
 		grp.add(this);
