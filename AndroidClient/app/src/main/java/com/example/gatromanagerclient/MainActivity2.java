@@ -5,22 +5,27 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
+import com.example.gatromanagerclient.model.DrillDownMenuButton;
+import com.example.gatromanagerclient.model.DrillDownMenuItemDetail;
 import com.example.gatromanagerclient.model.DrillDownMenuType;
 import com.example.gatromanagerclient.model.MenuDetail;
 import com.example.gatromanagerclient.socket.Client;
 import com.example.gatromanagerclient.util.SaxParserForGastromanager;
 import com.example.gatromanagerclient.util.Util;
+import com.example.gatromanagerclient.util.XmlUtil;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.text.Layout;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -44,6 +49,7 @@ public class MainActivity2 extends AppCompatActivity {
     private ActivityMain2Binding binding;
     private TextView orderDetailsView;
     private Button fetchOrderDetailsButton;
+    private MenuDetail menuDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +120,8 @@ public class MainActivity2 extends AppCompatActivity {
         );
         //Drill down menu
         Spinner drilldownMenuTypeSpinner = findViewById(R.id.spinner2);
+        //Menu space
+        LinearLayout menuView = findViewById(R.id.menuItemsView);
         //fetch data from server
         new LoadMenuTask().execute("menu", this, drilldownMenuTypeSpinner);
         drilldownMenuTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
@@ -122,7 +130,9 @@ public class MainActivity2 extends AppCompatActivity {
             public void onItemSelected(AdapterView adapter, View v, int i, long lng) {
 
                 String selecteditem =  adapter.getItemAtPosition(i).toString();
-                System.out.println("selected "+selecteditem);
+                System.out.println("selected "+selecteditem+ " "+menuDetail);
+                menuView.removeAllViews();
+                loadMenuView(selecteditem, menuDetail, menuView);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView)
@@ -131,6 +141,49 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, LinearLayout view) {
+        List<DrillDownMenuButton> menuButtons  = menuType.getButtons();
+        for(DrillDownMenuButton menuButton:menuButtons) {
+            Button menuButtonView = new Button(this);
+            menuButtonView.setWidth(Integer.valueOf(menuButton.getWidth()));
+            menuButtonView.setHeight(Integer.valueOf(menuButton.getHeight()));
+            menuButtonView.setText(menuButton.getName());
+            menuButtonView.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    // your handler code here
+                    System.out.println("Got here ");
+                }
+            });
+            view.addView(menuButtonView);
+
+        }
+    }
+
+    private void loadMenuView(String selectedMenuType, MenuDetail menuDetail, LinearLayout view) {
+        List<DrillDownMenuType> menuTypeList = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
+        for(DrillDownMenuType menuType: menuTypeList) {
+            if(menuType.getName().equals(selectedMenuType)) {
+                loadMenuItems(menuType, menuDetail, view);
+                break;
+            }
+        }
+        /*Button myNewButton = new Button(container.getContext());
+        myNewButton.setText(buttonText);
+        myNewButton.setHeight(Integer.parseInt(buttonHeight));
+        myNewButton.setWidth(Integer.parseInt(buttonWidth));
+        myNewButton.setVisibility(View.VISIBLE);
+        myNewButton.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // your handler code here
+                List<String> drillDownMenuTupes  = XmlUtil.getDrillDownMenuTypes("drilldownmenus", menuXml);
+                System.out.println(drillDownMenuTupes);
+                DrillDownMenuItemDetail menuItemDetail = loadMenuItemDetail(buttonText, menuXml);
+                System.out.println("Got here "+menuItemDetail);
+            }
+        });
+        linearLayout.addView(myNewButton);*/
     }
 
     private void loadMenuTypes(Spinner spinner,MenuDetail menuDetail) {
@@ -148,9 +201,12 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private MenuDetail loadMenuDetails(String response) {
+        MenuDetail responseMenuDetail = null;
         System.out.println("loading menu details for "+response);
         SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
-        return parser.parseXml(response, true);
+        responseMenuDetail = parser.parseXml(response, true);
+        menuDetail = responseMenuDetail;
+        return responseMenuDetail;
     }
 
     @SuppressLint("StaticFieldLeak")
