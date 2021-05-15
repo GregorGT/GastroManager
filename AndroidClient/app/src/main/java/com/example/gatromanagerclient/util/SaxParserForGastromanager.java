@@ -41,8 +41,8 @@ public class SaxParserForGastromanager {
         return instance;
     }
 
-    private MenuDetail parseXml(String xmlData, Boolean isRefresh) {
-        if(isRefresh) {
+    public MenuDetail parseXml(String xmlData, Boolean isRefresh) {
+        if(isRefresh && xmlData != null) {
             try {
                 SAXParserFactory factory = SAXParserFactory.newInstance();
                 SAXParser saxParser = null;
@@ -131,7 +131,7 @@ public class SaxParserForGastromanager {
                     itemStack.push(item);
                     break;
                 case "option":
-                    System.out.println("start of option "+ qName);
+                    System.out.println("start of option "+ qName +" "+attributes.getValue("name"));
                     if(itemStack != null && !itemStack.empty()) {
                         drillDownMenuItemOptionDetail = new DrillDownMenuItemOptionDetail();
                         drillDownMenuItemOptionDetail.setId(attributes.getValue("id"));
