@@ -23,8 +23,7 @@
         android:layout_marginTop="39dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:text="Enter Order Id" />
+        android:inputType="textPersonName" />
 
     <Button
         android:id="@+id/fetchOrderInfoButton"

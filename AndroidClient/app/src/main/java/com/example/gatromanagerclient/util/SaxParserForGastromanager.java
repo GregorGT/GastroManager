@@ -5,14 +5,14 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.gatromanagerclient.model.DrillDownMenuButton;
-import com.example.gatromanagerclient.model.DrillDownMenuItemDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuItemOptionChoiceDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuItemOptionDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuType;
-import com.example.gatromanagerclient.model.DrillDownMenus;
-import com.example.gatromanagerclient.model.Menu;
-import com.example.gatromanagerclient.model.MenuDetail;
+import com.gastromanager.models.DrillDownMenuButton;
+import com.gastromanager.models.DrillDownMenuItemDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionChoiceDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionDetail;
+import com.gastromanager.models.DrillDownMenuType;
+import com.gastromanager.models.DrillDownMenus;
+import com.gastromanager.models.Menu;
+import com.gastromanager.models.MenuDetail;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;

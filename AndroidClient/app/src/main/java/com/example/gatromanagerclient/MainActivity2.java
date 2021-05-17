@@ -5,22 +5,17 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.example.gatromanagerclient.model.DrillDownMenuButton;
-import com.example.gatromanagerclient.model.DrillDownMenuItemDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuType;
-import com.example.gatromanagerclient.model.MenuDetail;
+import com.gastromanager.models.DrillDownMenuButton;
+import com.gastromanager.models.DrillDownMenuType;
+import com.gastromanager.models.MenuDetail;
 import com.example.gatromanagerclient.socket.Client;
 import com.example.gatromanagerclient.util.SaxParserForGastromanager;
 import com.example.gatromanagerclient.util.Util;
-import com.example.gatromanagerclient.util.XmlUtil;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.text.Layout;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,19 +24,15 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
 
 import com.example.gatromanagerclient.databinding.ActivityMain2Binding;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity2 extends AppCompatActivity {
 
@@ -123,7 +114,13 @@ public class MainActivity2 extends AppCompatActivity {
         //Menu space
         LinearLayout menuView = findViewById(R.id.menuItemsView);
         //fetch data from server
-        new LoadMenuTask().execute("menu", this, drilldownMenuTypeSpinner);
+        try {
+            menuDetail = new LoadMenuTask().execute("menu", this, drilldownMenuTypeSpinner).get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         drilldownMenuTypeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
         {
             @Override
@@ -229,14 +226,14 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    private class LoadMenuTask extends AsyncTask<Object, Void, String> {
+    private class LoadMenuTask extends AsyncTask<Object, Void, MenuDetail> {
         MainActivity2 mainActivity2;
         String requestIdentifier;
         Spinner menuTypeSpinner;
 
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
-        protected String doInBackground(Object... request) {
+        protected MenuDetail doInBackground(Object... request) {
             Iterator iterator = Arrays.stream(request).iterator();
             int paramCount = 0;
             while(iterator.hasNext()) {
@@ -252,18 +249,19 @@ public class MainActivity2 extends AppCompatActivity {
                 paramCount++;
             }
             Client client = new Client();//Client.getInstance();
-            String serverResponse = client.getResponse(requestIdentifier);
+            //String serverResponse = client.getResponse(requestIdentifier);
+            MenuDetail serverResponse = client.getMenuDetails(requestIdentifier);
             System.out.println("Requesting for "+requestIdentifier);
             //System.out.println("Received "+serverResponse);
             client = null;
             return serverResponse;
         }
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(MenuDetail result) {
             //txtOne.setText(response);
             System.out.println("Received on postExecute "+result);
-            MenuDetail menuDetail = mainActivity2.loadMenuDetails(result);
-            mainActivity2.loadMenuTypes(menuTypeSpinner, menuDetail);
+            //MenuDetail menuDetail = mainActivity2.loadMenuDetails(result);
+            mainActivity2.loadMenuTypes(menuTypeSpinner, result);
             super.onPostExecute(result);
         }
     }

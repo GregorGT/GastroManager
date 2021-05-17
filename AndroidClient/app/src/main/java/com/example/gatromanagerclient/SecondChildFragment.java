@@ -16,9 +16,9 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
-import com.example.gatromanagerclient.model.DrillDownMenuItemDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuItemOptionChoiceDetail;
-import com.example.gatromanagerclient.model.DrillDownMenuItemOptionDetail;
+import com.gastromanager.models.DrillDownMenuItemDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionChoiceDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionDetail;
 import com.example.gatromanagerclient.socket.Client;
 import com.example.gatromanagerclient.util.XmlUtil;
 
@@ -41,7 +41,7 @@ public class SecondChildFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View returnView = inflater.inflate(R.layout.fragment_secondchild, container, false);
-        new LoadDrillDownMenuTask().execute("menu", this, container);
+        //new LoadDrillDownMenuTask().execute("menu", this, container);
         return returnView;
     }
 

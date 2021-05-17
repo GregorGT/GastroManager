@@ -28,7 +28,7 @@ public class ChildFragment extends Fragment {
         View returnView = inflater.inflate(R.layout.fragment_child, container, false);
         txtOne = (TextView) returnView.findViewById(R.id.orderDetailsText);
         System.out.println("second fragment call ");
-        new MyTask().execute("1"); //TODO enable after solving server issue on the socket connection when client closes
+        //new MyTask().execute("1"); //TODO enable after solving server issue on the socket connection when client closes
 
         return returnView;
     }

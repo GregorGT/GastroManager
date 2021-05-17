@@ -1,6 +1,8 @@
-package com.example.gatromanagerclient.model;
+package com.gastromanager.models;
 
-public class DrillDownMenuItemOptionDetail {
+import java.io.Serializable;
+
+public class DrillDownMenuItemOptionDetail implements Serializable {
     String id;
     String name;
     Double price;

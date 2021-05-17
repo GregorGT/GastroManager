@@ -1,12 +1,13 @@
-package com.example.gatromanagerclient.model;
+package com.gastromanager.models;
 
-import java.util.List;
+import java.io.Serializable;
 
-public class DrillDownMenuType {
+public class DrillDownMenuButton implements Serializable {
+
     String name;
     String width;
     String height;
-    List<DrillDownMenuButton> buttons;
+    DrillDownMenuItemDetail menuItemDetail;
 
     public String getName() {
         return name;
@@ -32,11 +33,11 @@ public class DrillDownMenuType {
         this.height = height;
     }
 
-    public List<DrillDownMenuButton> getButtons() {
-        return buttons;
+    public DrillDownMenuItemDetail getMenuItemDetail() {
+        return menuItemDetail;
     }
 
-    public void setButtons(List<DrillDownMenuButton> buttons) {
-        this.buttons = buttons;
+    public void setMenuItemDetail(DrillDownMenuItemDetail menuItemDetail) {
+        this.menuItemDetail = menuItemDetail;
     }
 }
