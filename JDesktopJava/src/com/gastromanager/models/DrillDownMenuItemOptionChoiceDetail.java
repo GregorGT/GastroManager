@@ -1,6 +1,8 @@
 package com.gastromanager.models;
 
-public class DrillDownMenuItemOptionChoiceDetail {
+import java.io.Serializable;
+
+public class DrillDownMenuItemOptionChoiceDetail implements Serializable {
     String name;
     Double price;
 

@@ -1,9 +1,10 @@
 package com.gastromanager.models;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class DrillDownMenuItemDetail {
+public class DrillDownMenuItemDetail implements Serializable {
     String menuItemName;
     Map<String, DrillDownMenuItemOptionDetail> options;
     List<DrillDownMenuItemDetail> subItems;

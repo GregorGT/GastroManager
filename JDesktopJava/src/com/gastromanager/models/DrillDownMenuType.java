@@ -1,8 +1,9 @@
 package com.gastromanager.models;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class DrillDownMenuType {
+public class DrillDownMenuType implements Serializable {
     String name;
     String width;
     String height;

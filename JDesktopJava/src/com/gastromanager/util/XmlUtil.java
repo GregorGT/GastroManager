@@ -3,6 +3,7 @@ package com.gastromanager.util;
 
 import com.gastromanager.mainwindow.GMTreeItem;
 
+import com.gastromanager.models.MenuDetail;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -177,4 +178,20 @@ public class XmlUtil {
         String uuid = String.valueOf(rd.nextLong());
         return uuid;
     }
+
+    public MenuDetail getMenuDetail() {
+		String xmlContent = null;
+		MenuDetail menuDetail = null;
+		try {
+			xmlContent = XmlUtil.readFileToString(
+					"C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+					Charset.defaultCharset());
+			SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
+			menuDetail = parser.parseXml(xmlContent);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return menuDetail;
+	}
 }

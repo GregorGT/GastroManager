@@ -29,7 +29,7 @@ public class SaxParserForGastromanager {
         return instance;
     }
 
-    private MenuDetail parseXml(String xmlData) {
+    public MenuDetail parseXml(String xmlData) {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = null;
@@ -40,7 +40,7 @@ public class SaxParserForGastromanager {
             //saxParser.parse("C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", xmlhandler);
             menuDetail = xmlhandler.getMenuDetail();
             addMenuItemtoDrillDownMenuButton(menuDetail);
-            System.out.println("Done");
+            System.out.println("Parsing Done");
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }
@@ -108,7 +108,7 @@ public class SaxParserForGastromanager {
 
         @Override
         public void startDocument() throws SAXException {
-            System.out.println("start of the document");
+            //System.out.println("start of the document");
             menuDetail = new MenuDetail();
         }
 
@@ -116,7 +116,7 @@ public class SaxParserForGastromanager {
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             switch (qName) {
                 case "menues":
-                    System.out.println("start of menues"+ qName);
+                    //System.out.println("start of menues"+ qName);
                     menu = new Menu();
                     break;
                 case "item":
@@ -126,11 +126,11 @@ public class SaxParserForGastromanager {
                     }
                     item = new DrillDownMenuItemDetail();
                     item.setMenuItemName(attributes.getValue("name"));
-                    System.out.println("start of item"+ qName);
+                    //System.out.println("start of item"+ qName);
                     itemStack.push(item);
                     break;
                 case "option":
-                    System.out.println("start of option "+ qName);
+                    //System.out.println("start of option "+ qName);
                     if(itemStack != null && !itemStack.empty()) {
                         drillDownMenuItemOptionDetail = new DrillDownMenuItemOptionDetail();
                         drillDownMenuItemOptionDetail.setId(attributes.getValue("id"));
@@ -148,17 +148,17 @@ public class SaxParserForGastromanager {
 
                     break;
                 case "choice":
-                    System.out.println("start of choice "+ qName);
+                    //System.out.println("start of choice "+ qName);
                     drillDownMenuItemOptionChoiceDetail = new DrillDownMenuItemOptionChoiceDetail();
                     drillDownMenuItemOptionChoiceDetail.setName(attributes.getValue("name"));
                     drillDownMenuItemOptionChoiceDetail.setPrice(Double.valueOf(attributes.getValue("price")));
                     break;
                 case "drilldownmenus":
-                    System.out.println("start of drill down menus"+ qName);
+                    //System.out.println("start of drill down menus"+ qName);
                     drillDownMenus = new DrillDownMenus();
                     break;
                 case "drilldownmenu":
-                    System.out.println("drill down menu type"+ qName+" "+attributes.getValue("name") + attributes.getValue("height"));
+                    //System.out.println("drill down menu type"+ qName+" "+attributes.getValue("name") + attributes.getValue("height"));
                     if(drillDownMenus != null) {
                         if (drillDownMenus.getDrillDownMenuTypes() == null) {
                             drillDownMenus.setDrillDownMenuTypes(new ArrayList<>());
@@ -184,7 +184,7 @@ public class SaxParserForGastromanager {
 
                     break;
                 default:
-                    System.out.println("start of "+qName);
+                    //System.out.println("start of "+qName);
             }
         }
 
@@ -192,12 +192,12 @@ public class SaxParserForGastromanager {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             switch (qName) {
                 case "menues":
-                    System.out.println("end of menus"+ qName);
+                    //System.out.println("end of menus"+ qName);
                     menuDetail.setMenu(menu);
                     menu = null;
                     break;
                 case "item":
-                    System.out.println("end of item "+ qName);
+                    //System.out.println("end of item "+ qName);
                     DrillDownMenuItemDetail item = itemStack.pop();
                     if(!itemStack.empty()) {
                         DrillDownMenuItemDetail parentItem  = itemStack.peek();
@@ -215,18 +215,18 @@ public class SaxParserForGastromanager {
                     }
                     break;
                 case "option":
-                    System.out.println("end of option"+ qName);
+                    //System.out.println("end of option"+ qName);
                     drillDownMenuItemOptionDetail = null;
                     break;
                 case "choice":
-                    System.out.println("end of choice "+ qName);
+                    //System.out.println("end of choice "+ qName);
                     if(drillDownMenuItemOptionDetail != null) {
                         drillDownMenuItemOptionDetail.setChoice(drillDownMenuItemOptionChoiceDetail);
                     }
                     drillDownMenuItemOptionChoiceDetail = null;
                     break;
                 case "drilldownmenus":
-                    System.out.println("end of drill down menus"+ qName + drillDownMenus.getDrillDownMenuTypes());
+                    //System.out.println("end of drill down menus"+ qName + drillDownMenus.getDrillDownMenuTypes());
                     if(menuDetail == null) {
                         menuDetail = new MenuDetail();
                     }
@@ -240,7 +240,7 @@ public class SaxParserForGastromanager {
                     this.drillDownMenuButton = null;
                     break;
                 default:
-                    System.out.println("end of "+ qName);
+                    //System.out.println("end of "+ qName);
             }
         }
 
