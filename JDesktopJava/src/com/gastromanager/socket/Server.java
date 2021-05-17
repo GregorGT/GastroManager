@@ -41,7 +41,8 @@ public class Server {
     public void sendXMLData(DataOutputStream out) {
         try {
             String xmlContent = XmlUtil.readFileToString(
-                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
+                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+                    Charset.defaultCharset());
             System.out.println(xmlContent);
             out.writeUTF(xmlContent);
         } catch (IOException e) {

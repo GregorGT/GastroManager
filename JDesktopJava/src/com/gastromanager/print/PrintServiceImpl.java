@@ -71,7 +71,7 @@ public class PrintServiceImpl implements PrintService {
             //addTotal(total.get(), orderDetailsBuilder);
         }
         System.out.println(orderDetailsBuilder.toString());
-        return orderDetailsBuilder.toString();
+        return orderDetailsBuilder.toString().trim();
     }
 
     private void addTotal(double total, StringBuilder orderDetailsBuilder) {

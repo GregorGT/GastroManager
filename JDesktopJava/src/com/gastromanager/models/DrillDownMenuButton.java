@@ -1,6 +1,8 @@
 package com.gastromanager.models;
 
-public class DrillDownMenuButton {
+import java.io.Serializable;
+
+public class DrillDownMenuButton implements Serializable {
 
     String name;
     String width;

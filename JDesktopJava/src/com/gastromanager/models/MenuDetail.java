@@ -1,6 +1,8 @@
 package com.gastromanager.models;
 
-public class MenuDetail {
+import java.io.Serializable;
+
+public class MenuDetail implements Serializable {
     private Menu menu;
     private DrillDownMenus drillDownMenus;
 
