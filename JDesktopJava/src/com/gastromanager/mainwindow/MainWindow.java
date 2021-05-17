@@ -7,12 +7,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Frame;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -30,6 +33,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -116,7 +120,7 @@ public class MainWindow extends JFrame {
 				try {
 					String fstr = xmlUtil.readFileToString(selected, Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
-					xmlUtil.parseXmlDocument(doc, root, newMElement, tabOrdering);
+					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
 					tree.init(tree, drillDownMenu);
 				} catch (Exception e1) {
 					e1.printStackTrace();
@@ -158,7 +162,7 @@ public class MainWindow extends JFrame {
 				try {
 					fstr = xmlUtil.readFileToString("C:\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
-					xmlUtil.parseXmlDocument(doc, root, newMElement, tabOrdering);
+					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
 					tree.init(tree, drillDownMenu);
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -187,8 +191,10 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("View", null, tabView, null);
 		tabView.setLayout(null);
 
-		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);
+//		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);
+		LayoutMenu tabLayout = new LayoutMenu();
 		tabbedPane.addTab("Layout", null, tabLayout, null);
+//		tabLayout.setLayout(null);
 		
 		tree = new GMTree(root);
 		tree.rootItem = root;
