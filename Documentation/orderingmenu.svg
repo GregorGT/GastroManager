@@ -16,7 +16,7 @@
    id="svg8"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="orderingmenu.svg"
-   inkscape:export-filename="C:\workspace\RestaurantePoint\GastroManager\Documentation\orderingmeue.png"
+   inkscape:export-filename="C:\workspace\RestaurantePoint\GastroManager2\Documentation\orderingmeue.png"
    inkscape:export-xdpi="610.10999"
    inkscape:export-ydpi="610.10999">
   <defs
@@ -36,9 +36,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.979899"
-     inkscape:cx="401.99612"
-     inkscape:cy="226.13849"
+     inkscape:zoom="1.4"
+     inkscape:cx="470.1694"
+     inkscape:cy="180.4621"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -320,26 +320,33 @@
          x="91.383507"
          y="51.621017"
          style="stroke-width:0.26458332">Enditem</tspan></text>
-    <rect
-       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
-       id="rect829-2-0-3"
-       width="35.675545"
-       height="6.4435868"
-       x="167.43181"
-       y="19.677805"
-       inkscape:export-xdpi="610.10999"
-       inkscape:export-ydpi="610.10999" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="172.30701"
-       y="23.835043"
-       id="text1025"><tspan
-         sodipodi:role="line"
-         id="tspan1023"
-         x="172.30701"
-         y="23.835043"
-         style="stroke-width:0.26458332">Drilldownmenu</tspan></text>
+    <g
+       id="g879"
+       transform="translate(-44.60119,60.854166)">
+      <g
+         id="g884">
+        <rect
+           style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+           id="rect829-2-0-3"
+           width="35.675545"
+           height="6.4435868"
+           x="167.80977"
+           y="19.866793"
+           inkscape:export-xdpi="610.10999"
+           inkscape:export-ydpi="610.10999" />
+        <text
+           xml:space="preserve"
+           style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+           x="172.27971"
+           y="24.403751"
+           id="text1025"><tspan
+             sodipodi:role="line"
+             id="tspan1023"
+             x="172.27971"
+             y="24.403751"
+             style="stroke-width:0.26458332">Drilldownmenu</tspan></text>
+      </g>
+    </g>
     <rect
        style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:2.08143449;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="rect829-2-0-3-8"
@@ -488,5 +495,33 @@
            id="tspan1023-4-2-6-5"
            sodipodi:role="line">&gt;&gt;</tspan></text>
     </g>
+    <rect
+       style="opacity:1;fill:#00ff39;fill-opacity:1;stroke:#ff0000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect886"
+       width="5.2916665"
+       height="6.0476193"
+       x="165.65582"
+       y="18.926077" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:3.52777767px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="173.21536"
+       y="23.650778"
+       id="text890"><tspan
+         sodipodi:role="line"
+         id="tspan888"
+         x="173.21536"
+         y="23.650778"
+         style="stroke-width:0.26458332">Fix table and floor</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 166.96161,20.226903 2.2717,3.934709"
+       id="path892"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 169.96839,20.093269 -3.57473,3.57473"
+       id="path894"
+       inkscape:connector-curvature="0" />
   </g>
 </svg>
