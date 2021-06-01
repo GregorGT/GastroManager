@@ -70,5 +70,29 @@
         android:layout_marginTop="400dp"
         android:orientation="horizontal" />
 
+    <LinearLayout
+        android:id="@+id/menuItemOptionsView"
+        android:layout_width="183dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="185dp"
+        android:layout_marginTop="400dp"
+        android:background="@color/white"
+        android:orientation="vertical"/>
+
+    <Button
+        android:id="@+id/addToOrderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="680dp"
+        android:text="Add to Order" />
+
+    <Button
+        android:id="@+id/newOrderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="198dp"
+        android:layout_marginTop="160dp"
+        android:text="New Order" />
+
 
 </RelativeLayout>
