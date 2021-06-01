@@ -6,6 +6,8 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.gastromanager.models.DrillDownMenuButton;
+import com.gastromanager.models.DrillDownMenuItemDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionDetail;
 import com.gastromanager.models.DrillDownMenuType;
 import com.gastromanager.models.MenuDetail;
 import com.example.gatromanagerclient.socket.Client;
@@ -30,8 +32,11 @@ import com.example.gatromanagerclient.databinding.ActivityMain2Binding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity2 extends AppCompatActivity {
@@ -41,6 +46,11 @@ public class MainActivity2 extends AppCompatActivity {
     private TextView orderDetailsView;
     private Button fetchOrderDetailsButton;
     private MenuDetail menuDetail;
+    private Stack<String> orderSelectionStack;
+    private LinearLayout menuView;
+    private LinearLayout menuOptionsView;
+    private Map<String, String> optionsSelectionMap;
+    EditText orderIdInputTextField;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +62,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         orderDetailsView = findViewById(R.id.textView2);
         System.out.println("Current order details :" + orderDetailsView.getText());
-        EditText orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
+        orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
         fetchOrderDetailsButton = findViewById(R.id.fetchOrderInfoButton);
         fetchOrderDetailsButton.setOnClickListener(v -> {
                     System.out.println("inside get order");
@@ -112,7 +122,8 @@ public class MainActivity2 extends AppCompatActivity {
         //Drill down menu
         Spinner drilldownMenuTypeSpinner = findViewById(R.id.spinner2);
         //Menu space
-        LinearLayout menuView = findViewById(R.id.menuItemsView);
+        menuView = findViewById(R.id.menuItemsView);
+        menuOptionsView = findViewById(R.id.menuItemOptionsView);
         //fetch data from server
         try {
             menuDetail = new LoadMenuTask().execute("menu", this, drilldownMenuTypeSpinner).get();
@@ -126,10 +137,10 @@ public class MainActivity2 extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView adapter, View v, int i, long lng) {
 
-                String selecteditem =  adapter.getItemAtPosition(i).toString();
-                System.out.println("selected "+selecteditem+ " "+menuDetail);
+                String selectedItem =  adapter.getItemAtPosition(i).toString();
+                System.out.println("selected "+selectedItem+ " "+menuDetail);
                 menuView.removeAllViews();
-                loadMenuView(selecteditem, menuDetail, menuView);
+                loadMenuView(selectedItem, menuDetail, menuView, menuOptionsView);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView)
@@ -138,49 +149,142 @@ public class MainActivity2 extends AppCompatActivity {
             }
         });
 
+        Button addToOrderButton = findViewById(R.id.addToOrderButton);
+        addToOrderButton.setOnClickListener(v -> {
+            loadOrderItemFromSelection();
+        });
+
+        Button newOrderIdButton = findViewById(R.id.newOrderButton);
+        newOrderIdButton.setOnClickListener(v -> {
+            new GetNextOrderIdTask().execute();//GetOrderDetailsTask().execute(inputOrderId.trim());
+        });
+
+
     }
 
-    private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, LinearLayout view) {
+    private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, LinearLayout view, LinearLayout menuOptionView) {
         List<DrillDownMenuButton> menuButtons  = menuType.getButtons();
         for(DrillDownMenuButton menuButton:menuButtons) {
             Button menuButtonView = new Button(this);
-            menuButtonView.setWidth(Integer.valueOf(menuButton.getWidth()));
-            menuButtonView.setHeight(Integer.valueOf(menuButton.getHeight()));
+            menuButtonView.setWidth(Integer.parseInt(menuButton.getWidth()));
+            menuButtonView.setHeight(Integer.parseInt(menuButton.getHeight()));
             menuButtonView.setText(menuButton.getName());
             menuButtonView.setOnClickListener(new View.OnClickListener() {
+                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onClick(View v) {
                     // your handler code here
-                    System.out.println("Got here ");
+                    System.out.println("Got here "+ menuButtonView.getText());
+                    if(orderSelectionStack == null) {
+                        orderSelectionStack = new Stack<>();
+                    }
+                    orderSelectionStack.push(menuButtonView.getText().toString());
+                    loadMenuItemOptionsView(menuButton.getMenuItemDetail(), menuButtonView, menuOptionView, true);
                 }
             });
+
             view.addView(menuButtonView);
 
         }
     }
 
-    private void loadMenuView(String selectedMenuType, MenuDetail menuDetail, LinearLayout view) {
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void loadMenuItemOptionsView(DrillDownMenuItemDetail menuItemDetail, View parentView,
+                                         LinearLayout menuOptionsView, Boolean isRefresh) {
+
+        if(isRefresh) {
+            menuOptionsView.removeAllViews();
+        }
+        Map<String, DrillDownMenuItemOptionDetail> optionsMap = menuItemDetail.getOptionsMap();
+        if(optionsMap != null) {
+            Spinner menuItemOptionsSpinner = new Spinner(this);
+            menuItemOptionsSpinner.setTransitionName(menuItemDetail.getMenuItemName()+"Options");
+            List<String> optionKeys = new ArrayList<>();
+            optionKeys.add("");
+            optionKeys.addAll(optionsMap.keySet());
+            System.out.println("Options "+optionKeys);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+                    (this, android.R.layout.simple_spinner_item, optionKeys);
+            arrayAdapter.setDropDownViewResource(android.R.layout
+                    .simple_spinner_dropdown_item);
+            menuItemOptionsSpinner.setAdapter(arrayAdapter);
+            menuItemOptionsSpinner.setSelection(0);
+            menuItemOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    System.out.println("Selected item "+menuItemOptionsSpinner.getSelectedItem().toString());
+                    if(!menuItemOptionsSpinner.getSelectedItem().toString().equals("")) {
+                        //orderSelectionStack.add(menuItemOptionsSpinner.getSelectedItem().toString());
+                        if(optionsSelectionMap ==  null) {
+                            optionsSelectionMap = new HashMap<>();
+                        }
+                        optionsSelectionMap.put(menuItemOptionsSpinner.getTransitionName(), menuItemOptionsSpinner.getSelectedItem().toString());
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+                    menuItemOptionsSpinner.setSelection(0);
+                }
+
+            });
+            menuOptionsView.addView(menuItemOptionsSpinner);
+            loadMenuSubItems(menuItemDetail, menuOptionsView, menuOptionsView);
+        }
+    }
+    private Boolean checkIfChildViewExists(String itemName, LinearLayout currentView){
+        Boolean doesChildExist = false;
+        Integer childCount = currentView.getChildCount();
+        for(int i=0; i<childCount; i++) {
+            View view = currentView.getChildAt(i);
+            if(view instanceof Button) {
+                Button currentButton = (Button) view;
+                if(currentButton.getText().equals(itemName)) {
+                    doesChildExist = true;
+                    break;
+                }
+            }
+        }
+        return doesChildExist;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void loadMenuSubItems(DrillDownMenuItemDetail menuItemDetail, View parentView, LinearLayout menuOptionsView) {
+        List<DrillDownMenuItemDetail> subItems = menuItemDetail.getSubItems();
+        System.out.println("Sub items "+subItems);
+
+        if(subItems != null) {
+            for (DrillDownMenuItemDetail subItem : subItems) {
+                String menuItemName = subItem.getMenuItemName();
+                if (!checkIfChildViewExists(menuItemName, menuOptionsView)) {
+                    Button menuButtonView = new Button(this);
+                    //menuButtonView.setWidth(Integer.valueOf(menuButton.getWidth()));
+                    //menuButtonView.setHeight(Integer.valueOf(menuButton.getHeight()));
+                    menuButtonView.setText(menuItemName);
+                    menuButtonView.setTransitionName(menuItemName);
+                    System.out.println("adding " + menuItemName);
+                    menuButtonView.setOnClickListener(new View.OnClickListener() {
+                        public void onClick(View v) {
+                            // your handler code here
+                            System.out.println("Got here " + menuButtonView.getText());
+                            orderSelectionStack.push(menuButtonView.getText().toString());
+                            loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false);
+                            loadMenuSubItems(subItem, menuButtonView, menuOptionsView);
+                        }
+                    });
+                    menuOptionsView.addView(menuButtonView);
+                }
+            }
+        }
+    }
+
+    private void loadMenuView(String selectedMenuType, MenuDetail menuDetail, LinearLayout view, LinearLayout menuOptionsView) {
         List<DrillDownMenuType> menuTypeList = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
         for(DrillDownMenuType menuType: menuTypeList) {
             if(menuType.getName().equals(selectedMenuType)) {
-                loadMenuItems(menuType, menuDetail, view);
+                loadMenuItems(menuType, menuDetail, view, menuOptionsView);
                 break;
             }
         }
-        /*Button myNewButton = new Button(container.getContext());
-        myNewButton.setText(buttonText);
-        myNewButton.setHeight(Integer.parseInt(buttonHeight));
-        myNewButton.setWidth(Integer.parseInt(buttonWidth));
-        myNewButton.setVisibility(View.VISIBLE);
-        myNewButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // your handler code here
-                List<String> drillDownMenuTupes  = XmlUtil.getDrillDownMenuTypes("drilldownmenus", menuXml);
-                System.out.println(drillDownMenuTupes);
-                DrillDownMenuItemDetail menuItemDetail = loadMenuItemDetail(buttonText, menuXml);
-                System.out.println("Got here "+menuItemDetail);
-            }
-        });
-        linearLayout.addView(myNewButton);*/
     }
 
     private void loadMenuTypes(Spinner spinner,MenuDetail menuDetail) {
@@ -206,6 +310,24 @@ public class MainActivity2 extends AppCompatActivity {
         return responseMenuDetail;
     }
 
+    private void loadOrderItemFromSelection() {
+        //menu item
+        /*int menuItemsCount = menuView.getChildCount();
+        for(int i=0; i< menuItemsCount; i++) {
+            View menuItemView = menuView.getChildAt(i);
+            if(menuItemView instanceof Button) {
+                Button menuItemViewButton  = (Button) menuItemView;
+                menuItemViewButton.
+            }
+        }*/
+        //item options
+        while(!orderSelectionStack.empty()) {
+            String itemName = orderSelectionStack.pop();
+            String itemOptionSelected = optionsSelectionMap.get(itemName+"Options");
+            System.out.println(itemName + " -> "+ itemOptionSelected);;
+        }
+    }
+
     @SuppressLint("StaticFieldLeak")
     private class GetOrderDetailsTask extends AsyncTask<String, Void, Void> {
         String response;
@@ -213,7 +335,8 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         protected Void doInBackground(String... request) {
             Client client = new Client();//.getInstance();
-            response = client.getResponse(Arrays.stream(request).findFirst().get());
+            //response = client.getResponse(Arrays.stream(request).findFirst().get());
+            response = client.getOrderInfo(Arrays.stream(request).findFirst().get());
             System.out.println("Requesting for "+Arrays.stream(request).findFirst().get());
             System.out.println("Response "+response);
             client = null;
@@ -262,6 +385,28 @@ public class MainActivity2 extends AppCompatActivity {
             System.out.println("Received on postExecute "+result);
             //MenuDetail menuDetail = mainActivity2.loadMenuDetails(result);
             mainActivity2.loadMenuTypes(menuTypeSpinner, result);
+            super.onPostExecute(result);
+        }
+    }
+
+
+    private class GetNextOrderIdTask extends AsyncTask<Void, Void, Integer> {
+        Integer response;
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            Client client = new Client();//.getInstance();
+            //response = client.getResponse(Arrays.stream(request).findFirst().get());
+            response = client.getNewOrderId("newOrderId");
+            System.out.println("Requesting for new order Id");
+            System.out.println("Response "+response);
+            client = null;
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            orderIdInputTextField.setText(result.toString());
             super.onPostExecute(result);
         }
     }
