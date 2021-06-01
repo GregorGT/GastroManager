@@ -68,7 +68,9 @@
 	<layout>
 		<floor value="1" name="firstfloor" name_de="erster stock" >
 			<image value=""/>
-			<table value="1" name_de="Tisch" name="table" x="3" y="0" width="100" heigh="100" rot="0"/>
+			<table value="1" name_de="Tisch" name="table" x="3" y="0" width="100" heigh="100" rot="0">
+				<chair name="proper chair" x="10" y="0" width="50" height="50"/> 
+			</table>
 		</floor>
 		<floor name="secondfloor" value="2">
 			<image value=""/>

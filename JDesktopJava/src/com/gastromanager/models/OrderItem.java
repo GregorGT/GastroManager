@@ -2,9 +2,10 @@ package com.gastromanager.models;
 
 import org.w3c.dom.Document;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class OrderItem {
+public class OrderItem implements Serializable {
     private Integer orderId;
     private Integer itemId;
     private Integer quantity;

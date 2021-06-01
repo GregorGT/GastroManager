@@ -116,6 +116,24 @@ public class DbUtil {
         return orderItems;
     }
 
+    public static Integer getNewOrderId() {
+        Integer nextOrderId = null;
+        try {
+            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERS";
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            ResultSet result = stmt.executeQuery();
+            while(result.next()) {
+                nextOrderId = result.getInt("MAX_ID") + 1;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextOrderId;
+    }
+
     public static void main(String[] args) {
         //List<OrderItem> orderItems = DbUtil.getOrderDetails("1");
         //System.out.println(orderItems.get(0).getXml().getElementsByTagName("item").getLength());
