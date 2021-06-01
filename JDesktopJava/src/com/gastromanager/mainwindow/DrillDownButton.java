@@ -203,7 +203,7 @@ public class DrillDownButton extends JButton implements ActionListener, MouseMot
 		
 		grp.add(this);
 		grp.revalidate();
-	    grp.repaint();
+	    grp.repaint();		
 	    this.setVisible(true);
 	    
 	}

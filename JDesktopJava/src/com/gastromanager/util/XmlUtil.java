@@ -127,8 +127,8 @@ public class XmlUtil {
 
 
     public static void parseXmlDocument(Document doc, GMTreeItem root, com.gastromanager.mainwindow.MenuElement mElement) {
-        try {
-            treeBuild(root, doc.getFirstChild(),(DefaultTreeModel) root.getTree().getModel() , mElement);
+    	try {
+        	treeBuild(root, doc.getFirstChild(),(DefaultTreeModel) root.getTree().getModel() , mElement);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,6 +136,10 @@ public class XmlUtil {
 
     public static String writeTreeIntoString(GMTreeItem treeItem) {
 
+    	if (treeItem.getXmlName().equals("floor")) {
+    		int c = 0;
+    	}
+    	
         String result = "";  
         List<GMTreeItem> children = treeItem.children;
         
@@ -159,7 +163,6 @@ public class XmlUtil {
     				result += ">" + "\n";
     			}
     		}
-    		
         }
         Iterator it = children.iterator();
         

@@ -48,8 +48,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.TreeSelectionEvent;
+import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreePath;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -64,7 +67,7 @@ import com.gastromanager.util.XmlUtil;
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
-	private GMTreeItem root = new GMTreeItem("Restaurant name");
+	private static GMTreeItem root = new GMTreeItem("Restaurant name");
 	private GMTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
@@ -75,6 +78,7 @@ public class MainWindow extends JFrame {
 	public Connection connection;
 	public DrillDownMenu drillDownMenu;
 	public XmlUtil xmlUtil;
+	private Document doc;
 	
 	/**
 	 * Launch the application.
@@ -105,6 +109,75 @@ public class MainWindow extends JFrame {
 		JMenu mnFileMenu = new JMenu("File");
 		menuBar.add(mnFileMenu);
 
+
+		
+
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		contentPane.setLayout(new BorderLayout(0, 0));
+		setContentPane(contentPane);
+
+		JSplitPane splitPane = new JSplitPane();
+		splitPane.setEnabled(false);
+		splitPane.setDividerLocation(200);
+		splitPane.getLeftComponent().setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
+		contentPane.add(splitPane, BorderLayout.CENTER);
+
+		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+		splitPane.setRightComponent(tabbedPane);
+		
+
+		JPanel tabView = new JPanel();
+		tabbedPane.addTab("View", null, tabView, null);
+		tabView.setLayout(null);
+
+
+		
+		tree = new GMTree(root);
+		tree.rootItem = root;
+		root.setTree(tree);
+
+		JScrollPane treeScroll = new JScrollPane(tree, 
+												 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+												 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		treeScroll.setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
+		splitPane.setLeftComponent(treeScroll);
+		tree.setEditable(true);
+		
+		treeScroll = new JScrollPane();
+		defaultModel = (DefaultTreeModel) tree.getModel(); 
+
+		LayoutMenu tabLayout = new LayoutMenu(this);
+		tabbedPane.addTab("Layout", null, tabLayout, null);
+		tabLayout.setLayout(new FlowLayout());
+		
+		drillDownMenu = new DrillDownMenu(root, defaultModel, tree, newMElement);
+		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu, 
+										   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+										   JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+		
+		tabbedPane.addTab("Drill Down Menu", null, drillDownScroll, null);
+		drillDownMenu.setLayout(null);
+
+		tabOrdering = new OrderingMenu(connection, drillDownItems, drillDownMenu);
+		tabbedPane.addTab("Ordering", null, tabOrdering, null);
+		tabOrdering.setLayout(null);
+		
+		ReportsMenu tabReports = new ReportsMenu();
+//		reportsTab.setLayout(new BoxLayout());
+		tabbedPane.addTab("Reports", null, tabReports, null);
+
+		PaymentMenu tabPayment = new PaymentMenu();
+		tabbedPane.addTab("Payment", null,tabPayment, null);
+		tabPayment.setPreferredSize(new Dimension(750,650));
+		tabPayment.setLayout(null);
+
+	
+	
+		
+		
+		
+		
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
 
@@ -116,12 +189,15 @@ public class MainWindow extends JFrame {
 
 				int returnVal = fc.showDialog(null, "Open XML File...");
 				String selected = fc.getSelectedFile().toString();
-				Document doc;
+				
 				try {
 					String fstr = xmlUtil.readFileToString(selected, Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
 					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
 					tree.init(tree, drillDownMenu);
+					tree.loaded = true;
+//					tabLayout.setDocument(doc);
+//					tabLayout.setTree(tree);
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
@@ -135,7 +211,8 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 //				String ex = xmlUtil.writeTreeIntoString(root);
 //				System.out.println(ex);
-				
+				System.out.println(root.getChildCount());
+				 
 				 String newString = xmlUtil.writeTreeIntoString(root);
 
 				 File saveFile = new File("C:\\saved_sample_template.xml");
@@ -172,67 +249,9 @@ public class MainWindow extends JFrame {
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
-
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setLayout(new BorderLayout(0, 0));
-		setContentPane(contentPane);
-
-		JSplitPane splitPane = new JSplitPane();
-		splitPane.setEnabled(false);
-		splitPane.setDividerLocation(200);
-		splitPane.getLeftComponent().setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
-		contentPane.add(splitPane, BorderLayout.CENTER);
-
-		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		splitPane.setRightComponent(tabbedPane);
-
-		JPanel tabView = new JPanel();
-		tabbedPane.addTab("View", null, tabView, null);
-		tabView.setLayout(null);
-
-//		JTabbedPane tabLayout = new JTabbedPane(JTabbedPane.TOP);
-		LayoutMenu tabLayout = new LayoutMenu();
-		tabbedPane.addTab("Layout", null, tabLayout, null);
-//		tabLayout.setLayout(null);
 		
-		tree = new GMTree(root);
-		tree.rootItem = root;
-		root.setTree(tree);
-
-		JScrollPane treeScroll = new JScrollPane(tree, 
-												 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-												 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		treeScroll.setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
-		splitPane.setLeftComponent(treeScroll);
-		tree.setEditable(true);
+//		tree.addTreeSelectionListener(createSelectionListener());
 		
-		treeScroll = new JScrollPane();
-		defaultModel = (DefaultTreeModel) tree.getModel(); 
-
-		
-		drillDownMenu = new DrillDownMenu(root, defaultModel, tree, newMElement);
-		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu, 
-										   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-										   JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
-		tabbedPane.addTab("Drill Down Menu", null, drillDownScroll, null);
-		drillDownMenu.setLayout(null);
-
-		tabOrdering = new OrderingMenu(connection, drillDownItems, drillDownMenu);
-		tabbedPane.addTab("Ordering", null, tabOrdering, null);
-		tabOrdering.setLayout(null);
-		
-		ReportsMenu tabReports = new ReportsMenu();
-
-//		reportsTab.setLayout(new BoxLayout());
-		tabbedPane.addTab("Reports", null, tabReports, null);
-
-		PaymentMenu tabPayment = new PaymentMenu();
-		tabbedPane.addTab("Payment", null,tabPayment, null);
-		tabPayment.setPreferredSize(new Dimension(750,650));
-		tabPayment.setLayout(null);
-
 	}
 	
 	private static void addPopup(Component component, final JPopupMenu popup) {
@@ -252,4 +271,39 @@ public class MainWindow extends JFrame {
 			}
 		});
 	}
+
+	public GMTree getTree() {
+		return tree;
+	}
+
+	public void setTree(GMTree tree) {
+		this.tree = tree;
+	}
+
+	public static GMTreeItem getRoot() {
+		return root;
+	}
+
+	public static void setRoot(GMTreeItem root) {
+		MainWindow.root = root;
+	}
+
+	public Document getDoc() {
+		return doc;
+	}
+
+	public void setDoc(Document doc) {
+		this.doc = doc;
+	}
+
+	public DefaultTreeModel getDefaultModel() {
+		return defaultModel;
+	}
+
+	public void setDefaultModel(DefaultTreeModel defaultModel) {
+		this.defaultModel = defaultModel;
+	}
+	
+
+	
 }

@@ -254,6 +254,7 @@ public class DrillDownMenu extends JPanel {
 				model.insertNodeInto(wItem, nItem, 1);
 				model.insertNodeInto(xPItem, nItem, 2);
 				model.insertNodeInto(yPItem, nItem, 3);
+				
 //				((DrillDownButton) comp).setTreeItem(nItem);
 				
 				break;
