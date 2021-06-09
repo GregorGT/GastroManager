@@ -1,26 +1,33 @@
 package com.gastromanager.socket;
 
 
-import com.gastromanager.models.MenuDetail;
-import com.gastromanager.models.OrderItem;
+import com.gastromanager.models.*;
+import com.gastromanager.models.xml.Choice;
+import com.gastromanager.models.xml.Item;
+import com.gastromanager.models.xml.Option;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.SaxParserForGastromanager;
 import com.gastromanager.util.XmlUtil;
 
+import javax.xml.bind.JAXB;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.StringWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.Charset;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class Server2 {
 
     ServerSocket serverSocket = null;
     Socket socket = null;
     Integer serverSocketPort = 5000;
+    static MenuDetail menuDetail;
 
     public Server2() {
         try {
@@ -43,13 +50,18 @@ public class Server2 {
 
     }
 
+    public Server2(String test) {
+
+    }
+
     private void sendMenuDetail(ObjectOutputStream out) {
         try {
-            String xmlContent = XmlUtil.readFileToString(
+           /* String xmlContent = XmlUtil.readFileToString(
                     "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
                     Charset.defaultCharset());
             SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
-            MenuDetail menuDetail = parser.parseXml(xmlContent);
+            menuDetail = parser.parseXml(xmlContent);*/
+            menuDetail = loadMenu();
             System.out.println("Drill down menu types available count " +menuDetail.getDrillDownMenus().getDrillDownMenuTypes().size());
             out.writeObject(menuDetail);
         } catch (IOException e) {
@@ -57,6 +69,94 @@ public class Server2 {
         }
 
 
+    }
+
+    private String createXmlItemInfo(SelectedOrderItem item, Double totalPrice) {
+        String xmlContent = null;
+        Menu menu = menuDetail.getMenu();
+        Map<String, DrillDownMenuItemDetail> menuMap = menu.getItemMap();
+        DrillDownMenuItemDetail menuItemDetail = menuMap.get(item.getItemName());
+        Item xmlMainItem = createItem(item, menuMap.get(item.getItemName()), totalPrice);
+        StringWriter sw = new StringWriter();
+        JAXB.marshal(xmlMainItem, sw);
+        String xmlString = sw.toString();
+        System.out.println("xml "+xmlString);
+        return xmlString;
+
+    }
+
+    private OrderItem buildOrderItemEntry(SelectedOrderItem selectedOrderItem) throws Exception {
+        Double orderItemPrice = (double) 0;
+        String xmlItemInfo = createXmlItemInfo(selectedOrderItem, orderItemPrice);
+        OrderItem orderItem = new OrderItem();
+        orderItem.setOrderId(Integer.valueOf(selectedOrderItem.getOrderId()));
+        orderItem.setQuantity(1);
+        orderItem.setPrice(orderItemPrice);
+        orderItem.setItemId(0);
+        orderItem.setRemark("");
+        orderItem.setDateTime(LocalDateTime.now());
+        orderItem.setPrintStatus(0);
+        orderItem.setPayed(0);
+        orderItem.setXmlText(xmlItemInfo);
+        orderItem.setStatus(0);
+        return orderItem;
+    }
+
+    private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  Double totalPrice) {
+        Item xmlMainItem = null;
+        if(itemDetail != null) {
+            Map<String, DrillDownMenuItemOptionDetail> itemOptionDetailMap = itemDetail.getOptionsMap();
+            xmlMainItem = new Item();
+            xmlMainItem.setName(item.getItemName());
+
+            SelectedOrderItemOption selectedOrderItemOption = item.getOption();
+            Option option = new Option();
+            option.setId(selectedOrderItemOption.getId());
+            option.setName(selectedOrderItemOption.getName());
+            DrillDownMenuItemOptionDetail optionDetail = itemOptionDetailMap.get(selectedOrderItemOption.getName());
+            if (optionDetail != null) {
+                totalPrice = totalPrice + optionDetail.getPrice();
+                option.setPrice(optionDetail.getPrice().toString());
+                DrillDownMenuItemOptionChoiceDetail choiceDetail = optionDetail.getChoice();
+                if (choiceDetail != null) {
+                    Choice choice = new Choice();
+                    choice.setName(choiceDetail.getName());
+                    choice.setPrice(choiceDetail.getPrice().toString());
+                }
+            }
+            //sub items
+            if(item.getSubItems() != null) {
+                List<Item> xmlSubItems = new ArrayList<>();
+                for (SelectedOrderItem subItem : item.getSubItems()) {
+                    Item item1 = createItem(subItem, itemDetail.getSubItems().stream().filter(menuSubItem ->
+                            menuSubItem.getMenuItemName().equals(subItem.getItemName())
+                    ).findAny().get(), totalPrice);
+                    xmlSubItems.add(item1);
+                }
+                xmlMainItem.setSubItem(xmlSubItems);
+            }
+
+            xmlMainItem.setOption(option);
+
+        }
+
+        return xmlMainItem;
+    }
+
+    private MenuDetail  loadMenu() {
+        try {
+            String xmlContent = XmlUtil.readFileToString(
+                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+                    Charset.defaultCharset());
+            SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
+            menuDetail = parser.parseXml(xmlContent);
+            System.out.println("Drill down menu types available count " +menuDetail.getDrillDownMenus().getDrillDownMenuTypes().size());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return menuDetail;
     }
 
     private static boolean isNumeric(String str) {
@@ -69,7 +169,43 @@ public class Server2 {
     }
 
     public static void main(String[] args) {
+
         Server2 server = new Server2();
+
+        //below code is only for test
+        /*Server2 server = new Server2("test");
+        MenuDetail menuDetail = server.loadMenu();
+        SelectedOrderItem orderItem = new SelectedOrderItem();
+        orderItem.setItemName("Pizza");
+        SelectedOrderItemOption itemOption = new SelectedOrderItemOption();
+        itemOption.setId("size");
+        itemOption.setName("small");
+        SelectedOrderItem subItem = new SelectedOrderItem();
+        subItem.setItemName("topping");
+        SelectedOrderItemOption subItemOption = new SelectedOrderItemOption();
+        subItemOption.setId("toppingammount");
+        subItemOption.setName("lots");
+        subItem.setOption(subItemOption);
+        orderItem.setOption(itemOption);
+        List<SelectedOrderItem> subItems = new ArrayList<>();
+        subItems.add(subItem);
+        orderItem.setSubItems(subItems);
+        orderItem.setOrderId("2");
+        orderItem.setFloorId("1");
+        orderItem.setStaffId("1");
+
+
+        //Item currItem = server.createItem(orderItem, menuDetail.getMenu().getItemMap());
+        //server.createXmlItemInfo(orderItem, new Double(0));
+        try {
+            OrderItem orderItem1 = server.buildOrderItemEntry(orderItem);
+            Integer noOfRowsInserted = DbUtil.insertOrder(orderItem1);
+            System.out.println((noOfRowsInserted ==1) ? "Order Inserted": " Order not inserted");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+*/
+
     }
 
     class ClientHandler extends Thread {
@@ -89,8 +225,11 @@ public class Server2 {
                 ois = new ObjectInputStream(this.s.getInputStream());
 
                 Object clientMessage = ois.readObject();
-                if(clientMessage instanceof OrderItem) {
-                    OrderItem orderItem = (OrderItem) clientMessage;
+                if(clientMessage instanceof SelectedOrderItem) {
+                    SelectedOrderItem orderItem = (SelectedOrderItem) clientMessage;
+                    OrderItem dbOrderItem = buildOrderItemEntry(orderItem);
+                    Integer noOfRowsInserted = DbUtil.insertOrder(dbOrderItem);
+                    System.out.println((noOfRowsInserted ==1) ? "Order Inserted": " Order not inserted");
 
                 } else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;
@@ -125,6 +264,8 @@ public class Server2 {
                 }
 
             } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
                 e.printStackTrace();
             } finally {
                 try {

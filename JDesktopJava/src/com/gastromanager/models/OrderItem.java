@@ -50,6 +50,14 @@ public class OrderItem implements Serializable {
         this.xml = xml;
     }
 
+    public String getXmlText() {
+        return xmlText;
+    }
+
+    public void setXmlText(String xmlText) {
+        this.xmlText = xmlText;
+    }
+
     public Double getPrice() {
         return price;
     }
@@ -92,6 +100,7 @@ public class OrderItem implements Serializable {
 
     private String remark;
     private Document xml;
+    private String xmlText;
     private Double price;
     private Integer printStatus;
     private Integer payed;

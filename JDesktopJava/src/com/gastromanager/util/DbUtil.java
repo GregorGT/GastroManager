@@ -7,10 +7,7 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,6 +88,51 @@ public class DbUtil {
         return orderItemXmlInfo;
     }
 
+    public static Integer insertOrder(OrderItem orderItem) {
+        Integer noOfRowsInserted = 0;
+        try {
+            String insertOrderQuery = "INSERT INTO orderitem (\n" +
+                    "                          order_id,\n" +
+                    "                          item_id,\n" +
+                    "                          quantity,\n" +
+                    "                          remark,\n" +
+                    "                          xml,\n" +
+                    "                          price,\n" +
+                    "                          print_status,\n" +
+                    "                          payed,\n" +
+                    "                          datetime,\n" +
+                    "                          status,\n" +
+                    "                          id,\n" +
+                    "                          transaction_id,\n" +
+                    "                          price_one_unit\n" +
+                    "                      )\n" +
+                    "                      VALUES (\n" +
+                    "                          '"+ orderItem.getOrderId()+"',\n" +
+                    "                          '"+ orderItem.getItemId()+"',\n" +
+                    "                          '1',\n" +
+                    "                          'remark',\n" +
+                    "                          '"+ orderItem.getXmlText()+"',\n" +
+                    "                          '"+ orderItem.getPrice()+"',\n" +
+                    "                          '"+ orderItem.getPrintStatus()+"',\n" +
+                    "                          '"+ orderItem.getPayed()+"',\n" +
+                    "                          '"+ orderItem.getDateTime()+"',\n" +
+                    "                          '"+ orderItem.getStatus()+"',\n" +
+                    "                          '"+ DbUtil.getNewId()+"',\n" +
+                    "                          '1',\n" +
+                    "                          '"+ orderItem.getPrice()/orderItem.getQuantity()+"'\n" +
+                    "                      )";
+            System.out.println("Executing \n "+insertOrderQuery);
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Statement statement = connection.createStatement();
+            noOfRowsInserted = statement.executeUpdate(insertOrderQuery);
+            statement.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return noOfRowsInserted;
+    }
+
     private static List<OrderItem> loadResults(ResultSet result) {
             List<OrderItem> orderItems = null;
             try {
@@ -102,6 +144,7 @@ public class DbUtil {
                     orderItem.setItemId(result.getInt("item_id"));
                     orderItem.setRemark(result.getString("remark"));
                     orderItem.setXml(XmlUtil.loadXMLFromString(result.getString("xml")));
+                    orderItem.setXmlText(result.getString("xml"));
                     orderItem.setPrice(result.getDouble("price"));
                     orderItem.setQuantity(result.getInt("quantity"));
                     orderItems.add(orderItem);
@@ -132,6 +175,24 @@ public class DbUtil {
         }
 
         return nextOrderId;
+    }
+
+    public static Integer getNewId() {
+        Integer nextId = null;
+        try {
+            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERITEM";
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            ResultSet result = stmt.executeQuery();
+            while(result.next()) {
+                nextId = result.getInt("MAX_ID") + 1;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextId;
     }
 
     public static void main(String[] args) {
