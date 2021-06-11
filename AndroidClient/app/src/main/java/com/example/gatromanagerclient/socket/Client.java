@@ -2,6 +2,7 @@ package com.example.gatromanagerclient.socket;
 
 import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.OrderDetailsView;
+import com.gastromanager.models.SelectedOrderItem;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -184,6 +185,17 @@ public class Client {
         try {
             System.out.println(textContent);
             out.writeObject(textContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void sendOrderItemData(SelectedOrderItem orderItem) {
+        try {
+            System.out.println("sending order item info "+orderItem.getItemName());
+            out.writeObject(orderItem);
         } catch (IOException e) {
             e.printStackTrace();
         }
