@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class XmlUtil {
-
+	
     public static Document loadXMLFromString(String xml) throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -40,7 +40,7 @@ public class XmlUtil {
         return new String(encoded, encoding);
     }
 
-    static void treeBuild(GMTreeItem rootNode, Node xmlNode, DefaultTreeModel model ,com.gastromanager.mainwindow.MenuElement menuElement) {
+    private static void treeBuild(GMTreeItem rootNode, Node xmlNode, DefaultTreeModel model ,com.gastromanager.mainwindow.MenuElement menuElement) {
 		if (xmlNode.getNodeName().contains("#"))
 			return;
 		boolean isRootNode;
@@ -63,12 +63,12 @@ public class XmlUtil {
 		newNode.setXmlName(xmlNode.getNodeName());
 		newNode.setUserObject(newNode.getDisplayString());
 
+		
 		if (newNode.getXmlName() == "button") {			
 			createButton(newNode, model, rootNode, menuElement);
 		}
 		
 		NodeList children = xmlNode.getChildNodes();
-		
 		newNode.setTree(rootNode.getTree());
 		
 		if (isRootNode) {
@@ -135,15 +135,17 @@ public class XmlUtil {
     }
 
     public static String writeTreeIntoString(GMTreeItem treeItem) {
-
-    	if (treeItem.getXmlName().equals("floor")) {
-    		int c = 0;
+    	
+    	if (treeItem.getXmlName().equals("layout")) {
+    		int c=0;
     	}
     	
         String result = "";  
         List<GMTreeItem> children = treeItem.children;
+
         
-        if (treeItem.getXmlName().length() == 0) {} 
+        if (treeItem.getXmlName().length() == 0) 
+        	{} 
         else {
         	result += "<" + treeItem.getXmlName() ;
 
@@ -197,4 +199,5 @@ public class XmlUtil {
 
 		return menuDetail;
 	}
+
 }

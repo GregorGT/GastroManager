@@ -1,85 +1,53 @@
 package com.gastromanager.mainwindow;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.Panel;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.HierarchyListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Scanner;
 
-import javax.imageio.ImageIO;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
-import javax.swing.event.AncestorEvent;
-import javax.swing.event.AncestorListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import com.gastromanager.util.XmlUtil;
+import com.gastromanager.db.DbConnection;
+
 
 public class LayoutMenu extends JPanel {
-	private static final String LAYOUT_TREE_PATH = "layout";
-
+	private static final long serialVersionUID = 1L;
+	
+	
+	private static final String INSERT_TO_LOCATION = "INSERT INTO LOCATION VALUES(?,?,?,?,?,?,?,?,?)";
+	private static final String SELECT_MAX_ID = "SELECT max(id)+1 FROM location";
+	
 	private String absolutePathToImage;
 	private int windowWidth = 0;
 	private int windowHeight = 0;
@@ -87,9 +55,30 @@ public class LayoutMenu extends JPanel {
     private ImageDrawing currentDisplayedImage;    
     private MainWindow mainWindow;
     private String floorName="";
-    private Map<JScrollPane, ImageDrawing> scrollPanes;
-    
+    private GMTreeItem root;
+	private GMTree tree;
+	private DefaultTreeModel defaultModel;
+	private MenuElement newMElement;
+	private boolean isFileLoaded;
+	private Map<Floor, ImageDrawing> allFloors = new HashMap<>();
+	private TitledBorder tb = new TitledBorder("Floor");
+	private JTextField filePathString = new JTextField();
+	private Connection connection;
+	
+	
 	public LayoutMenu(MainWindow mainWindow) {
+		
+		try {
+			connection = DbConnection.getDbConnection().gastroDbConnection;
+		} catch (Exception e) {
+			System.err.println("Failed to connect to database.\nClass: LayoutMenu.java\tLine: 69");
+		}
+		
+		this.root = mainWindow.getRoot();
+		this.tree = mainWindow.getTree();
+		this.defaultModel = mainWindow.getDefaultModel();
+		this.newMElement = mainWindow.getNewMElement();
+		
 		this.mainWindow = mainWindow;
     	JButton newFloorButton = new JButton("<html>New<br/>floor</html>");
 		JButton newTableButton = new JButton("<html>New<br/>table</html>");
@@ -105,7 +94,7 @@ public class LayoutMenu extends JPanel {
 		
 		TitledBorder border = new TitledBorder("Image layout");
 		JLabel selectImage = new JLabel("Select image for the floor's layout");
-		JTextField filePathString = new JTextField();
+
 		JButton browseImageButton = new JButton("Browse");
 	
 		browseImageButton.addActionListener(new ActionListener() {
@@ -138,7 +127,7 @@ public class LayoutMenu extends JPanel {
 		this.add(imageSelectPanel);
 		
 		
-		TitledBorder tb = new TitledBorder("Title goes here");
+
 		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(windowWidth-30, windowHeight-220));
 		scrollPane.setBorder(tb);
@@ -177,7 +166,6 @@ public class LayoutMenu extends JPanel {
             }
 		});
 		
-		//TODO: notify this class when tree event happens in MainWindow.
 		mainWindow.getTree().addTreeSelectionListener(createSelectionListener());
 	}
 
@@ -186,100 +174,154 @@ public class LayoutMenu extends JPanel {
 			JOptionPane.showMessageDialog(this, "Please load a file first", null, JOptionPane.ERROR_MESSAGE, null);
 			return;
 		}
-		currentDisplayedImage.addTable();
+		
+		if (currentDisplayedImage.getPathToImage().equals("")) {
+			JOptionPane.showMessageDialog(this, "Select an image", null, JOptionPane.ERROR_MESSAGE, null);
+			return;	
+		}
+		
 		JButton btn = new JButton();
-		btn.setName("newtable");
-		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), floorName, btn);
+		btn.setName("table");
+
+		GMTreeItem newItem = new GMTreeItem("table");
+		newItem.setName("table");
+		newItem.setXmlName("table");
+		for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+			if (map.getKey().getTitle().equals(floorName)) {
+				newItem.addAttributes("value", String.valueOf(map.getValue().getNumOfRecs()+1));		
+			}
+		}
+		newItem.addAttributes("name", "table");
+		newItem.addAttributes("x", "");
+		newItem.addAttributes("y", "");
+		newItem.addAttributes("width", "");
+		newItem.addAttributes("height", "");
+		newItem.addAttributes("rot", "");
+		
+		currentDisplayedImage.addTable(newItem.getAttribute("value"), false);	
+		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), floorName, btn, "table", newItem);
 	}
+	
 	
 	private void addNewFloor() {
 		if (!mainWindow.getTree().loaded) {
 			JOptionPane.showMessageDialog(this, "Please load a file first", null, JOptionPane.ERROR_MESSAGE, null);
 			return;
 		}
+
 		JButton btn = new JButton();
 		String op = JOptionPane.showInputDialog("Enter the name of the new floor");
+		if (op == null) {
+			return;
+		}
 		btn.setName(op);
-		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), "layout", btn);
-//		mainWindow.setRoot(mainWindow.getRoot());
-		btn.setName("Image");
-		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), op, btn);
+		
+		GMTreeItem floorItem = new GMTreeItem(op);
+		floorItem.setName(btn.getName());
+		floorItem.setXmlName("floor");
+	
+		floorItem.addAttributes("name", op);
+		floorItem.addAttributes("value", String.valueOf(allFloors.size()+1));	
+		
+		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), "layout", btn, "floor", floorItem);
+		
+		
+		
+		btn = new JButton();
+
+		GMTreeItem imageItem = new GMTreeItem("image");
+		imageItem.setXmlName("image");
+		imageItem.setName("Image");
+		imageItem.addAttributes("value", "");		
+		
+		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), op, btn, "image", imageItem);
+
+		allFloors.put(new Floor(op, String.valueOf(allFloors.size()+1), "", null, false), new ImageDrawing("", String.valueOf(allFloors.size()+1)));
+		
 	}
 	
-	
-	public void componentToTree(GMTreeItem item, DefaultTreeModel model, String parent, Component comp) {
-		Enumeration enumer = item.children();
 
-		if (item.toString() == parent) {
-			GMTreeItem newItem = new GMTreeItem(comp.getName());
-			newItem.setName(comp.getName());
-			newItem.addAttributes("name", comp.getName());
-			newItem.addMenuElements(item.menuElement);
-			newItem.treeParent = item.getTree();
-			newItem.setXmlName("floor");
-			model.insertNodeInto(newItem, item, 0);
+	public void componentToTree(GMTreeItem treeItem, DefaultTreeModel model, String parent, Component comp, String xmlName, GMTreeItem newItem) {
+		Enumeration enumer = treeItem.children();
+
+		if (treeItem.toString().equals(parent)) {
+
+			newItem.addMenuElements(treeItem.menuElement);
+			newItem.treeParent = treeItem.getTree();
+			
+			newItem.setTree(treeItem.getTree());
+		
+			defaultModel.insertNodeInto(newItem, treeItem, 0);
+			treeItem.children.add(newItem);
 		}
 		
 		if(enumer != null) {
 			while (enumer.hasMoreElements()) {
-				componentToTree((GMTreeItem)enumer.nextElement(), mainWindow.getDefaultModel(), parent , comp);
+				componentToTree((GMTreeItem)enumer.nextElement(), model, parent , comp, xmlName, newItem);
 			}
 		}
 	}
 	
 	private void displayImage() {
-		currentDisplayedImage = new ImageDrawing(absolutePathToImage);
-		scrollPane.setViewportView(currentDisplayedImage);
-		this.add(scrollPane);
-	}
-
-    private void loadImageFromXML() {
-    	System.out.println("I should load the image of the " + floorName + " floor.");
-    	NodeList nodeListFloor = mainWindow.getDoc().getElementsByTagName("floor");
-    	
-    	for (int i=0; i<nodeListFloor.getLength(); ++i) {
-    		Node node = nodeListFloor.item(i);
-            if (node.getNodeType() == Node.ELEMENT_NODE) {
-                if (node.getNodeType() == Node.ELEMENT_NODE) {
-                	Element element = (Element) node;
-                	if (element.getAttribute("name").equals(floorName)) {
-                		NodeList imageList = element.getElementsByTagName("image");
-                		System.out.println(imageList.getLength());
-                		String imagePath = imageList.item(0).getAttributes().item(0).getNodeValue();
-                		
-                		System.out.println(imagePath);
-                		
-                		if (imagePath != "") {
-	                		absolutePathToImage = imagePath;
-	                		currentDisplayedImage = new ImageDrawing(absolutePathToImage); 
-	                		this.scrollPane.setViewportView(currentDisplayedImage);
-                		
-	                		
-	                		
-                		} else {
-                			this.remove(scrollPane);
-                			repaint();
-                			revalidate();
-                			initScrollPane();
-                		}
-                		
-//                		if (!scrollPanes.containsKey(floorName)) {
-//                			scrollPanes.put(scrollPane, currentDisplayedImage);
-//                		}
-                	}
-                }
-            }
-    	}
-    }
-
-    private void initScrollPane() {
-	    TitledBorder tb = new TitledBorder(floorName);
-		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		scrollPane.setPreferredSize(new Dimension(windowWidth-30, windowHeight-220));
-		scrollPane.setBorder(tb);
-	    this.add(scrollPane, BorderLayout.CENTER);
+		for (Map.Entry<Floor, ImageDrawing> m: allFloors.entrySet()) {
+			if (m.getKey().getTitle().equals(floorName)) {
+				m.getValue().setPathToImage(absolutePathToImage);
+				changeImageInTree(mainWindow.getRoot());
+			}
+		}
 	}
     
+	private void changeImageInTree(GMTreeItem root) {
+		Enumeration enumer = root.children();
+		
+		if (root.toString().equals(floorName)) {
+			while (enumer.hasMoreElements()) {
+				root = (GMTreeItem) enumer.nextElement();
+				if (root.getXmlName().equals("image")) {
+					root.addAttributes("value", absolutePathToImage);
+					return;
+				}
+			}
+		}
+		
+		while (enumer.hasMoreElements()) {
+			changeImageInTree((GMTreeItem)enumer.nextElement());
+		}
+	}
+	
+	private void changeTableAttributesInTree(GMTreeItem root) {
+		Enumeration enumer = root.children();
+		
+		try {
+			if (root.getXmlName().equals("table")) {
+				String currentValue = root.getAttribute("value");		
+				for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+
+					if (root.getParent().toString().equals(map.getKey().getTitle())) { 
+						Tables[] tables = map.getValue().getTables();
+						
+						for (int i=0; i<tables.length; ++i) {
+							if (tables[i].getValue().equals(currentValue)) {
+								root.addAttributes("value", String.valueOf(tables[i].getValue()));
+								root.addAttributes("x", String.valueOf(tables[i].x));
+								root.addAttributes("y", String.valueOf(tables[i].y));
+								root.addAttributes("width", String.valueOf(tables[i].getWidth()));
+								root.addAttributes("height", String.valueOf(tables[i].getHeight()));
+								root.addAttributes("rot", String.valueOf(tables[i].getRotate()));
+							}
+						}
+					}
+				}
+			}
+		} catch (NullPointerException e) {
+			
+		}
+		while (enumer.hasMoreElements()) {
+			changeTableAttributesInTree((GMTreeItem)enumer.nextElement());
+		}
+	}
+
+	
     private TreeSelectionListener createSelectionListener() {
         return new TreeSelectionListener() {
         	@Override
@@ -292,12 +334,239 @@ public class LayoutMenu extends JPanel {
                 		if (floorName.equals(path.getLastPathComponent().toString())) {
                 			continue;
                 		}
-                		
+                	
                 		floorName = path.getLastPathComponent().toString();
-                		loadImageFromXML();
+                		
+                		boolean found=false;
+                		for (Map.Entry<Floor, ImageDrawing> m: allFloors.entrySet()) {
+                			if (m.getKey().getTitle().equals(floorName)) {
+                				scrollPane.setViewportView(m.getValue());
+                				scrollPane.setBorder(new TitledBorder(m.getKey().getTitle()));
+                				currentDisplayedImage = m.getValue();
+                				filePathString.setText(m.getValue().getPathToImage());
+                				found = true;
+                				break;
+                			}
+                		}
+                		if (!found) {
+                			ImageDrawing im = createFloor(floorName);
+                			scrollPane.setViewportView(im);
+            				scrollPane.setBorder(new TitledBorder(floorName));
+            				currentDisplayedImage = im;
+            				filePathString.setText(im.getPathToImage());
+                		}		
                 	}
                 }
         	}
         };
     }
+    
+	private ImageDrawing createFloor(String floorName) {
+		ImageDrawing im = new ImageDrawing(null, String.valueOf(allFloors.size()+1));
+		allFloors.put(new Floor(floorName, String.valueOf(allFloors.size()+1), "", "", false), im);
+		return im;
+	}
+	
+    private void loadFloorFromFile() {
+    	XPathFactory xPathfactory = XPathFactory.newInstance();
+    	XPath xpath = xPathfactory.newXPath();
+    	try {
+			XPathExpression expr = xpath.compile("/root/layout/floor");
+			NodeList nl = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
+			for (int i=0; i<nl.getLength(); ++i) {
+				String flrName = nl.item(i).getAttributes().getNamedItem("name").getNodeValue();
+				String flrValue = String.valueOf(nl.item(i).getAttributes().getNamedItem("value").getNodeValue());
+				
+				Floor floor = new Floor(flrName, flrValue, "", "", true);
+				
+				expr = xpath.compile("/root/layout/floor[@name=\""+flrName+"\"]/image");
+				NodeList images = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
+				
+				String imgPath = images.item(0).getAttributes().getNamedItem("value").getNodeValue();
+				ImageDrawing imgDrawing = new ImageDrawing(imgPath, flrValue);
+
+				expr = xpath.compile("/root/layout/floor[@name=\""+flrName+"\"]/table");
+				NodeList tables = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
+				
+				int x=0, y=0, width=0, height=0, value=0, rotate=0;
+				for (int j=0; j<tables.getLength(); ++j) {
+					try {
+						x = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("x").getNodeValue());
+						y = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("y").getNodeValue());
+						width = (int) Double.parseDouble(tables.item(j).getAttributes().getNamedItem("width").getNodeValue());
+						height = (int) Double.parseDouble(tables.item(j).getAttributes().getNamedItem("height").getNodeValue());
+						value = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("value").getNodeValue());
+						rotate = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("rot").getNodeValue());
+					} catch (NullPointerException e) {
+						//TODO: implement logic when some value is missing
+						x = 50;
+						y = 50;
+						width = 50;
+						height = 50;
+						value = 1;
+						rotate = 45;						
+					}
+					
+					imgDrawing.addTable(x, y, width, height, rotate, String.valueOf(value), true);
+				}
+				
+				allFloors.put(floor, imgDrawing);
+				
+			}
+    	} catch (XPathExpressionException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    
+    public void saveToXmlAndDb() {
+    	Thread t1 = new Thread() {
+    		@Override
+			public void run() {
+    			System.out.println("thread1");
+    			changeTableAttributesInTree(mainWindow.getRoot());
+		    }
+    	};
+    	Thread t2 = new Thread() {
+    		@Override
+			public void run() {
+    			System.out.println("thread2");
+    			saveToDB();
+    	    }
+    	};
+    	
+    	t1.start();
+    	t2.start();
+    	try {
+			t1.join();
+			t2.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+    }
+
+    private void saveToDB() {
+		System.out.println("Saving.....");
+		
+		try {
+    		PreparedStatement statement = connection.prepareStatement(SELECT_MAX_ID);
+			ResultSet resultSet = statement.executeQuery();
+			
+			int id = resultSet.getInt(1);
+			
+			PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TO_LOCATION);
+
+			for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+				map.getKey().save(connection);
+				
+				String flrName = map.getKey().getTitle();
+				int flrId = Integer.parseInt(map.getKey().getValue());
+				
+				Tables[] tables = map.getValue().getTables();
+				int size = map.getValue().getNumOfRecs();
+				for (int i=0; i<size; ++i) {
+					tables[i].save(connection);
+					
+					int tableId = Integer.parseInt(tables[i].getValue());
+					
+					preparedStatement.setInt(1, id++);
+					preparedStatement.setString(2, flrName);
+					preparedStatement.setString(3, "2 ppl");
+					preparedStatement.setString(4, "");
+					preparedStatement.setString(5, "");
+					preparedStatement.setString(6, "");				
+					preparedStatement.setString(7, "");				
+					preparedStatement.setInt(8, flrId);
+					preparedStatement.setInt(9, tableId);
+					
+					preparedStatement.addBatch();
+				}
+				
+				int[] results = preparedStatement.executeBatch();
+				System.out.println(results.length + " rows added to location.");
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+    	
+    }
+    
+    public void changeAttributesToXml(GMTreeItem treeItem, String xmlTag, String id) {
+    	Enumeration enumer = treeItem.children();
+    	
+    	if (xmlTag.equals(treeItem.getXmlName())) {
+    		System.out.println(xmlTag);
+    	}
+    	
+    	if (enumer.hasMoreElements()) {
+    		changeAttributesToXml((GMTreeItem)enumer.nextElement(), xmlTag, id);
+    	}
+    }
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+	public MainWindow getMainWindow() {
+		return mainWindow;
+	}
+
+	public void setMainWindow(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
+	}
+
+	public boolean getIsFileLoaded() {
+		return isFileLoaded;
+	}
+
+	public void setIsFileLoaded(boolean isFileLoaded) {
+		this.isFileLoaded = isFileLoaded;
+		if (this.isFileLoaded == true) {
+			loadFloorFromFile();
+		}
+	}
+		
 }
