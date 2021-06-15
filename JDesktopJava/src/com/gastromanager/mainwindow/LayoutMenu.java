@@ -44,9 +44,10 @@ import com.gastromanager.db.DbConnection;
 public class LayoutMenu extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
-	
 	private static final String INSERT_TO_LOCATION = "INSERT INTO LOCATION VALUES(?,?,?,?,?,?,?,?,?)";
 	private static final String SELECT_MAX_ID = "SELECT max(id)+1 FROM location";
+	private static final String UPDATE_TO_LOCATION = "UPDATE location SET last_midified_date=? WHERE floor_id=? AND table_id=?";
+	
 	
 	private String absolutePathToImage;
 	private int windowWidth = 0;
@@ -198,7 +199,7 @@ public class LayoutMenu extends JPanel {
 		newItem.addAttributes("height", "");
 		newItem.addAttributes("rot", "");
 		
-		currentDisplayedImage.addTable(newItem.getAttribute("value"), false);	
+		currentDisplayedImage.addTable(newItem.getAttribute("value"), false, false);	
 		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), floorName, btn, "table", newItem);
 	}
 	
@@ -213,6 +214,12 @@ public class LayoutMenu extends JPanel {
 		String op = JOptionPane.showInputDialog("Enter the name of the new floor");
 		if (op == null) {
 			return;
+		}
+		for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+			if (map.getKey().getTitle().equals(op)) {
+				JOptionPane.showMessageDialog(this, "There is already a floor with the same name", null, JOptionPane.ERROR_MESSAGE, null);
+				return;
+			}
 		}
 		btn.setName(op);
 		
@@ -236,7 +243,7 @@ public class LayoutMenu extends JPanel {
 		
 		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), op, btn, "image", imageItem);
 
-		allFloors.put(new Floor(op, String.valueOf(allFloors.size()+1), "", null, false), new ImageDrawing("", String.valueOf(allFloors.size()+1)));
+		allFloors.put(new Floor(op, String.valueOf(allFloors.size()+1), "", false), new ImageDrawing("", String.valueOf(allFloors.size()+1)));
 		
 	}
 	
@@ -363,7 +370,7 @@ public class LayoutMenu extends JPanel {
     
 	private ImageDrawing createFloor(String floorName) {
 		ImageDrawing im = new ImageDrawing(null, String.valueOf(allFloors.size()+1));
-		allFloors.put(new Floor(floorName, String.valueOf(allFloors.size()+1), "", "", false), im);
+		allFloors.put(new Floor(floorName, String.valueOf(allFloors.size()+1), "", false), im);
 		return im;
 	}
 	
@@ -377,7 +384,7 @@ public class LayoutMenu extends JPanel {
 				String flrName = nl.item(i).getAttributes().getNamedItem("name").getNodeValue();
 				String flrValue = String.valueOf(nl.item(i).getAttributes().getNamedItem("value").getNodeValue());
 				
-				Floor floor = new Floor(flrName, flrValue, "", "", true);
+				Floor floor = new Floor(flrName, flrValue, "", true);
 				
 				expr = xpath.compile("/root/layout/floor[@name=\""+flrName+"\"]/image");
 				NodeList images = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
@@ -398,16 +405,14 @@ public class LayoutMenu extends JPanel {
 						value = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("value").getNodeValue());
 						rotate = Integer.parseInt(tables.item(j).getAttributes().getNamedItem("rot").getNodeValue());
 					} catch (NullPointerException e) {
-						//TODO: implement logic when some value is missing
-						x = 50;
-						y = 50;
-						width = 50;
-						height = 50;
-						value = 1;
-						rotate = 45;						
+						x = 0;
+						y = 0;
+						width = 30;
+						height = 30;
+						rotate = 0;
 					}
 					
-					imgDrawing.addTable(x, y, width, height, rotate, String.valueOf(value), true);
+					imgDrawing.addTable(x, y, width, height, rotate, String.valueOf(value), true, true);
 				}
 				
 				allFloors.put(floor, imgDrawing);
@@ -423,14 +428,12 @@ public class LayoutMenu extends JPanel {
     	Thread t1 = new Thread() {
     		@Override
 			public void run() {
-    			System.out.println("thread1");
     			changeTableAttributesInTree(mainWindow.getRoot());
 		    }
     	};
     	Thread t2 = new Thread() {
     		@Override
 			public void run() {
-    			System.out.println("thread2");
     			saveToDB();
     	    }
     	};
@@ -446,8 +449,6 @@ public class LayoutMenu extends JPanel {
     }
 
     private void saveToDB() {
-		System.out.println("Saving.....");
-		
 		try {
     		PreparedStatement statement = connection.prepareStatement(SELECT_MAX_ID);
 			ResultSet resultSet = statement.executeQuery();
@@ -455,7 +456,8 @@ public class LayoutMenu extends JPanel {
 			int id = resultSet.getInt(1);
 			
 			PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TO_LOCATION);
-
+			PreparedStatement updateStatement = connection.prepareStatement(UPDATE_TO_LOCATION);
+			
 			for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
 				map.getKey().save(connection);
 				
@@ -466,24 +468,35 @@ public class LayoutMenu extends JPanel {
 				int size = map.getValue().getNumOfRecs();
 				for (int i=0; i<size; ++i) {
 					tables[i].save(connection);
-					
 					int tableId = Integer.parseInt(tables[i].getValue());
 					
-					preparedStatement.setInt(1, id++);
-					preparedStatement.setString(2, flrName);
-					preparedStatement.setString(3, "2 ppl");
-					preparedStatement.setString(4, "");
-					preparedStatement.setString(5, "");
-					preparedStatement.setString(6, "");				
-					preparedStatement.setString(7, "");				
-					preparedStatement.setInt(8, flrId);
-					preparedStatement.setInt(9, tableId);
-					
-					preparedStatement.addBatch();
+					if (!tables[i].isInDbLocationTable()) {
+						preparedStatement.setInt(1, id++);
+						preparedStatement.setString(2, flrName);
+						preparedStatement.setString(3, "2 ppl");
+						preparedStatement.setString(4, "");
+						preparedStatement.setString(5, tables[i].getCreatedDate());
+						preparedStatement.setString(6, "");				
+						preparedStatement.setString(7, tables[i].getLastModifiedDate());				
+						preparedStatement.setInt(8, flrId);
+						preparedStatement.setInt(9, tableId);
+						
+						preparedStatement.addBatch();
+						tables[i].setInDbLocationTable(true);
+					} else {
+						updateStatement.setString(1, tables[i].getLastModifiedDate());
+						updateStatement.setInt(2, flrId);
+						updateStatement.setInt(3, tableId);
+						updateStatement.addBatch();
+					}
 				}
 				
 				int[] results = preparedStatement.executeBatch();
 				System.out.println(results.length + " rows added to location.");
+				results = updateStatement.executeBatch();
+				System.out.println(results.length + " rows updated to location.");
+				preparedStatement.close();
+				updateStatement.close();
 			}
 			
 		} catch (SQLException e) {

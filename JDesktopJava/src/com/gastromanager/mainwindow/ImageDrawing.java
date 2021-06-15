@@ -78,6 +78,7 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 				    if (SwingUtilities.isRightMouseButton(evt)) {
 				    	doPop(evt);
 				    }
+				    tables[currentSquareIndex].setLastModifiedDate();
 				}
 		 
 				@Override
@@ -139,9 +140,9 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
     	return -1;
     }
     
-    public void addTable(int x, int y, int width, int height, int rotate, String value, boolean isInDb) {
+    public void addTable(int x, int y, int width, int height, int rotate, String value, boolean isInDb, boolean isInDbLocationTable) {
     	if (numOfRecs < MAX) {
-    		tables[numOfRecs] = new Tables(x, y, width, height, rotate, value, floorId, isInDb);
+    		tables[numOfRecs] = new Tables(x, y, width, height, rotate, value, floorId, isInDb, isInDbLocationTable);
 			currentSquareIndex = numOfRecs;
 			numOfRecs++;
 			repaint();
@@ -190,8 +191,8 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 	
 	
 	 
-	public void addTable(String value, boolean isInDb) {
-		this.addTable(0, 0, recW, recW, 0, value, isInDb);
+	public void addTable(String value, boolean isInDb, boolean isInDbLocationTable) {
+		this.addTable(0, 0, recW, recW, 0, value, isInDb, isInDbLocationTable);
 	}
 	
 
