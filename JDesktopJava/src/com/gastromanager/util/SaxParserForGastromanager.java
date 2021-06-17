@@ -79,7 +79,9 @@ public class SaxParserForGastromanager {
         for(DrillDownMenuType menuType : menuTypes) {
             List<DrillDownMenuButton> buttons = menuType.getButtons();
             for(DrillDownMenuButton button: buttons) {
-                button.setMenuItemDetail(menuItemMap.get(button.getName()));
+                button.setMenuItemDetail(menuItemMap.get(button.getTarget()));
+                System.out.println("Added menuitem "+menuItemMap.get(button.getTarget()).getUuid() +" to "
+                +button.getName());
             }
         }
     }
@@ -126,6 +128,7 @@ public class SaxParserForGastromanager {
                     }
                     item = new DrillDownMenuItemDetail();
                     item.setMenuItemName(attributes.getValue("name"));
+                    item.setUuid(attributes.getValue("uuid"));
                     //System.out.println("start of item"+ qName);
                     itemStack.push(item);
                     break;
@@ -179,6 +182,7 @@ public class SaxParserForGastromanager {
                         drillDownMenuButton.setName(attributes.getValue("name"));
                         drillDownMenuButton.setHeight(attributes.getValue("height"));
                         drillDownMenuButton.setWidth(attributes.getValue("width"));
+                        drillDownMenuButton.setTarget(attributes.getValue("target"));
                         drillDownMenuType.getButtons().add(drillDownMenuButton);
                     }
 
@@ -201,7 +205,8 @@ public class SaxParserForGastromanager {
                     DrillDownMenuItemDetail item = itemStack.pop();
                     if(!itemStack.empty()) {
                         DrillDownMenuItemDetail parentItem  = itemStack.peek();
-                        System.out.println("adding "+ item.getMenuItemName() + "to "+parentItem.getMenuItemName());
+                        System.out.println("adding "+ item.getMenuItemName() + "to "+parentItem.getMenuItemName() + " uuid "+
+                                item.getUuid());
                         if(parentItem.getSubItems() == null) {
                             parentItem.setSubItems(new ArrayList<>());
                         }
@@ -210,7 +215,7 @@ public class SaxParserForGastromanager {
                         if(menu.getItemMap() == null) {
                             menu.setItemMap(new HashMap<>());
                         }
-                        menu.getItemMap().put(item.getMenuItemName(), item);
+                        menu.getItemMap().put(item.getUuid(), item);
                         itemStack = null;
                     }
                     break;
