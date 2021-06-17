@@ -23,12 +23,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import androidx.navigation.ui.AppBarConfiguration;
 
 import com.example.gatromanagerclient.databinding.ActivityMain2Binding;
+import com.gastromanager.models.SelectedOrderItem;
+import com.gastromanager.models.SelectedOrderItemOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,6 +54,7 @@ public class MainActivity2 extends AppCompatActivity {
     private LinearLayout menuOptionsView;
     private Map<String, String> optionsSelectionMap;
     EditText orderIdInputTextField;
+    private SelectedOrderItem mainSelectedOrderItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,6 +156,7 @@ public class MainActivity2 extends AppCompatActivity {
         Button addToOrderButton = findViewById(R.id.addToOrderButton);
         addToOrderButton.setOnClickListener(v -> {
             loadOrderItemFromSelection();
+            new AddOrderItemTask().execute(mainSelectedOrderItem);
         });
 
         Button newOrderIdButton = findViewById(R.id.newOrderButton);
@@ -173,12 +178,19 @@ public class MainActivity2 extends AppCompatActivity {
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onClick(View v) {
                     // your handler code here
-                    System.out.println("Got here "+ menuButtonView.getText());
+                    CharSequence itemName = menuButtonView.getText();
+                    System.out.println("main item "+ itemName);
+                    mainSelectedOrderItem = null;
+                    mainSelectedOrderItem = new SelectedOrderItem();
+                    mainSelectedOrderItem.setItemName(itemName.toString());
+                    mainSelectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ?"2" :orderIdInputTextField.getText().toString());
                     if(orderSelectionStack == null) {
                         orderSelectionStack = new Stack<>();
                     }
-                    orderSelectionStack.push(menuButtonView.getText().toString());
-                    loadMenuItemOptionsView(menuButton.getMenuItemDetail(), menuButtonView, menuOptionView, true);
+                    orderSelectionStack.push(itemName.toString());
+                    loadMenuItemOptionsView(menuButton.getMenuItemDetail(), menuButtonView,
+                            menuOptionView, true, itemName.toString(),mainSelectedOrderItem);
+                    loadMenuSubItems(menuButton.getMenuItemDetail(), menuOptionsView, itemName.toString(), mainSelectedOrderItem);
                 }
             });
 
@@ -189,7 +201,8 @@ public class MainActivity2 extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private void loadMenuItemOptionsView(DrillDownMenuItemDetail menuItemDetail, View parentView,
-                                         LinearLayout menuOptionsView, Boolean isRefresh) {
+                                         LinearLayout menuOptionsView, Boolean isRefresh,
+                                         String mainItem, SelectedOrderItem selectedOrderItem) {
 
         if(isRefresh) {
             menuOptionsView.removeAllViews();
@@ -218,6 +231,11 @@ public class MainActivity2 extends AppCompatActivity {
                             optionsSelectionMap = new HashMap<>();
                         }
                         optionsSelectionMap.put(menuItemOptionsSpinner.getTransitionName(), menuItemOptionsSpinner.getSelectedItem().toString());
+                        System.out.println("Option "+menuItemOptionsSpinner.getSelectedItem().toString() +" selected for "+mainItem);
+                        SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
+                        selectedOrderItemOption.setId(getOptionId(optionsMap));
+                        selectedOrderItemOption.setName(menuItemOptionsSpinner.getSelectedItem().toString());
+                        selectedOrderItem.setOption(selectedOrderItemOption);
                     }
                 }
 
@@ -228,9 +246,18 @@ public class MainActivity2 extends AppCompatActivity {
 
             });
             menuOptionsView.addView(menuItemOptionsSpinner);
-            loadMenuSubItems(menuItemDetail, menuOptionsView, menuOptionsView);
+            //loadMenuSubItems(menuItemDetail, menuOptionsView, mainItem, mainSelectedOrderItem);
         }
     }
+
+    private String getOptionId(Map<String, DrillDownMenuItemOptionDetail> optionsMap) {
+        String optionId = null;
+        if(optionsMap != null && optionsMap.entrySet().iterator().hasNext()) {
+            optionId = optionsMap.entrySet().iterator().next().getValue().getId();
+        }
+        return optionId;
+    }
+
     private Boolean checkIfChildViewExists(String itemName, LinearLayout currentView){
         Boolean doesChildExist = false;
         Integer childCount = currentView.getChildCount();
@@ -248,7 +275,8 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void loadMenuSubItems(DrillDownMenuItemDetail menuItemDetail, View parentView, LinearLayout menuOptionsView) {
+    private void loadMenuSubItems(DrillDownMenuItemDetail menuItemDetail, LinearLayout menuOptionsView,
+                                  String mainItem, SelectedOrderItem selectedOrderItem) {
         List<DrillDownMenuItemDetail> subItems = menuItemDetail.getSubItems();
         System.out.println("Sub items "+subItems);
 
@@ -265,10 +293,16 @@ public class MainActivity2 extends AppCompatActivity {
                     menuButtonView.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             // your handler code here
-                            System.out.println("Got here " + menuButtonView.getText());
+                            SelectedOrderItem currSelectedOrderItem = new SelectedOrderItem();
+                            currSelectedOrderItem.setItemName(menuItemName);
+                            System.out.println("Sub item "+menuItemName +" selected for "+mainItem);
                             orderSelectionStack.push(menuButtonView.getText().toString());
-                            loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false);
-                            loadMenuSubItems(subItem, menuButtonView, menuOptionsView);
+                            loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
+                            loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
+                            if(selectedOrderItem.getSubItems() == null) {
+                                selectedOrderItem.setSubItems(new ArrayList<>());
+                            }
+                            selectedOrderItem.getSubItems().add(currSelectedOrderItem);
                         }
                     });
                     menuOptionsView.addView(menuButtonView);
@@ -311,20 +345,33 @@ public class MainActivity2 extends AppCompatActivity {
     }
 
     private void loadOrderItemFromSelection() {
-        //menu item
-        /*int menuItemsCount = menuView.getChildCount();
-        for(int i=0; i< menuItemsCount; i++) {
-            View menuItemView = menuView.getChildAt(i);
-            if(menuItemView instanceof Button) {
-                Button menuItemViewButton  = (Button) menuItemView;
-                menuItemViewButton.
-            }
-        }*/
-        //item options
+        Stack<String> orderDetailOutputStack = new Stack<>();;
         while(!orderSelectionStack.empty()) {
             String itemName = orderSelectionStack.pop();
             String itemOptionSelected = optionsSelectionMap.get(itemName+"Options");
-            System.out.println(itemName + " -> "+ itemOptionSelected);;
+
+            if(itemOptionSelected == null) {
+                orderDetailOutputStack.push(itemName);
+            } else {
+                orderDetailOutputStack.push(itemName + " -> "+ itemOptionSelected);
+            }
+        }
+
+        if(orderDetailOutputStack != null) {
+            StringBuilder orderItemInfoBuilder = new StringBuilder();
+            if(orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
+                orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
+            }
+            while(!orderDetailOutputStack.empty()) {
+                String temp = orderDetailOutputStack.pop();
+                //orderItemInfoBuilder.append(order DetailOutputStack.pop() + "\n");
+                System.out.println("curr item "+temp);
+
+                orderItemInfoBuilder.append(temp + "\n");
+            }
+            System.out.println("Sub items : "+mainSelectedOrderItem.getSubItems());
+            orderDetailsView.setText(orderItemInfoBuilder.toString());
+
         }
     }
 
@@ -408,6 +455,20 @@ public class MainActivity2 extends AppCompatActivity {
         protected void onPostExecute(Integer result) {
             orderIdInputTextField.setText(result.toString());
             super.onPostExecute(result);
+        }
+    }
+
+    private class AddOrderItemTask extends AsyncTask<SelectedOrderItem, Void, Void> {
+        @RequiresApi(api = Build.VERSION_CODES.N)
+
+        @Override
+        protected Void doInBackground(SelectedOrderItem... selectedOrderItems) {
+            Client client = new Client();//.getInstance();
+            //response = client.getResponse(Arrays.stream(request).findFirst().get());
+            client.sendOrderItemData(Arrays.stream(selectedOrderItems).findFirst().get());
+            System.out.println("Sent order item to server");
+            client = null;
+            return null;
         }
     }
 }

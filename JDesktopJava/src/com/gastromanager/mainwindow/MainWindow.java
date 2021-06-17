@@ -2,38 +2,23 @@ package com.gastromanager.mainwindow;
 
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
-import java.awt.Frame;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowStateListener;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.Connection;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -46,28 +31,19 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
-import javax.swing.SpringLayout;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 import com.gastromanager.util.XmlUtil;
+
 
 public class MainWindow extends JFrame {
 
 	private JPanel contentPane;
-	private static GMTreeItem root = new GMTreeItem("Restaurant name");
+	private GMTreeItem root = new GMTreeItem("Restaurant name");
 	private GMTree tree;
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
@@ -87,7 +63,8 @@ public class MainWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow frame = new MainWindow();
+					MainWindow frame = 
+							new MainWindow();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -171,11 +148,6 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Payment", null,tabPayment, null);
 		tabPayment.setPreferredSize(new Dimension(750,650));
 		tabPayment.setLayout(null);
-
-	
-	
-		
-		
 		
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");
@@ -196,12 +168,11 @@ public class MainWindow extends JFrame {
 					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
 					tree.init(tree, drillDownMenu);
 					tree.loaded = true;
-//					tabLayout.setDocument(doc);
-//					tabLayout.setTree(tree);
+					tabLayout.setIsFileLoaded(true);
+
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
-
 			}
 		});
 		mnFileMenu.add(mntmLoad);
@@ -211,22 +182,24 @@ public class MainWindow extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 //				String ex = xmlUtil.writeTreeIntoString(root);
 //				System.out.println(ex);
-				System.out.println(root.getChildCount());
-				 
-				 String newString = xmlUtil.writeTreeIntoString(root);
+//				System.out.println(root.getChildCount());
 
-				 File saveFile = new File("C:\\saved_sample_template.xml");
-					
-					try {
-							FileWriter fileWriter = new FileWriter(saveFile);
-							fileWriter.write(newString);
-							fileWriter.flush();
-							fileWriter.close();
-					} catch (IOException e1) {
-							// TODO Auto-generated catch block
-							e1.printStackTrace();
-						}
-					System.out.println(newString);
+				tabLayout.saveToXmlAndDb();
+				
+				
+				String newString = xmlUtil.writeTreeIntoString(root);
+
+				File saveFile = new File("C:\\saved_sample_template.xml");
+				try {
+						FileWriter fileWriter = new FileWriter(saveFile);
+						fileWriter.write(newString);
+						fileWriter.flush();
+						fileWriter.close();
+				} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+				}
+//				System.out.println(newString);
 			}
 		});
 		mnFileMenu.add(mntmNewMenuItem);
@@ -249,11 +222,8 @@ public class MainWindow extends JFrame {
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
-		
-//		tree.addTreeSelectionListener(createSelectionListener());
-		
 	}
-	
+		
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -280,12 +250,12 @@ public class MainWindow extends JFrame {
 		this.tree = tree;
 	}
 
-	public static GMTreeItem getRoot() {
+	public GMTreeItem getRoot() {
 		return root;
 	}
 
-	public static void setRoot(GMTreeItem root) {
-		MainWindow.root = root;
+	public void setRoot(GMTreeItem root) {
+		this.root = root;
 	}
 
 	public Document getDoc() {
@@ -303,7 +273,29 @@ public class MainWindow extends JFrame {
 	public void setDefaultModel(DefaultTreeModel defaultModel) {
 		this.defaultModel = defaultModel;
 	}
-	
 
+	public MenuElement getNewMElement() {
+		return newMElement;
+	}
+
+	public void setNewMElement(MenuElement newMElement) {
+		this.newMElement = newMElement;
+	}
+
+	public XmlUtil getXmlUtil() {
+		return xmlUtil;
+	}
+
+	public void setXmlUtil(XmlUtil xmlUtil) {
+		this.xmlUtil = xmlUtil;
+	}
+
+	public DrillDownMenu getDrillDownMenu() {
+		return drillDownMenu;
+	}
+
+	public void setDrillDownMenu(DrillDownMenu drillDownMenu) {
+		this.drillDownMenu = drillDownMenu;
+	}
 	
 }
