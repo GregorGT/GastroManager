@@ -7,6 +7,7 @@ public class DrillDownMenuButton implements Serializable {
     String name;
     String width;
     String height;
+    String target;
     DrillDownMenuItemDetail menuItemDetail;
 
     public String getName() {
@@ -39,5 +40,13 @@ public class DrillDownMenuButton implements Serializable {
 
     public void setMenuItemDetail(DrillDownMenuItemDetail menuItemDetail) {
         this.menuItemDetail = menuItemDetail;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 }
