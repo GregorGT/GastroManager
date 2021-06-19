@@ -183,6 +183,7 @@ public class MainActivity2 extends AppCompatActivity {
                     mainSelectedOrderItem = null;
                     mainSelectedOrderItem = new SelectedOrderItem();
                     mainSelectedOrderItem.setItemName(itemName.toString());
+                    mainSelectedOrderItem.setTarget(menuButton.getTarget());
                     mainSelectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ?"2" :orderIdInputTextField.getText().toString());
                     if(orderSelectionStack == null) {
                         orderSelectionStack = new Stack<>();

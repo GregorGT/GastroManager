@@ -11,6 +11,7 @@ public class SelectedOrderItem implements Serializable {
     private String floorId;
     private String tableId;
     private String staffId;
+    private String target;
 
     public String getItemName() {
         return itemName;
@@ -66,5 +67,13 @@ public class SelectedOrderItem implements Serializable {
 
     public void setStaffId(String staffId) {
         this.staffId = staffId;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 }

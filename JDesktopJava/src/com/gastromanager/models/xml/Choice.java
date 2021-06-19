@@ -2,14 +2,17 @@ package com.gastromanager.models.xml;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name="choice")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Choice
 {
+    @XmlAttribute
     private String price;
 
+    @XmlAttribute
     private String name;
 
     public String getPrice ()

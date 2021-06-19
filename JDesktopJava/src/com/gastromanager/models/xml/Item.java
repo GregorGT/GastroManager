@@ -17,7 +17,7 @@ public class Item
     @XmlElement
     private Option option;
 
-    private List<Item> subItem;
+    private List<Item> item;
 
     public String getName ()
     {
@@ -49,12 +49,12 @@ public class Item
         this.option = option;
     }
 
-    public List<Item> getSubItem() {
-        return subItem;
+    public List<Item> getItem() {
+        return item;
     }
 
-    public void setSubItem(List<Item> subItem) {
-        this.subItem = subItem;
+    public void setItem(List<Item> item) {
+        this.item = item;
     }
 
     @Override

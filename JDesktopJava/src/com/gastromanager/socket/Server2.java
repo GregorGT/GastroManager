@@ -75,8 +75,8 @@ public class Server2 {
         String xmlContent = null;
         Menu menu = menuDetail.getMenu();
         Map<String, DrillDownMenuItemDetail> menuMap = menu.getItemMap();
-        DrillDownMenuItemDetail menuItemDetail = menuMap.get(item.getItemName());
-        Item xmlMainItem = createItem(item, menuMap.get(item.getItemName()), totalPrice);
+        DrillDownMenuItemDetail menuItemDetail = menuMap.get(item.getTarget());
+        Item xmlMainItem = createItem(item, menuItemDetail, totalPrice);
         StringWriter sw = new StringWriter();
         JAXB.marshal(xmlMainItem, sw);
         String xmlString = sw.toString();
@@ -122,6 +122,7 @@ public class Server2 {
                     Choice choice = new Choice();
                     choice.setName(choiceDetail.getName());
                     choice.setPrice(choiceDetail.getPrice().toString());
+                    option.setChoice(choice);
                 }
             }
             //sub items
@@ -133,7 +134,7 @@ public class Server2 {
                     ).findAny().get(), totalPrice);
                     xmlSubItems.add(item1);
                 }
-                xmlMainItem.setSubItem(xmlSubItems);
+                xmlMainItem.setItem(xmlSubItems);
             }
 
             xmlMainItem.setOption(option);
