@@ -6,6 +6,7 @@ public class DrillDownMenuItemOptionDetail implements Serializable {
     String id;
     String name;
     Double price;
+    Boolean isOverwritePrice;
     DrillDownMenuItemOptionChoiceDetail choice;
 
     public String getId() {
@@ -30,6 +31,14 @@ public class DrillDownMenuItemOptionDetail implements Serializable {
 
     public void setPrice(Double price) {
         this.price = price;
+    }
+
+    public Boolean getOverwritePrice() {
+        return isOverwritePrice;
+    }
+
+    public void setOverwritePrice(Boolean overwritePrice) {
+        isOverwritePrice = overwritePrice;
     }
 
     public DrillDownMenuItemOptionChoiceDetail getChoice() {

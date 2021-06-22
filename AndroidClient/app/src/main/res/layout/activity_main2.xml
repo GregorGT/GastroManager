@@ -23,7 +23,29 @@
         android:layout_marginTop="39dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
-        android:inputType="textPersonName" />
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/floorIdInputTextField"
+        android:layout_width="67dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textView2"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/cardview_light_background"
+        android:ems="10"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/tableIdInputTextField"
+        android:layout_width="67dp"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@id/textView2"
+        android:layout_marginLeft="100dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/cardview_light_background"
+        android:ems="10"
+        android:inputType="text" />
 
     <Button
         android:id="@+id/fetchOrderInfoButton"
