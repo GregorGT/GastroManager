@@ -2,8 +2,8 @@ package com.gastromanager.util;
 
 
 import com.gastromanager.mainwindow.GMTreeItem;
-
 import com.gastromanager.models.MenuDetail;
+import com.gastromanager.models.OrderItem;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -18,13 +18,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class XmlUtil {
 	
@@ -198,6 +192,63 @@ public class XmlUtil {
 		}
 
 		return menuDetail;
+	}
+
+	public static String formatOrderText(OrderItem orderItem) {
+		StringBuilder orderDetailsBuilder = new StringBuilder();
+
+				//Main Item
+				Node item = orderItem.getXml().getDocumentElement();
+				if (item.getNodeName() == "item") {
+					orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
+					//addOptionOrderInfo(item, orderDetailsBuilder);
+					//Linked items
+					addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
+					//addChildItems(item, orderDetailsBuilder);
+					orderDetailsBuilder.append("\n");
+
+				}
+
+		System.out.println(orderDetailsBuilder.toString());
+		return orderDetailsBuilder.toString().trim();
+	}
+
+	private static void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder) {
+		for (int childId = 0; childId < children.getLength(); childId++) {
+			Node child = children.item(childId);
+			String childItemName  = child.getNodeName();
+			if(childItemName == "item") {
+				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+				addOptionOrderInfo(child, orderDetailsBuilder);
+				//orderDetailsBuilder.append("\n");
+				if(child.hasChildNodes()) {
+					addChildItemInfo(child.getChildNodes(), orderDetailsBuilder);
+				}
+			}
+		}
+	}
+
+	private static void addOptionOrderInfo(Node node, StringBuilder orderDetailsBuilder) {
+		NodeList childNodes  = node.getChildNodes();
+		for (int childId = 0; childId < childNodes.getLength(); childId++) {
+			Node child = childNodes.item(childId);
+			if(child.getNodeName() == "option") {
+				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+				if(child.hasChildNodes()) {
+					NodeList optionChildNodes  = child.getChildNodes();
+					for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
+						Node optionChild = optionChildNodes.item(optionChildId);
+						if(optionChild.getNodeName() == "choice") {
+							orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
+							break;
+						}
+					}
+				}
+				orderDetailsBuilder.append("\n");
+				break;
+			}
+
+		}
 	}
 
 }

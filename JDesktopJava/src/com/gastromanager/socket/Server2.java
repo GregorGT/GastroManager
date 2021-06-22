@@ -19,6 +19,7 @@ import java.net.Socket;
 import java.nio.charset.Charset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,7 +77,9 @@ public class Server2 {
         Menu menu = menuDetail.getMenu();
         Map<String, DrillDownMenuItemDetail> menuMap = menu.getItemMap();
         DrillDownMenuItemDetail menuItemDetail = menuMap.get(item.getTarget());
-        Item xmlMainItem = createItem(item, menuItemDetail, totalPrice);
+        Map<String, Double> optionPriceMap = new HashMap<>();
+        Map<String, Double> choicePriceMap = new HashMap<>();
+        Item xmlMainItem = createItem(item, menuItemDetail, totalPrice, optionPriceMap, choicePriceMap);
         StringWriter sw = new StringWriter();
         JAXB.marshal(xmlMainItem, sw);
         String xmlString = sw.toString();
@@ -86,12 +89,25 @@ public class Server2 {
     }
 
     private OrderItem buildOrderItemEntry(SelectedOrderItem selectedOrderItem) throws Exception {
-        Double orderItemPrice = (double) 0;
+        Double orderItemPrice = new Double(0);
+        selectedOrderItem.setPrice(orderItemPrice);
         String xmlItemInfo = createXmlItemInfo(selectedOrderItem, orderItemPrice);
+        //Order
+        Order order = new Order();
+        order.setId(Integer.valueOf(selectedOrderItem.getOrderId()));
+        order.setAmount(selectedOrderItem.getPrice()); //TODO need to be sum
+        order.setDateTime(LocalDateTime.now());
+        order.setFloorId(selectedOrderItem.getFloorId());
+        order.setTableId(selectedOrderItem.getTableId());
+        order.setHumanReadableId(selectedOrderItem.getOrderId());
+        order.setDateTime(LocalDateTime.now());
+
+
+        //Orderitem
         OrderItem orderItem = new OrderItem();
         orderItem.setOrderId(Integer.valueOf(selectedOrderItem.getOrderId()));
         orderItem.setQuantity(1);
-        orderItem.setPrice(orderItemPrice);
+        orderItem.setPrice(selectedOrderItem.getPrice());
         orderItem.setItemId(0);
         orderItem.setRemark("");
         orderItem.setDateTime(LocalDateTime.now());
@@ -99,10 +115,13 @@ public class Server2 {
         orderItem.setPayed(0);
         orderItem.setXmlText(xmlItemInfo);
         orderItem.setStatus(0);
+        orderItem.setOrder(order);
+
         return orderItem;
     }
 
-    private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  Double totalPrice) {
+    private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  Double totalPrice,
+                            Map<String, Double> optionPriceMap, Map<String, Double> choicePriceMap) {
         Item xmlMainItem = null;
         if(itemDetail != null) {
             Map<String, DrillDownMenuItemOptionDetail> itemOptionDetailMap = itemDetail.getOptionsMap();
@@ -115,14 +134,25 @@ public class Server2 {
             option.setName(selectedOrderItemOption.getName());
             DrillDownMenuItemOptionDetail optionDetail = itemOptionDetailMap.get(selectedOrderItemOption.getName());
             if (optionDetail != null) {
-                totalPrice = totalPrice + optionDetail.getPrice();
+                totalPrice = new Double(totalPrice + optionDetail.getPrice());
+                item.setPrice(Double.valueOf((item.getPrice() == null ? Double.valueOf(0) : item.getPrice() )+ optionDetail.getPrice()));
                 option.setPrice(optionDetail.getPrice().toString());
+                if(optionDetail.getOverwritePrice()) {
+                    optionPriceMap.put(option.getId(), item.getPrice());
+                } else {
+                    optionPriceMap.put(option.getId(), Double.valueOf((optionPriceMap.get(option.getId()) == null ? Double.valueOf(0) : optionPriceMap.get(option.getId() )
+                            + optionDetail.getPrice())));
+                }
                 DrillDownMenuItemOptionChoiceDetail choiceDetail = optionDetail.getChoice();
+
                 if (choiceDetail != null) {
                     Choice choice = new Choice();
                     choice.setName(choiceDetail.getName());
                     choice.setPrice(choiceDetail.getPrice().toString());
+                    totalPrice = new Double(totalPrice + choiceDetail.getPrice() - optionDetail.getPrice());
+                    item.setPrice(Double.valueOf(item.getPrice() + choiceDetail.getPrice() - optionDetail.getPrice()));
                     option.setChoice(choice);
+                    choicePriceMap.put(choiceDetail.getName(), choiceDetail.getPrice());
                 }
             }
             //sub items
@@ -131,8 +161,10 @@ public class Server2 {
                 for (SelectedOrderItem subItem : item.getSubItems()) {
                     Item item1 = createItem(subItem, itemDetail.getSubItems().stream().filter(menuSubItem ->
                             menuSubItem.getMenuItemName().equals(subItem.getItemName())
-                    ).findAny().get(), totalPrice);
+                    ).findAny().get(), totalPrice, optionPriceMap, choicePriceMap);
                     xmlSubItems.add(item1);
+                    //totalPrice = totalPrice + totalPrice;
+                    item.setPrice(Double.valueOf(item.getPrice()+ (subItem.getPrice() == null ? Double.valueOf(0):subItem.getPrice())));
                 }
                 xmlMainItem.setItem(xmlSubItems);
             }
@@ -242,8 +274,9 @@ public class Server2 {
                         System.out.println(orderItems);
                         ArrayList<String> orderDetails = new ArrayList<>();
                         for(OrderItem orderItem:orderItems) {
-                            orderDetails.add(orderItem.getItemId() +" "
-                                    + orderItem.getQuantity() +"\n");
+                            /*orderDetails.add(orderItem.getItemId() +" "
+                                    + orderItem.getQuantity() +"\n");*/
+                            orderDetails.add(XmlUtil.formatOrderText(orderItem));
                         }
 
                         oos.writeObject(orderDetails);

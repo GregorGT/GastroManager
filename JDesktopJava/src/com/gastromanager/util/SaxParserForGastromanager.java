@@ -138,10 +138,13 @@ public class SaxParserForGastromanager {
                         drillDownMenuItemOptionDetail = new DrillDownMenuItemOptionDetail();
                         drillDownMenuItemOptionDetail.setId(attributes.getValue("id"));
                         drillDownMenuItemOptionDetail.setName(attributes.getValue("name"));
-                        drillDownMenuItemOptionDetail.setPrice(Double.valueOf(
-                                (attributes.getValue("price") != null) ? attributes.getValue("price") :
-                                        attributes.getValue("overwrite_price")
-                        ));
+                        if(attributes.getValue("price") == null) {
+                            drillDownMenuItemOptionDetail.setPrice(Double.valueOf(attributes.getValue("overwrite_price")));
+                            drillDownMenuItemOptionDetail.setOverwritePrice(true);
+                        } else {
+                            drillDownMenuItemOptionDetail.setPrice(Double.valueOf(
+                                    (attributes.getValue("price"))));
+                        }
                         DrillDownMenuItemDetail currentItem  = itemStack.peek();
                         if(currentItem.getOptionsMap() == null) {
                             currentItem.setOptionsMap(new HashMap<>());

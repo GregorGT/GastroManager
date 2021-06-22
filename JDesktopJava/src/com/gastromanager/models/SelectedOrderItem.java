@@ -12,6 +12,8 @@ public class SelectedOrderItem implements Serializable {
     private String tableId;
     private String staffId;
     private String target;
+    private String menuId;
+    private Double price;
 
     public String getItemName() {
         return itemName;
@@ -76,4 +78,14 @@ public class SelectedOrderItem implements Serializable {
     public void setTarget(String target) {
         this.target = target;
     }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
+
+
 }

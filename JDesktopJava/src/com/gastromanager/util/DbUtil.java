@@ -1,17 +1,22 @@
 package com.gastromanager.util;
 
 import com.gastromanager.db.DbConnection;
+import com.gastromanager.models.Order;
 import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
+
 
 import java.sql.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DbUtil {
+
+    public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     public static List<OrderItem> getOrderDetails(String orderId) {
     	List<OrderItem> orderItems = null;
         try {
@@ -47,7 +52,8 @@ public class DbUtil {
                 orderInfo = new OrderInfo();
                 orderInfo.setHumanReadableId(result.getString("HUMANREADABLE_ID"));
                 orderInfo.setStaffId(result.getString("STAFF_ID"));
-                DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss");
+
+                org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss");
                 DateTime dt = formatter.parseDateTime(result.getString("DATETIME"));
                 orderInfo.setTimestamp(dt.toString(formatter));
                 orderInfo.setFloorId(result.getString("FLOOR_ID"));
@@ -88,9 +94,96 @@ public class DbUtil {
         return orderItemXmlInfo;
     }
 
+    public static void checkAndAddOrderId(OrderItem orderItem) {
+        String query = "select * from orders where id = '"+orderItem.getOrderId() +"'";
+        Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            //TODO inserts for adding a new order may have to create new transaction, reservation/location, etc entries as well
+            Order order = orderItem.getOrder();
+            if(!resultSet.next() && order != null) {
+                String insertOrder = "INSERT INTO orders (\n" +
+                        "                       id,\n" +
+                        "                       amount,\n" +
+                        "                       menu_id,\n" +
+                        "                       staff_id,\n" +
+                        "                       location_id,\n" +
+                        "                       transaction_id,\n" +
+                        "                       member_id,\n" +
+                        "                       humanreadable_id,\n" +
+                        "                       datetime\n" +
+                        "                   )\n" +
+                        "                   VALUES (\n" +
+                        "                       '"+ orderItem.getOrderId() +"',\n" +
+                        "                       '"+ orderItem.getPrice() +"',\n" +
+                        "                       '"+ orderItem.getOrder().getMenuId() +"',\n" +
+                        "                       '"+ orderItem.getOrder().getStaffId() +"',\n" +
+                        "                       '"+ getLocationId(order.getFloorId(),
+                        order.getTableId())+"',\n" +
+                        "                       '"+ order.getTransactionId() +"',\n" +
+                        "                       '"+ order.getMemberId() +"',\n" +
+                        "                       '"+ order.getHumanReadableId() +"',\n" +
+                        "                       '"+ translateToSqlDate(order.getDateTime()) + "');";
+                System.out.println("insert into order "+insertOrder);
+                statement.executeUpdate(insertOrder);
+
+                //insert into reservation
+                String insertReservation = "INSERT INTO reservations (\n" +
+                        "                             id,\n" +
+                        "                             capacity,\n" +
+                        "                             created_by,\n" +
+                        "                             start_date,\n" +
+                        "                             floor_id,\n" +
+                        "                             table_id,\n" +
+                        "                             end_date\n" +
+                        "                         )\n" +
+                        "                         VALUES (\n" +
+                        "                             '"+ getNewReservationId() +"',\n" +
+                        "                             '0',\n" +
+                        "                             'created_by',\n" +
+                        "                             '"+ translateToSqlDate(LocalDateTime.now()) +"',\n" +
+                        "                             '"+ order.getFloorId() +"',\n" +
+                        "                             '"+ order.getTableId() +"',\n" +
+                        "                             '"+ translateToSqlDate(LocalDateTime.now().plusHours(1))+"')";
+                System.out.println("insert into reservation "+insertReservation);
+                statement.executeUpdate(insertReservation);
+
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+
+    }
+
+    private static String translateToSqlDate(LocalDateTime localDateTime) {
+        return localDateTime.format(DATE_TME_FORMATTER);
+    }
+
+    private static Integer getLocationId(String floorId, String tableId) {
+        Integer locationId  = null;
+        if(floorId != null && tableId != null) {
+            String query = "select id from location where floor_id='" + floorId + "' and table_id='" + tableId + "'";
+            try {
+                Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+                Statement statement = connection.createStatement();
+                ResultSet resultSet = statement.executeQuery(query);
+                while (resultSet.next()) {
+                    locationId = resultSet.getInt("id");
+                    break;
+                }
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        }
+        return locationId;
+    }
+
     public static Integer insertOrder(OrderItem orderItem) {
         Integer noOfRowsInserted = 0;
         try {
+            checkAndAddOrderId(orderItem);
             String insertOrderQuery = "INSERT INTO orderitem (\n" +
                     "                          order_id,\n" +
                     "                          item_id,\n" +
@@ -163,6 +256,24 @@ public class DbUtil {
         Integer nextOrderId = null;
         try {
             String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERS";
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            ResultSet result = stmt.executeQuery();
+            while(result.next()) {
+                nextOrderId = result.getInt("MAX_ID") + 1;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextOrderId;
+    }
+
+    public static Integer getNewReservationId() {
+        Integer nextOrderId = null;
+        try {
+            String query = "SELECT MAX(ID) AS MAX_ID FROM RESERVATIONS";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
