@@ -6,6 +6,8 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -20,9 +22,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 
@@ -227,12 +232,33 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 							tables[currentSquareIndex].setRotate(tables[currentSquareIndex].getRotate()+45);
 							rotate = true;
 						} else if (m.getText().equals("Resize")) {
-							if (tables[currentSquareIndex].width == recW) {
-								tables[currentSquareIndex].setSize((int)tables[currentSquareIndex].width+recW, recW);
-							} else {
-								tables[currentSquareIndex].setSize((int)tables[currentSquareIndex].getWidth()-recW, recW);
-							}
-							resize = true;
+							JTextField height = new JTextField("");
+							JTextField width = new JTextField("");
+							JPanel pan = new JPanel(new GridLayout(0, 1));
+							
+					    	pan.add(new JLabel("Width:"));
+					    	pan.add(height);
+					    	pan.add(new JLabel("Height:"));
+					    	pan.add(width);
+					    	int result = JOptionPane.showConfirmDialog(null, pan, "Width & Height",
+					                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+					    	if (result == JOptionPane.OK_OPTION) {
+					    		System.out.println(Integer.parseInt(width.getText()) + "   "+ Integer.parseInt(height.getText()));
+					    		try {
+					    			width.setText(width.getText().trim());
+					    			height.setText(height.getText().trim());
+					    			if ((Integer.parseInt(width.getText()) > img.getWidth()) || 
+					    					(Integer.parseInt(height.getText()) > img.getHeight())) {
+					    				return;
+					    			}
+					    			tables[currentSquareIndex].setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+					    		} catch (NumberFormatException e) {
+					    			e.printStackTrace();
+					    		}
+				    		} 
+					    	resize = true;
+					    	
 						} else if (m.getText().equals("Activate")) {
 							tables[currentSquareIndex].setColor(Color.YELLOW);
 							activate = true;

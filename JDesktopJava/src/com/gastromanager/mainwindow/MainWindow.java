@@ -149,6 +149,9 @@ public class MainWindow extends JFrame {
 		tabPayment.setPreferredSize(new Dimension(750,650));
 		tabPayment.setLayout(null);
 		
+		BookingsMenu tabBookings = new BookingsMenu();
+		tabbedPane.addTab("Bookings", null,tabBookings, null);
+	
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
@@ -222,6 +225,10 @@ public class MainWindow extends JFrame {
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
+	
+	
+		Thread deleteOld = new DeleteOld();
+		deleteOld.start();
 	}
 		
 	private static void addPopup(Component component, final JPopupMenu popup) {
