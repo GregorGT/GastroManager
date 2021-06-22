@@ -136,7 +136,6 @@ public class Tables extends Rectangle {
 		return lastModifiedDate;
 	}
 	public void setLastModifiedDate() {
-		System.out.println("Updating...");
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		this.lastModifiedDate = sdf.format(date);
