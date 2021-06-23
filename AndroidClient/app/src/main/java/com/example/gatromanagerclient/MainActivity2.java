@@ -299,8 +299,10 @@ public class MainActivity2 extends AppCompatActivity {
                             currSelectedOrderItem.setItemName(menuItemName);
                             System.out.println("Sub item "+menuItemName +" selected for "+mainItem);
                             orderSelectionStack.push(menuButtonView.getText().toString());
-                            loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
-                            loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
+                            if(subItem.getSubItems() != null && subItem.getSubItems().size() > 0 ) {
+                                loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
+                                loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
+                            }
                             if(selectedOrderItem.getSubItems() == null) {
                                 selectedOrderItem.setSubItems(new ArrayList<>());
                             }
