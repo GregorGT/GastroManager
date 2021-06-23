@@ -210,7 +210,7 @@ public class DbUtil {
                     "                          '"+ orderItem.getPayed()+"',\n" +
                     "                          '"+ orderItem.getDateTime()+"',\n" +
                     "                          '"+ orderItem.getStatus()+"',\n" +
-                    "                          '"+ DbUtil.getNewId()+"',\n" +
+                    "                          '"+ DbUtil.getNewId(orderItem)+"',\n" +
                     "                          '1',\n" +
                     "                          '"+ orderItem.getPrice()/orderItem.getQuantity()+"'\n" +
                     "                      )";
@@ -255,12 +255,14 @@ public class DbUtil {
     public static Integer getNewOrderId() {
         Integer nextOrderId = null;
         try {
-            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERS";
+            String query = "SELECT MAX(HUMANREADABLE_ID) AS MAX_ID FROM ORDERS ORDER BY DATETIME DESC";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
-            while(result.next()) {
+            if(result.next()) {
                 nextOrderId = result.getInt("MAX_ID") + 1;
+            } else {
+                nextOrderId = 1;
             }
             stmt.close();
         } catch(SQLException sqlException) {
@@ -271,32 +273,36 @@ public class DbUtil {
     }
 
     public static Integer getNewReservationId() {
-        Integer nextOrderId = null;
+        Integer nextReservationId = null;
         try {
             String query = "SELECT MAX(ID) AS MAX_ID FROM RESERVATIONS";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
-            while(result.next()) {
-                nextOrderId = result.getInt("MAX_ID") + 1;
+            if(result.next()) {
+                nextReservationId = result.getInt("MAX_ID") + 1;
+            } else {
+                nextReservationId = 1;
             }
             stmt.close();
         } catch(SQLException sqlException) {
             sqlException.printStackTrace();
         }
 
-        return nextOrderId;
+        return nextReservationId;
     }
 
-    public static Integer getNewId() {
+    public static Integer getNewId(OrderItem orderItem) {
         Integer nextId = null;
         try {
             String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERITEM";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
-            while(result.next()) {
+            if (result.next()) {
                 nextId = result.getInt("MAX_ID") + 1;
+            } else {
+                nextId = 1;
             }
             stmt.close();
         } catch(SQLException sqlException) {
