@@ -161,6 +161,7 @@ public class MainActivity2 extends AppCompatActivity {
 
         Button newOrderIdButton = findViewById(R.id.newOrderButton);
         newOrderIdButton.setOnClickListener(v -> {
+            orderDetailsView.setText("");
             new GetNextOrderIdTask().execute();//GetOrderDetailsTask().execute(inputOrderId.trim());
         });
 

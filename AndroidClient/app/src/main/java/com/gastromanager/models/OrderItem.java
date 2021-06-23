@@ -9,6 +9,15 @@ public class OrderItem implements Serializable {
     private Integer orderId;
     private Integer itemId;
     private Integer quantity;
+    private String remark;
+    private Document xml;
+    private String xmlText;
+    private Double price;
+    private Integer printStatus;
+    private Integer payed;
+    private LocalDateTime dateTime;
+    private Integer status;
+    private Order order;
 
     public Integer getOrderId() {
         return orderId;
@@ -48,6 +57,14 @@ public class OrderItem implements Serializable {
 
     public void setXml(Document xml) {
         this.xml = xml;
+    }
+
+    public String getXmlText() {
+        return xmlText;
+    }
+
+    public void setXmlText(String xmlText) {
+        this.xmlText = xmlText;
     }
 
     public Double getPrice() {
@@ -90,13 +107,11 @@ public class OrderItem implements Serializable {
         this.status = status;
     }
 
-    private String remark;
-    private Document xml;
-    private Double price;
-    private Integer printStatus;
-    private Integer payed;
-    private LocalDateTime dateTime;
-    private Integer status;
+    public Order getOrder() {
+        return order;
+    }
 
-
+    public void setOrder(Order order) {
+        this.order = order;
+    }
 }
