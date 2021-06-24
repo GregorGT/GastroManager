@@ -2,17 +2,18 @@ package com.gastromanager.models;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 public class SelectedOrderItem implements Serializable {
     private String itemName;
     private SelectedOrderItemOption option;
+    private Map<String, SelectedOrderItemOption> allOptions;
     private List<SelectedOrderItem> subItems;
     private String orderId;
     private String floorId;
     private String tableId;
     private String staffId;
     private String target;
-    private String menuId;
     private Double price;
 
     public String getItemName() {
@@ -29,6 +30,14 @@ public class SelectedOrderItem implements Serializable {
 
     public void setOption(SelectedOrderItemOption option) {
         this.option = option;
+    }
+
+    public Map<String, SelectedOrderItemOption> getAllOptions() {
+        return allOptions;
+    }
+
+    public void setAllOptions(Map<String, SelectedOrderItemOption> allOptions) {
+        this.allOptions = allOptions;
     }
 
     public List<SelectedOrderItem> getSubItems() {
