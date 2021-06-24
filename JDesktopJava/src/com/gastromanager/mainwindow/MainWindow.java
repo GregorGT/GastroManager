@@ -192,7 +192,7 @@ public class MainWindow extends JFrame {
 				
 				String newString = xmlUtil.writeTreeIntoString(root);
 
-				File saveFile = new File("C:\\saved_sample_template.xml");
+				File saveFile = new File("C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml");
 				try {
 						FileWriter fileWriter = new FileWriter(saveFile);
 						fileWriter.write(newString);

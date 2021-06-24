@@ -145,11 +145,15 @@ public class SaxParserForGastromanager {
                             drillDownMenuItemOptionDetail.setPrice(Double.valueOf(
                                     (attributes.getValue("price"))));
                         }
+                        drillDownMenuItemOptionDetail.setMenuId(attributes.getValue("menu_id") == null ?
+                                    null : attributes.getValue("menu_id"));
+
                         DrillDownMenuItemDetail currentItem  = itemStack.peek();
                         if(currentItem.getOptionsMap() == null) {
                             currentItem.setOptionsMap(new HashMap<>());
                         }
                         currentItem.getOptionsMap().put(drillDownMenuItemOptionDetail.getName(), drillDownMenuItemOptionDetail);
+                        //checkAndAddMenuIdEntry(drillDownMenuItemOptionDetail, currentItem);
                     }
 
                     break;
@@ -192,6 +196,21 @@ public class SaxParserForGastromanager {
                     break;
                 default:
                     //System.out.println("start of "+qName);
+            }
+        }
+
+        private void checkAndAddMenuIdEntry(DrillDownMenuItemOptionDetail drillDownMenuItemOptionDetail,
+                                            DrillDownMenuItemDetail currentItem) {
+
+            if(drillDownMenuItemOptionDetail.getMenuId() != null) {
+                SelectedOrderItem menuIdSelectionOrderItem = new SelectedOrderItem();
+                menuIdSelectionOrderItem.setPrice(drillDownMenuItemOptionDetail.getPrice());
+                menuIdSelectionOrderItem.setItemName(currentItem.getMenuItemName());
+                menuIdSelectionOrderItem.setTarget(currentItem.getUuid());
+
+                //menu
+                menu.getQuickMenuIdRefMap().put(drillDownMenuItemOptionDetail.getMenuId(),
+                        menuIdSelectionOrderItem);
             }
         }
 

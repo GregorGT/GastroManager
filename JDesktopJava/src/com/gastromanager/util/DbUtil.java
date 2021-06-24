@@ -255,6 +255,7 @@ public class DbUtil {
     public static Integer getNewOrderId() {
         Integer nextOrderId = null;
         try {
+            //TODO add a check with current date
             String query = "SELECT MAX(HUMANREADABLE_ID) AS MAX_ID FROM ORDERS ORDER BY DATETIME DESC";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
