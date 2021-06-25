@@ -37,7 +37,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
-import org.jdatepicker.DateModel;
 import org.jdatepicker.JDatePicker;
 
 import com.gastromanager.db.DbConnection;
@@ -80,8 +79,6 @@ public class BookingsMenu extends JPanel{
 	private JTextField textField;
 	
 	BookingsMenu() {
-		
-//		deleteOldReservations();
 		
 		this.setLayout(new BorderLayout(5,5));	
 		
