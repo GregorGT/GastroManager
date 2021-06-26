@@ -9,6 +9,9 @@ public class Option
     @XmlAttribute
     private String price;
 
+    @XmlAttribute(name="overwrite_price")
+    private String overwritePrice;
+
     @XmlAttribute
     private String name;
 
@@ -26,6 +29,14 @@ public class Option
     public void setPrice (String price)
     {
         this.price = price;
+    }
+
+    public String getOverwritePrice() {
+        return overwritePrice;
+    }
+
+    public void setOverwritePrice(String overwrite_price) {
+        this.overwritePrice = overwrite_price;
     }
 
     public String getName ()

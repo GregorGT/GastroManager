@@ -70,14 +70,14 @@ public class Server2 {
 
     }
 
-    private String createXmlItemInfo(SelectedOrderItem item, Double totalPrice, OrderItem orderItem) {
+    private String createXmlItemInfo(SelectedOrderItem item, OrderPrice orderPrice, OrderItem orderItem) {
         String xmlContent = null;
         Menu menu = menuDetail.getMenu();
         Map<String, DrillDownMenuItemDetail> menuMap = menu.getItemMap();
         DrillDownMenuItemDetail menuItemDetail = menuMap.get(item.getTarget());
         Map<String, Double> optionPriceMap = new HashMap<>();
         Map<String, Double> choicePriceMap = new HashMap<>();
-        Item xmlMainItem = createItem(item, menuItemDetail, totalPrice, optionPriceMap, choicePriceMap, orderItem);
+        Item xmlMainItem = createItem(item, menuItemDetail, orderPrice, optionPriceMap, choicePriceMap, orderItem);
         StringWriter sw = new StringWriter();
         JAXB.marshal(xmlMainItem, sw);
         String xmlString = sw.toString();
@@ -87,14 +87,19 @@ public class Server2 {
     }
 
     private OrderItem buildOrderItemEntry(SelectedOrderItem selectedOrderItem) throws Exception {
-        Double orderItemPrice = new Double(0);
-        selectedOrderItem.setPrice(orderItemPrice);
+        OrderPrice orderPrice = new OrderPrice((double) 0, false);
         OrderItem orderItem = new OrderItem();
-        String xmlItemInfo = createXmlItemInfo(selectedOrderItem, orderItemPrice, orderItem);
+        String xmlItemInfo = createXmlItemInfo(selectedOrderItem, orderPrice, orderItem);
+        System.out.println("Price choice: "+orderPrice.getChoicePrice() +
+                "price: "+orderPrice.getPrice());
+        selectedOrderItem.setPrice(
+                (orderPrice.getPrice() != null ? orderPrice.getPrice() : (double) 0) +
+                        (orderPrice.getChoicePrice() != null ? orderPrice.getChoicePrice() : (double) 0));
         //Order
         Order order = new Order();
         order.setId(Integer.valueOf(selectedOrderItem.getOrderId()));
-        order.setAmount(selectedOrderItem.getPrice()); //TODO need to be sum
+        //order.setAmount(selectedOrderItem.getPrice()); //TODO need to be sum
+        order.setAmount(selectedOrderItem.getPrice());
         order.setDateTime(LocalDateTime.now());
         order.setFloorId(selectedOrderItem.getFloorId());
         order.setTableId(selectedOrderItem.getTableId());
@@ -106,6 +111,7 @@ public class Server2 {
         //OrderItem orderItem = new OrderItem();
         orderItem.setOrderId(Integer.valueOf(selectedOrderItem.getOrderId()));
         orderItem.setQuantity(1);
+        //orderItem.setPrice(selectedOrderItem.getPrice());
         orderItem.setPrice(selectedOrderItem.getPrice());
         //orderItem.setItemId(0);
         orderItem.setRemark("");
@@ -119,7 +125,7 @@ public class Server2 {
         return orderItem;
     }
 
-    private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  Double totalPrice,
+    private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  OrderPrice orderPrice,
                             Map<String, Double> optionPriceMap, Map<String, Double> choicePriceMap, OrderItem orderItem) {
         Item xmlMainItem = null;
         if(itemDetail != null) {
@@ -134,14 +140,31 @@ public class Server2 {
                 option.setName(selectedOrderItemOption.getName());
                 DrillDownMenuItemOptionDetail optionDetail = itemOptionDetailMap.get(selectedOrderItemOption.getName());
                 if (optionDetail != null) {
-                    totalPrice = new Double(totalPrice + optionDetail.getPrice());
-                    item.setPrice(Double.valueOf((item.getPrice() == null ? Double.valueOf(0) : item.getPrice()) + optionDetail.getPrice()));
-                    option.setPrice(optionDetail.getPrice().toString());
+                    //item.setPrice(Double.valueOf((item.getPrice() == null ? Double.valueOf(0) : item.getPrice()) + optionDetail.getPrice()));
                     if (optionDetail.getOverwritePrice()) {
+                        option.setOverwritePrice(optionDetail.getPrice().toString());
                         optionPriceMap.put(option.getId(), item.getPrice());
+                        orderPrice.setPrice(optionDetail.getPrice());
+                        System.out.println(" Price set to in overwrite "+orderPrice.getPrice() );
+                        orderPrice.setOverwritePrice(true);
                     } else {
-                        optionPriceMap.put(option.getId(), Double.valueOf((optionPriceMap.get(option.getId()) == null ? Double.valueOf(0) : optionPriceMap.get(option.getId())
-                                + optionDetail.getPrice())));
+                        option.setPrice(optionDetail.getPrice().toString());
+                        //If already added we need to update by subtracting the earlier price
+                        Double currentOptionPrice = optionPriceMap.get(option.getId()+option.getName());
+                        System.out.println("Existing price "+currentOptionPrice);
+                        Double newPrice = (double) 0;
+                        if(currentOptionPrice == null) {
+                            newPrice = optionDetail.getPrice();
+                        } else {
+                            newPrice = optionDetail.getPrice() - currentOptionPrice;
+                        }
+                        //update
+                        optionPriceMap.put(option.getId()+option.getName(), optionDetail.getPrice());
+
+                        if(!orderPrice.getOverwritePrice()) {
+                            orderPrice.setPrice(orderPrice.getPrice() + newPrice);
+                            System.out.println(" Price set to  "+orderPrice.getPrice() );
+                        }
                     }
                     DrillDownMenuItemOptionChoiceDetail choiceDetail = optionDetail.getChoice();
 
@@ -149,8 +172,9 @@ public class Server2 {
                         Choice choice = new Choice();
                         choice.setName(choiceDetail.getName());
                         choice.setPrice(choiceDetail.getPrice().toString());
-                        totalPrice = new Double(totalPrice + choiceDetail.getPrice() - optionDetail.getPrice());
-                        item.setPrice(Double.valueOf(item.getPrice() + choiceDetail.getPrice() - optionDetail.getPrice()));
+                        orderPrice.setChoicePrice(choiceDetail.getPrice()); //choiceDetail.getPrice() - optionDetail.getPrice()
+                        System.out.println(" Price set to in choice "+orderPrice.getChoicePrice() + " optionPrice "+optionDetail.getPrice() );
+                        //item.setPrice(Double.valueOf(item.getPrice() + choiceDetail.getPrice() - optionDetail.getPrice()));
                         option.setChoice(choice);
                         choicePriceMap.put(choiceDetail.getName(), choiceDetail.getPrice());
                     }
@@ -164,10 +188,10 @@ public class Server2 {
                     Item item1 = createItem(subItem, itemDetail.getSubItems().stream().filter(menuSubItem ->
                             menuSubItem.getMenuItemName().equals(subItem.getItemName())
                             //menuSubItem.getUuid().equals(subItem.getTarget())
-                    ).findAny().get(), totalPrice, optionPriceMap, choicePriceMap, orderItem);
+                    ).findAny().get(), orderPrice, optionPriceMap, choicePriceMap, orderItem);
                     xmlSubItems.add(item1);
                     //totalPrice = totalPrice + totalPrice;
-                    item.setPrice(Double.valueOf(item.getPrice()+ (subItem.getPrice() == null ? Double.valueOf(0):subItem.getPrice())));
+                    //item.setPrice(Double.valueOf(item.getPrice()+ (subItem.getPrice() == null ? Double.valueOf(0):subItem.getPrice())));
                 }
                 xmlMainItem.setItem(xmlSubItems);
             } else {
@@ -242,6 +266,14 @@ public class Server2 {
                 selectedOrderItem.setItemName(parent.getMenuItemName());
                 selectedOrderItem.setTarget(parent.getUuid());
                 selectedOrderItem.setPrice(optionDetail.getPrice());
+                //add option to parent
+                DrillDownMenuItemOptionDetail menuItemOptionDetail = parent.getOptionsMap().get(optionDetail.getName());
+                if(menuItemOptionDetail != null) {
+                    SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
+                    selectedOrderItemOption.setName(menuItemOptionDetail.getName());
+                    selectedOrderItemOption.setId(menuItemOptionDetail.getId());
+                    selectedOrderItem.setOption(selectedOrderItemOption);
+                }
 
                 //sub item
                 SelectedOrderItem selectedOrderSubItem = new SelectedOrderItem();
@@ -283,7 +315,8 @@ public class Server2 {
                             SelectedOrderItem currParentSelectedOrderItem = new SelectedOrderItem();
                             currParentSelectedOrderItem.setItemName(drillDownMenuItemDetail.getMenuItemName());
                             currParentSelectedOrderItem.setTarget(drillDownMenuItemDetail.getUuid());
-                            currParentSelectedOrderItem.setAllOptions(optionsMap);
+                            //currParentSelectedOrderItem.setAllOptions(optionsMap);
+                            currParentSelectedOrderItem.setOption(selectedOrderItemOption);
                             List<SelectedOrderItem> currSubItems = new ArrayList<>();
                             currSubItems.add(selectedOrderItem);
                             currParentSelectedOrderItem.setSubItems(currSubItems);

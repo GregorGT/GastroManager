@@ -225,10 +225,6 @@ public class MainWindow extends JFrame {
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
-	
-	
-		Thread deleteOld = new DeleteOld();
-		deleteOld.start();
 	}
 		
 	private static void addPopup(Component component, final JPopupMenu popup) {
