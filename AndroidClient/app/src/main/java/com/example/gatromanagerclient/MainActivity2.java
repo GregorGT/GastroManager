@@ -474,6 +474,15 @@ public class MainActivity2 extends AppCompatActivity {
                             if(subItem.getSubItems() != null && subItem.getSubItems().size() > 0 ) {
                                 loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
                                 loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
+                            } else {
+                                if(mainSelectedOrderItem.getOption() != null) {
+                                    DrillDownMenuItemOptionDetail currMenuOptionDetail =
+                                            subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName());
+                                    if(currMenuOptionDetail != null && currMenuOptionDetail.getId().equals(mainSelectedOrderItem.getOption().getId())) {
+                                        currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
+                                    }
+                                }
+
                             }
                             if(selectedOrderItem.getSubItems() == null) {
                                 selectedOrderItem.setSubItems(new ArrayList<>());
