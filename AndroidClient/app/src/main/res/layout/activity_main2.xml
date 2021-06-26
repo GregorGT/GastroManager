@@ -116,5 +116,23 @@
         android:layout_marginTop="160dp"
         android:text="New Order" />
 
+    <EditText
+        android:id="@+id/menuIdInputTextField"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="400dp"
+        android:layout_marginTop="100dp"
+        android:background="@color/cardview_light_background"
+        android:ems="10"
+        android:inputType="text" />
+
+    <Button
+        android:id="@+id/selectMenuIdButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="400dp"
+        android:layout_marginTop="160dp"
+        android:text="Select Menu Item" />
+
 
 </RelativeLayout>

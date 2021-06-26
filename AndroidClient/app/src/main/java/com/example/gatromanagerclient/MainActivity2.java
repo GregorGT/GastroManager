@@ -4,32 +4,28 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-
-import com.gastromanager.models.DrillDownMenuButton;
-import com.gastromanager.models.DrillDownMenuItemDetail;
-import com.gastromanager.models.DrillDownMenuItemOptionDetail;
-import com.gastromanager.models.DrillDownMenuType;
-import com.gastromanager.models.MenuDetail;
-import com.example.gatromanagerclient.socket.Client;
-import com.example.gatromanagerclient.util.SaxParserForGastromanager;
-import com.example.gatromanagerclient.util.Util;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.ui.AppBarConfiguration;
 
 import com.example.gatromanagerclient.databinding.ActivityMain2Binding;
+import com.example.gatromanagerclient.socket.Client;
+import com.example.gatromanagerclient.util.SaxParserForGastromanager;
+import com.example.gatromanagerclient.util.Util;
+import com.gastromanager.models.DrillDownMenuButton;
+import com.gastromanager.models.DrillDownMenuItemDetail;
+import com.gastromanager.models.DrillDownMenuItemOptionDetail;
+import com.gastromanager.models.DrillDownMenuType;
+import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.SelectedOrderItem;
 import com.gastromanager.models.SelectedOrderItemOption;
 
@@ -54,8 +50,13 @@ public class MainActivity2 extends AppCompatActivity {
     private LinearLayout menuOptionsView;
     private Map<String, String> optionsSelectionMap;
     EditText orderIdInputTextField;
+    EditText floorIdInputTextField;
+    EditText tableIdInputTextField;
+    EditText menuIdInputTextField;
+    private Button selectMenuIdButton;
     private SelectedOrderItem mainSelectedOrderItem;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +68,10 @@ public class MainActivity2 extends AppCompatActivity {
         orderDetailsView = findViewById(R.id.textView2);
         System.out.println("Current order details :" + orderDetailsView.getText());
         orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
+        floorIdInputTextField = findViewById(R.id.floorIdInputTextField);
+        tableIdInputTextField = findViewById(R.id.tableIdInputTextField);
+        menuIdInputTextField = findViewById(R.id.menuIdInputTextField);
+
         fetchOrderDetailsButton = findViewById(R.id.fetchOrderInfoButton);
         fetchOrderDetailsButton.setOnClickListener(v -> {
                     System.out.println("inside get order");
@@ -157,6 +162,7 @@ public class MainActivity2 extends AppCompatActivity {
         addToOrderButton.setOnClickListener(v -> {
             loadOrderItemFromSelection();
             new AddOrderItemTask().execute(mainSelectedOrderItem);
+            menuOptionsView.removeAllViews();
         });
 
         Button newOrderIdButton = findViewById(R.id.newOrderButton);
@@ -164,8 +170,101 @@ public class MainActivity2 extends AppCompatActivity {
             orderDetailsView.setText("");
             new GetNextOrderIdTask().execute();//GetOrderDetailsTask().execute(inputOrderId.trim());
         });
+        selectMenuIdButton = findViewById(R.id.selectMenuIdButton);
+        selectMenuIdButton.setOnClickListener(v -> {
+            String menuId = menuIdInputTextField.getText().toString();
+            SelectedOrderItem selectedOrderItem = loadSelectedOrderFromMenuId(menuId);
+
+            if(selectedOrderItem != null) {
+                selectedOrderItem.setFloorId((floorIdInputTextField.getText() == null) ? null : floorIdInputTextField.getText().toString());
+                selectedOrderItem.setTableId((tableIdInputTextField.getText() == null) ? null : tableIdInputTextField.getText().toString());
+                selectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ? null : orderIdInputTextField.getText().toString());
+
+                if (selectedOrderItem.getOption() != null) {
+                    StringBuilder orderItemInfoBuilder = new StringBuilder();
+                    if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
+                        orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
+                    }
+                    orderItemInfoBuilder.append(selectedOrderItem.getItemName() + "\t" +
+                            selectedOrderItem.getSubItems().get(0).getItemName() + "\t" +
+                            selectedOrderItem.getSubItems().get(0).getOption().getName() + "\n");
+                    orderDetailsView.setText(orderItemInfoBuilder.toString());
+
+                    new AddOrderItemTask().execute(selectedOrderItem);
+                } else {
+
+                    buildOptionsSpinner(selectedOrderItem, selectedOrderItem);
+                }
+            }
+
+        });
 
 
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void buildOptionsSpinner(SelectedOrderItem selectedOrderItem, SelectedOrderItem root) {
+        if (selectedOrderItem.getAllOptions() != null) {
+            Spinner menuIdItemOptionsSpinner = new Spinner(this);
+            System.out.println("adding spinner for "+selectedOrderItem.getItemName());
+            menuIdItemOptionsSpinner.setTransitionName(selectedOrderItem.getItemName() + "Options");
+            List<String> optionKeys = new ArrayList<>();
+            optionKeys.add("");
+            for(Map.Entry<String, SelectedOrderItemOption> option: selectedOrderItem.getAllOptions().entrySet()) {
+                optionKeys.add(option.getKey());
+            }
+            System.out.println("Options " + optionKeys);
+            ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+                    (this, android.R.layout.simple_spinner_item, optionKeys);
+            arrayAdapter.setDropDownViewResource(android.R.layout
+                    .simple_spinner_dropdown_item);
+            menuIdItemOptionsSpinner.setAdapter(arrayAdapter);
+            menuIdItemOptionsSpinner.setSelection(0);
+            menuIdItemOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String selectedItem =  parent.getItemAtPosition(position).toString();
+                    SelectedOrderItemOption selectedOrderItemOption = selectedOrderItem.getAllOptions().get(selectedItem);
+                    if(selectedOrderItemOption != null) {
+                        selectedOrderItem.setOption(selectedOrderItemOption);
+                        StringBuilder orderItemInfoBuilder = new StringBuilder();
+                        if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
+                            orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
+                        }
+                        loadMenuItemDesc(selectedOrderItem, orderItemInfoBuilder);
+                        orderDetailsView.setText(orderItemInfoBuilder.toString());
+
+                        new AddOrderItemTask().execute(root);
+                        menuOptionsView.removeAllViews();
+                    }
+                }
+
+                private void loadMenuItemDesc(SelectedOrderItem selectedOrderItem,StringBuilder orderItemInfoBuilder) {
+                    orderItemInfoBuilder.append(selectedOrderItem.getItemName() + "\t");
+                    if(selectedOrderItem.getSubItems() != null) {
+                        loadMenuItemDesc(selectedOrderItem.getSubItems().get(0), orderItemInfoBuilder );
+                    } else {
+                        orderItemInfoBuilder.append(selectedOrderItem.getOption() !=null ?
+                                selectedOrderItem.getOption().getName()+"\n":"");
+                    }
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+            menuOptionsView.addView(menuIdItemOptionsSpinner);
+        } else {
+            if(selectedOrderItem.getSubItems() != null && selectedOrderItem.getSubItems().size() > 0) {
+                buildOptionsSpinner(selectedOrderItem.getSubItems().get(0), root);
+            }
+        }
+    }
+
+    private SelectedOrderItem loadSelectedOrderFromMenuId(String menuId) {
+        return menuDetail.getMenu().getQuickMenuIdRefMap().get(menuId);
     }
 
     private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, LinearLayout view, LinearLayout menuOptionView) {
@@ -185,7 +284,12 @@ public class MainActivity2 extends AppCompatActivity {
                     mainSelectedOrderItem = new SelectedOrderItem();
                     mainSelectedOrderItem.setItemName(itemName.toString());
                     mainSelectedOrderItem.setTarget(menuButton.getTarget());
-                    mainSelectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ?"2" :orderIdInputTextField.getText().toString());
+                    mainSelectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ? null :orderIdInputTextField.getText().toString());
+                    //floor id and table id
+                    mainSelectedOrderItem.setFloorId((floorIdInputTextField.getText() == null) ? null :floorIdInputTextField.getText().toString());
+                    mainSelectedOrderItem.setTableId((tableIdInputTextField.getText() == null) ? null :tableIdInputTextField.getText().toString());
+
+
                     if(orderSelectionStack == null) {
                         orderSelectionStack = new Stack<>();
                     }
