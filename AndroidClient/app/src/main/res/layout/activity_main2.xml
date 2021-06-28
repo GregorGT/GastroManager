@@ -90,7 +90,7 @@
         android:layout_height="300dp"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="400dp"
-        android:orientation="horizontal" />
+        android:orientation="vertical" />
 
     <LinearLayout
         android:id="@+id/menuItemOptionsView"

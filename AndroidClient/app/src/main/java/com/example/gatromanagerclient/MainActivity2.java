@@ -4,12 +4,16 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -180,7 +184,7 @@ public class MainActivity2 extends AppCompatActivity {
                 selectedOrderItem.setTableId((tableIdInputTextField.getText() == null) ? null : tableIdInputTextField.getText().toString());
                 selectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ? null : orderIdInputTextField.getText().toString());
 
-                if (selectedOrderItem.getOption() != null) {
+                if (checkIfItemIsReadyForSelection(selectedOrderItem)) {
                     StringBuilder orderItemInfoBuilder = new StringBuilder();
                     if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
                         orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
@@ -192,13 +196,18 @@ public class MainActivity2 extends AppCompatActivity {
 
                     new AddOrderItemTask().execute(selectedOrderItem);
                 } else {
-
                     buildOptionsSpinner(selectedOrderItem, selectedOrderItem);
                 }
             }
 
         });
 
+
+    }
+
+    private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem selectedOrderItem) {
+         return (selectedOrderItem.getSubItems() != null && selectedOrderItem.getSubItems().size() ==1
+        && selectedOrderItem.getSubItems().get(0).getOption() != null && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
 
     }
 
@@ -316,6 +325,7 @@ public class MainActivity2 extends AppCompatActivity {
         Map<String, DrillDownMenuItemOptionDetail> optionsMap = menuItemDetail.getOptionsMap();
         if(optionsMap != null) {
             Spinner menuItemOptionsSpinner = new Spinner(this);
+
             menuItemOptionsSpinner.setTransitionName(menuItemDetail.getMenuItemName()+"Options");
             List<String> optionKeys = new ArrayList<>();
             optionKeys.add("");
@@ -351,9 +361,67 @@ public class MainActivity2 extends AppCompatActivity {
                 }
 
             });
+
             menuOptionsView.addView(menuItemOptionsSpinner);
+            //createAndLoadPopupWindow(menuOptionsView, menuItemOptionsSpinner);
             //loadMenuSubItems(menuItemDetail, menuOptionsView, mainItem, mainSelectedOrderItem);
         }
+    }
+
+    private void createAndLoadPopupWindow(View parentView, View currentView) {
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        //View popupView = inflater.inflate(R.layout.popup_window, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(currentView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(parentView, Gravity.CENTER, 0, 0);
+
+        /*// dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });*/
+
+    }
+
+    private View createAndLoadPopupWindow(View view) {
+        // inflate the layout of the popup window
+        LayoutInflater inflater = (LayoutInflater)
+                getSystemService(LAYOUT_INFLATER_SERVICE);
+        View popupView = inflater.inflate(R.layout.popup_window, null);
+
+        // create the popup window
+        int width = LinearLayout.LayoutParams.WRAP_CONTENT;
+        int height = LinearLayout.LayoutParams.WRAP_CONTENT;
+        boolean focusable = true; // lets taps outside the popup also dismiss it
+        final PopupWindow popupWindow = new PopupWindow(popupView, width, height, focusable);
+
+        // show the popup window
+        // which view you pass in doesn't matter, it is only used for the window tolken
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // dismiss the popup window when touched
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+
+        return popupView;
+
     }
 
     private String getOptionId(Map<String, DrillDownMenuItemOptionDetail> optionsMap) {
@@ -406,6 +474,15 @@ public class MainActivity2 extends AppCompatActivity {
                             if(subItem.getSubItems() != null && subItem.getSubItems().size() > 0 ) {
                                 loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
                                 loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
+                            } else {
+                                if(mainSelectedOrderItem.getOption() != null) {
+                                    DrillDownMenuItemOptionDetail currMenuOptionDetail =
+                                            subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName());
+                                    if(currMenuOptionDetail != null && currMenuOptionDetail.getId().equals(mainSelectedOrderItem.getOption().getId())) {
+                                        currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
+                                    }
+                                }
+
                             }
                             if(selectedOrderItem.getSubItems() == null) {
                                 selectedOrderItem.setSubItems(new ArrayList<>());
