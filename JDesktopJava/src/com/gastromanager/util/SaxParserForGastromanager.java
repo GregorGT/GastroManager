@@ -189,6 +189,8 @@ public class SaxParserForGastromanager {
                         drillDownMenuButton.setName(attributes.getValue("name"));
                         drillDownMenuButton.setHeight(attributes.getValue("height"));
                         drillDownMenuButton.setWidth(attributes.getValue("width"));
+                        drillDownMenuButton.setxPosition(attributes.getValue("x-position"));
+                        drillDownMenuButton.setyPosition(attributes.getValue("y-position"));
                         drillDownMenuButton.setTarget(attributes.getValue("target"));
                         drillDownMenuType.getButtons().add(drillDownMenuButton);
                     }
