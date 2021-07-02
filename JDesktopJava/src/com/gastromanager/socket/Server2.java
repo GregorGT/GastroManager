@@ -427,31 +427,29 @@ public class Server2 {
                     Integer noOfRowsInserted = DbUtil.insertOrder(dbOrderItem);
                     System.out.println((noOfRowsInserted ==1) ? "Order Inserted": " Order not inserted");
 
+                } else if(clientMessage instanceof OrderDetailQuery) {
+                    //send result to client
+                    List<OrderItem> orderItems = DbUtil.getOrderDetails((OrderDetailQuery) clientMessage);
+                    if(orderItems != null) {
+                        System.out.println(orderItems);
+                        ArrayList<String> orderDetails = new ArrayList<>();
+                        for (OrderItem orderItem : orderItems) {
+                            /*orderDetails.add(orderItem.getItemId() +" "
+                                    + orderItem.getQuantity() +"\n");*/
+                            orderDetails.add(XmlUtil.formatOrderText(orderItem));
+                        }
+
+                        oos.writeObject(orderDetails);
+                    }
                 } else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;
                     System.out.println("Received request for " + request);
 
-                    if (isNumeric(request)) { //order details id 1
-                        //send result to client
-                        List<OrderItem> orderItems = DbUtil.getOrderDetails(request);
-                        if(orderItems != null) {
-                            System.out.println(orderItems);
-                            ArrayList<String> orderDetails = new ArrayList<>();
-                            for (OrderItem orderItem : orderItems) {
-                            /*orderDetails.add(orderItem.getItemId() +" "
-                                    + orderItem.getQuantity() +"\n");*/
-                                orderDetails.add(XmlUtil.formatOrderText(orderItem));
-                            }
-
-                            oos.writeObject(orderDetails);
-                        }
-                    } else {
-                        if (request.equals("menu")) { //menu
-                            sendMenuDetail(oos);
-                        } else if(request.equals("newOrderId")) {
-                            System.out.println("Next order id "+DbUtil.getNewOrderId());
-                            oos.writeObject(DbUtil.getNewOrderId());
-                        }
+                    if (request.equals("menu")) { //menu
+                        sendMenuDetail(oos);
+                    } else if(request.equals("newOrderId")) {
+                        System.out.println("Next order id "+DbUtil.getNewHumanReadableOrderId());
+                        oos.writeObject(DbUtil.getNewHumanReadableOrderId());
                     }
 
                     if (request.equals("Exit")) {

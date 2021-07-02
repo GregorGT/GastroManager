@@ -4,6 +4,7 @@ import com.gastromanager.db.DbConnection;
 import com.gastromanager.models.Order;
 import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
+import com.gastromanager.models.OrderDetailQuery;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -17,8 +18,42 @@ import java.util.List;
 public class DbUtil {
 
     public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
-    public static List<OrderItem> getOrderDetails(String orderId) {
+    public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery) {
     	List<OrderItem> orderItems = null;
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Integer locationId = getLocationId(orderDetailQuery.getFloorId(), orderDetailQuery.getTableId());
+            if(locationId != null) {
+                Integer orderId = getOrderId(orderDetailQuery, locationId);
+                if(orderId != null) {
+                    PreparedStatement stmt=connection.prepareStatement(
+                            "SELECT * from ORDERITEM WHERE \n" +
+                                    "ORDER_ID = ?\n" +
+                                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                    stmt.setInt(1, orderId);
+                    ResultSet result = stmt.executeQuery();
+
+                    orderItems = loadResults(result);
+                    if (orderItems == null || orderItems.size() == 0) {
+                        System.out.println("No order items found for orderId " + orderId + " today");
+                    }
+                    stmt.close();
+                } else {
+                    System.out.println("Order not found for humanreadableId: "+orderDetailQuery.getHumanreadableId() +" location: "+locationId);
+                }
+            } else {
+                System.out.println("Location not found for floor: "+orderDetailQuery.getFloorId() +" and table: "+orderDetailQuery.getTableId());
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            orderItems = null;
+        }
+
+        return orderItems;
+    }
+
+    public static List<OrderItem> getOrderDetails(String orderId) {
+        List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
@@ -94,16 +129,19 @@ public class DbUtil {
         return orderItemXmlInfo;
     }
 
-    public static void checkAndAddOrderId(OrderItem orderItem) {
-        String query = "select * from orders where id = '"+orderItem.getOrderId() +"'";
-        Connection connection = DbConnection.getDbConnection().gastroDbConnection;
-        try {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(query);
-            //TODO inserts for adding a new order may have to create new transaction, reservation/location, etc entries as well
-            Order order = orderItem.getOrder();
-            if(!resultSet.next() && order != null) {
-                String insertOrder = "INSERT INTO orders (\n" +
+    public static Integer checkAndAddOrderId(OrderItem orderItem) {
+        //String query = "select * from orders where id = '"+orderItem.getOrderId() +"'";
+        //String query = "select * from orders where id = '"+orderId +"'";
+        //Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+        Order order = orderItem.getOrder();
+        Integer orderId = getOrderId(order.getHumanReadableId(), order.getFloorId(), order.getTableId());
+        if (orderId == null) {
+            orderId  = getNewOrderId();
+            try {
+                Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+                Statement statement = connection.createStatement();
+
+                String insertOrder = " INSERT INTO orders (\n" +
                         "                       id,\n" +
                         "                       amount,\n" +
                         "                       menu_id,\n" +
@@ -115,17 +153,17 @@ public class DbUtil {
                         "                       datetime\n" +
                         "                   )\n" +
                         "                   VALUES (\n" +
-                        "                       '"+ orderItem.getOrderId() +"',\n" +
-                        "                       '"+ orderItem.getPrice() +"',\n" +
-                        "                       '"+ orderItem.getOrder().getMenuId() +"',\n" +
-                        "                       '"+ orderItem.getOrder().getStaffId() +"',\n" +
-                        "                       '"+ getLocationId(order.getFloorId(),
-                        order.getTableId())+"',\n" +
-                        "                       '"+ order.getTransactionId() +"',\n" +
-                        "                       '"+ order.getMemberId() +"',\n" +
-                        "                       '"+ order.getHumanReadableId() +"',\n" +
-                        "                       '"+ translateToSqlDate(order.getDateTime()) + "');";
-                System.out.println("insert into order "+insertOrder);
+                        "                       '" + orderId + "',\n" +
+                        "                       '" + orderItem.getPrice() + "',\n" +
+                        "                       '" + orderItem.getOrder().getMenuId() + "',\n" +
+                        "                       '" + orderItem.getOrder().getStaffId() + "',\n" +
+                        "                       '" + getLocationId(order.getFloorId(),
+                        order.getTableId()) + "',\n" +
+                        "                       '" + order.getTransactionId() + "',\n" +
+                        "                       '" + order.getMemberId() + "',\n" +
+                        "                       '" + order.getHumanReadableId() + "',\n" +
+                        "                       '" + translateToSqlDate(order.getDateTime()) + "');";
+                System.out.println("insert into order " + insertOrder);
                 statement.executeUpdate(insertOrder);
 
                 //insert into reservation
@@ -139,22 +177,21 @@ public class DbUtil {
                         "                             end_date\n" +
                         "                         )\n" +
                         "                         VALUES (\n" +
-                        "                             '"+ getNewReservationId() +"',\n" +
+                        "                             '" + getNewReservationId() + "',\n" +
                         "                             '0',\n" +
                         "                             'created_by',\n" +
-                        "                             '"+ translateToSqlDate(LocalDateTime.now()) +"',\n" +
-                        "                             '"+ order.getFloorId() +"',\n" +
-                        "                             '"+ order.getTableId() +"',\n" +
-                        "                             '"+ translateToSqlDate(LocalDateTime.now().plusHours(1))+"')";
-                System.out.println("insert into reservation "+insertReservation);
+                        "                             '" + translateToSqlDate(LocalDateTime.now()) + "',\n" +
+                        "                             '" + order.getFloorId() + "',\n" +
+                        "                             '" + order.getTableId() + "',\n" +
+                        "                             '" + translateToSqlDate(LocalDateTime.now().plusHours(1)) + "')";
+                System.out.println("insert into reservation " + insertReservation);
                 statement.executeUpdate(insertReservation);
 
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
             }
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
         }
-
-
+        return orderId;
     }
 
     private static String translateToSqlDate(LocalDateTime localDateTime) {
@@ -173,6 +210,7 @@ public class DbUtil {
                     locationId = resultSet.getInt("id");
                     break;
                 }
+                statement.close();
             } catch (SQLException sqlException) {
                 sqlException.printStackTrace();
             }
@@ -180,10 +218,65 @@ public class DbUtil {
         return locationId;
     }
 
+    private static Integer getOrderId(OrderDetailQuery orderDetailQuery, Integer locationId) {
+        Integer orderId  = null;
+        if(locationId != null && orderDetailQuery != null) {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            try {
+                PreparedStatement stmt=connection.prepareStatement(
+                        "SELECT ID from ORDERS WHERE \n" +
+                                "HUMANREADABLE_ID = ?\n" +
+                                " AND LOCATION_ID = ?" +
+                                " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                stmt.setInt(1,Integer.parseInt(orderDetailQuery.getHumanreadableId()));
+                stmt.setInt(2,locationId);
+                ResultSet resultOrder = stmt.executeQuery();
+                while(resultOrder.next()) {
+                    orderId = resultOrder.getInt("ID");
+                    break;
+                }
+                stmt.close();
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+
+        }
+        return orderId;
+    }
+
+    private static Integer getOrderId(String humanReadableId, String floorId, String tableId) {
+        Integer orderId  = null;
+        Integer locationId = getLocationId(floorId, tableId);
+        if(locationId != null && humanReadableId != null) {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            try {
+                PreparedStatement stmt=connection.prepareStatement(
+                        "SELECT ID from ORDERS WHERE \n" +
+                                "HUMANREADABLE_ID = ?\n" +
+                                " AND LOCATION_ID = ?" +
+                                " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                stmt.setInt(1,Integer.parseInt(humanReadableId));
+                stmt.setInt(2,locationId);
+                ResultSet resultOrder = stmt.executeQuery();
+                while(resultOrder.next()) {
+                    orderId = resultOrder.getInt("ID");
+                    break;
+                }
+                stmt.close();
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+
+        }
+        return orderId;
+    }
+
     public static Integer insertOrder(OrderItem orderItem) {
         Integer noOfRowsInserted = 0;
         try {
-            checkAndAddOrderId(orderItem);
+
+            Integer orderId = checkAndAddOrderId(orderItem);
+            Integer newOrderItemId = getNewOrderItemId();
             String insertOrderQuery = "INSERT INTO orderitem (\n" +
                     "                          order_id,\n" +
                     "                          item_id,\n" +
@@ -200,7 +293,7 @@ public class DbUtil {
                     "                          price_one_unit\n" +
                     "                      )\n" +
                     "                      VALUES (\n" +
-                    "                          '"+ orderItem.getOrderId()+"',\n" +
+                    "                          '"+ orderId+"',\n" +
                     "                          '"+ orderItem.getItemId()+"',\n" +
                     "                          '1',\n" +
                     "                          'remark',\n" +
@@ -208,9 +301,9 @@ public class DbUtil {
                     "                          '"+ orderItem.getPrice()+"',\n" +
                     "                          '"+ orderItem.getPrintStatus()+"',\n" +
                     "                          '"+ orderItem.getPayed()+"',\n" +
-                    "                          '"+ orderItem.getDateTime()+"',\n" +
+                    "                          '"+ translateToSqlDate(orderItem.getDateTime())+"',\n" +
                     "                          '"+ orderItem.getStatus()+"',\n" +
-                    "                          '"+ DbUtil.getNewId(orderItem)+"',\n" +
+                    "                          '"+newOrderItemId+"',\n" +
                     "                          '1',\n" +
                     "                          '"+ orderItem.getPrice()/orderItem.getQuantity()+"'\n" +
                     "                      )";
@@ -242,6 +335,9 @@ public class DbUtil {
                     orderItem.setQuantity(result.getInt("quantity"));
                     orderItems.add(orderItem);
                 }
+                if (orderItems == null) {
+                    orderItems = new ArrayList<>();
+                }
 
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -252,11 +348,13 @@ public class DbUtil {
         return orderItems;
     }
 
-    public static Integer getNewOrderId() {
+    public static Integer getNewHumanReadableOrderId() {
         Integer nextOrderId = null;
         try {
-            //TODO add a check with current date
-            String query = "SELECT MAX(HUMANREADABLE_ID) AS MAX_ID FROM ORDERS ORDER BY DATETIME DESC";
+            String query = "SELECT HUMANREADABLE_ID AS MAX_ID, MAX(DATETIME) FROM ORDERS "
+                    + "WHERE  DATE(DATETIME)  = DATE('NOW', 'LOCALTIME') "
+                    +"ORDER BY DATETIME DESC";
+
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
@@ -293,24 +391,44 @@ public class DbUtil {
         return nextReservationId;
     }
 
-    public static Integer getNewId(OrderItem orderItem) {
-        Integer nextId = null;
+    public static Integer getNewOrderId() {
+        Integer nextOrderId = null;
         try {
-            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERITEM";
+            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERS";
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
             ResultSet result = stmt.executeQuery();
-            if (result.next()) {
-                nextId = result.getInt("MAX_ID") + 1;
+            if(result.next()) {
+                nextOrderId = result.getInt("MAX_ID") + 1;
             } else {
-                nextId = 1;
+                nextOrderId = 1;
             }
             stmt.close();
         } catch(SQLException sqlException) {
             sqlException.printStackTrace();
         }
 
-        return nextId;
+        return nextOrderId;
+    }
+
+    public static Integer getNewOrderItemId() {
+        Integer nextOrderItemId = null;
+        try {
+            String query = "SELECT MAX(ID) AS MAX_ID FROM ORDERITEM";
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            ResultSet result = stmt.executeQuery();
+            if(result.next()) {
+                nextOrderItemId = result.getInt("MAX_ID") + 1;
+            } else {
+                nextOrderItemId = 1;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextOrderItemId;
     }
 
     public static void main(String[] args) {
