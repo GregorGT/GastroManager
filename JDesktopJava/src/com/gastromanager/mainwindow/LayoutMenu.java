@@ -502,8 +502,6 @@ public class LayoutMenu extends JPanel {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-    	
     }
     
     public void changeAttributesToXml(GMTreeItem treeItem, String xmlTag, String id) {
@@ -517,51 +515,6 @@ public class LayoutMenu extends JPanel {
     		changeAttributesToXml((GMTreeItem)enumer.nextElement(), xmlTag, id);
     	}
     }
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 	public MainWindow getMainWindow() {
 		return mainWindow;
@@ -581,5 +534,4 @@ public class LayoutMenu extends JPanel {
 			loadFloorFromFile();
 		}
 	}
-		
 }

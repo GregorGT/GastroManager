@@ -8,6 +8,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AbsoluteLayout;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -50,7 +51,7 @@ public class MainActivity2 extends AppCompatActivity {
     private Button fetchOrderDetailsButton;
     private MenuDetail menuDetail;
     private Stack<String> orderSelectionStack;
-    private LinearLayout menuView;
+    private AbsoluteLayout menuView;
     private LinearLayout menuOptionsView;
     private Map<String, String> optionsSelectionMap;
     EditText orderIdInputTextField;
@@ -241,7 +242,7 @@ public class MainActivity2 extends AppCompatActivity {
                         if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
                             orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
                         }
-                        loadMenuItemDesc(selectedOrderItem, orderItemInfoBuilder);
+                        loadMenuItemDesc(selectedOrderItem, root, orderItemInfoBuilder, null);
                         orderDetailsView.setText(orderItemInfoBuilder.toString());
 
                         new AddOrderItemTask().execute(root);
@@ -249,14 +250,43 @@ public class MainActivity2 extends AppCompatActivity {
                     }
                 }
 
-                private void loadMenuItemDesc(SelectedOrderItem selectedOrderItem,StringBuilder orderItemInfoBuilder) {
-                    orderItemInfoBuilder.append(selectedOrderItem.getItemName() + "\t");
-                    if(selectedOrderItem.getSubItems() != null) {
-                        loadMenuItemDesc(selectedOrderItem.getSubItems().get(0), orderItemInfoBuilder );
-                    } else {
-                        orderItemInfoBuilder.append(selectedOrderItem.getOption() !=null ?
-                                selectedOrderItem.getOption().getName()+"\n":"");
+                private void loadMenuItemDesc(SelectedOrderItem selectedOrderItem, SelectedOrderItem parent,
+                                              StringBuilder orderItemInfoBuilder, List<String> optionsAdded) {
+                    orderItemInfoBuilder.append(parent.getItemName() + "\t");
+                    if(optionsAdded == null) {
+                        optionsAdded = new ArrayList<>();
                     }
+                    if(parent.getOption() != null) {
+                        orderItemInfoBuilder.append(parent.getOption().getName() + "\t");
+                        optionsAdded.add(parent.getOption().getId());
+                    }
+                    if(selectedOrderItem.getSubItems() != null) {
+                        loadMenuItemDesc(selectedOrderItem.getSubItems().get(0),selectedOrderItem, orderItemInfoBuilder, optionsAdded);
+                    } else {
+                        orderItemInfoBuilder.append(selectedOrderItem.getItemName());
+                        if(!optionsAdded.contains(selectedOrderItem.getOption().getId())) {
+                            orderItemInfoBuilder
+                                    .append("-")
+                                    .append(selectedOrderItem.getOption().getName()).append("\n");
+                        }
+                    }
+                    /*if(parent.getSubItems() != null) {
+                        if(parent.getSubItems().get(0) == selectedOrderItem) {
+                            if(selectedOrderItem.getSubItems() != null) {
+                                //TODO check if this case is possible
+                            } else {
+                                orderItemInfoBuilder.append(selectedOrderItem.getItemName()+"-");
+                                orderItemInfoBuilder.append(selectedOrderItem.getOption() !=null ?
+                                        selectedOrderItem.getOption().getName()+"\n":"");
+                            }
+                        } else {
+                            loadMenuItemDesc(selectedOrderItem, selectedOrderItem.getSubItems().get(0),
+                                    orderItemInfoBuilder );
+                        }
+
+                    } else {
+                        System.out.println("Error ..in loading selection");
+                    }*/
                 }
 
                 @Override
@@ -276,13 +306,19 @@ public class MainActivity2 extends AppCompatActivity {
         return menuDetail.getMenu().getQuickMenuIdRefMap().get(menuId);
     }
 
-    private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, LinearLayout view, LinearLayout menuOptionView) {
+    private void loadMenuItems(DrillDownMenuType menuType, MenuDetail menuDetail, AbsoluteLayout view, LinearLayout menuOptionView) {
+        System.out.println(" Drill Down Menu view width: "+ view.getWidth() +
+                " height "+ view.getHeight());
         List<DrillDownMenuButton> menuButtons  = menuType.getButtons();
         for(DrillDownMenuButton menuButton:menuButtons) {
             Button menuButtonView = new Button(this);
             menuButtonView.setWidth(Integer.parseInt(menuButton.getWidth()));
             menuButtonView.setHeight(Integer.parseInt(menuButton.getHeight()));
+            menuButtonView.setX(Float.parseFloat(menuButton.getxPosition()));
+            menuButtonView.setY(Float.parseFloat(menuButton.getyPosition()));
             menuButtonView.setText(menuButton.getName());
+            System.out.println(" Menu Button  "+menuButton.getName() + " width "+menuButton.getWidth()
+            + " height "+menuButton.getHeight() + " x "+menuButton.getxPosition() +" y "+menuButton.getyPosition());
             menuButtonView.setOnClickListener(new View.OnClickListener() {
                 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                 public void onClick(View v) {
@@ -496,7 +532,7 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-    private void loadMenuView(String selectedMenuType, MenuDetail menuDetail, LinearLayout view, LinearLayout menuOptionsView) {
+    private void loadMenuView(String selectedMenuType, MenuDetail menuDetail, AbsoluteLayout view, LinearLayout menuOptionsView) {
         List<DrillDownMenuType> menuTypeList = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
         for(DrillDownMenuType menuType: menuTypeList) {
             if(menuType.getName().equals(selectedMenuType)) {

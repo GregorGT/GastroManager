@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,14 +19,15 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSpinner;
 import javax.swing.JTable;
@@ -33,6 +36,7 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
@@ -60,13 +64,16 @@ public class BookingsMenu extends JPanel{
 	private static final String SELECT_MAX_ID = "SELECT max(id)+1 FROM reservations";
 	private static final String SELECT_ALL_RESERVATIONS = "SELECT * FROM reservations WHERE start_date LIKE ? ORDER BY start_date, end_date";
 	private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+	private static final String GET_SELECTED_RESERVATION = "SELECT id FROM reservations "
+			+ "WHERE start_date=? AND floor_id=? AND table_id=?";
+	private static final String DELETE_RESERVATION = "DELETE FROM reservations WHERE id=?";
+	
 	
 	private JDatePicker datePicker;
 	private JDatePicker dateForTable;
 	private JComboBox timesComboBox;
 	private JComboBox durationComboBox;
 	private JSpinner spinner;
-	private List<Map.Entry<Integer, Integer>> reservations = new ArrayList<>();
 	private Connection connection = DbConnection.getDbConnection().gastroDbConnection;
 	private JTable jTable;
 	private String columns[] = {"Date","Start time","End time", "Floor", "Table", "Name"};  
@@ -77,6 +84,9 @@ public class BookingsMenu extends JPanel{
 	private DefaultTableModel model;
 	private boolean canBeInserted = false;
 	private JTextField textField;
+	private int selectedRow;
+	private int selectedId;
+	
 	
 	BookingsMenu() {
 		
@@ -184,6 +194,19 @@ public class BookingsMenu extends JPanel{
 			public void actionPerformed(ActionEvent arg0) {
 				fillTable();
 			}
+	    });
+	    
+	    jTable.addMouseListener(new MouseAdapter() {
+	    	@Override
+			public void mousePressed(MouseEvent evt) {
+
+			    if (SwingUtilities.isRightMouseButton(evt)) {
+			    	selectedRow = jTable.rowAtPoint(evt.getPoint());
+			    	TablePopup menu = new TablePopup();
+			        menu.show(evt.getComponent(), evt.getX(), evt.getY());
+			    }
+			}
+	 
 	    });
 
 	    scrollPane.add(dateForTable);
@@ -355,12 +378,11 @@ public class BookingsMenu extends JPanel{
 						model.addRow(new Object[]{dates[0].substring(0, 10), dates[0].substring(11, dates[0].length()), dates[1].substring(11, dates[1].length()), floorId, tableId, textField.getText()});	
 					}	
 				}
+				fillTable();
 				
 				canBeInserted = false;
 				
-			}
-			
-				
+			}	
 		};
 	}
 	
@@ -432,4 +454,62 @@ public class BookingsMenu extends JPanel{
 		dates[1] = endDate;
 	}
 	
+	private void deleteRowFromTable() {
+		if (selectedRow == -1) {
+			return;
+		}
+		try (PreparedStatement pr = connection.prepareStatement(GET_SELECTED_RESERVATION)) {
+			pr.setString(1, model.getValueAt(selectedRow, 0).toString()+" "+model.getValueAt(selectedRow, 1).toString());
+			pr.setInt(2, Integer.parseInt(model.getValueAt(selectedRow, 3).toString()));
+			pr.setInt(3, Integer.parseInt(model.getValueAt(selectedRow, 4).toString()));
+			
+			
+			ResultSet rs = pr.executeQuery();
+			rs.next();
+			selectedId = rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		model.removeRow(selectedRow);
+		
+		selectedRow = -1;
+	}
+	
+	private void deleteRowFromDb() {
+		if (selectedId == -1) {
+			return;
+		}
+		
+		try (PreparedStatement pr = connection.prepareStatement(DELETE_RESERVATION)) {
+			pr.setInt(1, selectedId);
+			pr.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		selectedId = -1;
+	}
+	
+	
+	private class TablePopup extends JPopupMenu {
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+		private JMenuItem anItem;
+//	    private ArrayList<JMenuItem> allItems;
+
+	    public TablePopup() {
+	        anItem = new JMenuItem("Delete");
+	        this.add(anItem);
+	        
+	        anItem.addActionListener(new ActionListener() {
+	        	@Override
+				public void actionPerformed(ActionEvent e) {
+					deleteRowFromTable();
+					deleteRowFromDb();
+				}
+	        });
+	    }
+	}
 }
