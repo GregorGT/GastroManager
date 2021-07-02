@@ -79,14 +79,14 @@
         android:layout_width="200dp"
         android:layout_height="45dp"
         android:layout_alignLeft="@id/textView2"
-        android:layout_marginLeft="250dp"
-        android:layout_marginTop="240dp"
+        android:layout_marginLeft="400dp"
+        android:layout_marginTop="0dp"
         android:visibility="visible"
         android:background="@color/white"/>
 
     <AbsoluteLayout
         android:id="@+id/menuItemsView"
-        android:layout_width="400dp"
+        android:layout_width="500dp"
         android:layout_height="200dp"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="400dp"
@@ -97,17 +97,17 @@
         android:id="@+id/menuItemOptionsView"
         android:layout_width="183dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="185dp"
-        android:layout_marginTop="300dp"
+        android:layout_marginLeft="400dp"
+        android:layout_marginTop="250dp"
         android:background="@color/white"
         android:orientation="vertical" />
 
-    <Button
+    <!--<Button
         android:id="@+id/addToOrderButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="680dp"
-        android:text="Add to Order" />
+        android:text="Add to Order" />-->
 
     <Button
         android:id="@+id/newOrderButton"
@@ -134,6 +134,14 @@
         android:layout_marginLeft="400dp"
         android:layout_marginTop="160dp"
         android:text="Select Menu Item" />
+
+    <Button
+        android:id="@+id/signOffOrderButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="500dp"
+        android:layout_marginTop="800dp"
+        android:text="SIGNOFF" />
 
 
 </RelativeLayout>

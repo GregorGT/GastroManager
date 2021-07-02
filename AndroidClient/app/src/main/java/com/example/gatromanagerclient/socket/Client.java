@@ -1,6 +1,8 @@
 package com.example.gatromanagerclient.socket;
 
+import com.example.gatromanagerclient.util.Constants;
 import com.gastromanager.models.MenuDetail;
+import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderDetailsView;
 import com.gastromanager.models.SelectedOrderItem;
 
@@ -51,71 +53,32 @@ public class Client {
 
     }
 
-    public String getOrderInfo(String request) {
+    public String getOrderInfo(OrderDetailQuery request) {
         StringBuilder responseBuilder = null;
 
         try {
-            sendTextData(request, out); //request could be orderId
+            //sendTextData(request, out); //request could be orderId
+            out.writeObject(request);
             ArrayList<String> orderItems = (ArrayList<String>) in.readObject();
-            for(String item : orderItems) {
-                if(responseBuilder == null) {
-                    responseBuilder = new StringBuilder();
-                }
-                responseBuilder.append(item);
-                System.out.println(item);
-
-            }
-            //in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
-            /*byte[] bytes = new byte[1000]; //
-            socket.getInputStream().read(bytes);
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-            in = new ObjectInputStream(byteArrayInputStream);*/
-            // read from the stream
-            /*ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            byte[] content = new byte[ 2048 ];
-            int bytesRead = -1;
-            while( ( bytesRead = in.read( content ) ) != -1 ) {
-                baos.write( content, 0, bytesRead );
-            }
-            ByteArrayInputStream bais = new ByteArrayInputStream( baos.toByteArray() );
-            in = new ObjectInputStream(bais);
-            List<OrderItem> orderItemList  = (List<OrderItem>) in.readObject();
-            for(OrderItem item : orderItemList) {
-                responseBuilder.append(item.getItemId() +" "
-                        + item.getQuantity() +"\n");
-
-            }*/
-
-            /*if(responseFromServer instanceof Object[]) {
-                Object[] responseObjects = (Object[]) responseFromServer;
-                for(int i=0; i < responseObjects.length; i++) {
-                    Object responseObject = responseObjects[i];
-                    if(responseObject instanceof OrderItem) {
-                        OrderItem orderItem = (OrderItem) responseObject;
-                        responseBuilder.append(orderItem.getItemId() +" "
-                                + orderItem.getQuantity() +"\n");
-
+            if(orderItems.size() == 0) {
+                responseBuilder = null;
+            } else {
+                for (String item : orderItems) {
+                    if (responseBuilder == null) {
+                        responseBuilder = new StringBuilder();
                     }
-                }
+                    responseBuilder.append(item);
+                    System.out.println(item);
 
-                *//*List<Object> orderDetailList = (List) responseFromServer;
-                for(Object orderItemObject: orderDetailList) {
-                    if(orderItemObject instanceof OrderItem) {
-                        OrderItem currentItem = (OrderItem) orderItemObject;
-                        responseBuilder.append(currentItem.getItemId() +" "
-                        + currentItem.getQuantity() +"\n");
-                    }
-                }*//*
-            }*/
-            //System.out.println("Client received order from Server: "+response);
-            //close();
+                }
+            }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             close();
         }
 
-        return (responseBuilder == null) ? null :responseBuilder.toString();
+        return (responseBuilder == null) ? Constants.EMPTY_RESULT :responseBuilder.toString();
     }
 
     public String getResponse(String request) {
