@@ -1,10 +1,10 @@
 package com.gastromanager.print;
 
+import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
-import com.gastromanager.util.PropertiesUtil;
 import io.github.escposjava.PrinterService;
 import io.github.escposjava.print.NetworkPrinter;
 import io.github.escposjava.print.Printer;
@@ -19,7 +19,10 @@ import javax.print.attribute.PrintServiceAttributeSet;
 import javax.print.attribute.standard.*;
 import javax.print.event.PrintJobAdapter;
 import javax.print.event.PrintJobEvent;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -30,6 +33,15 @@ public class PrintServiceImpl implements PrintService {
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
         return executePrint(formatOrderText(orderItems, orderInfo));
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
+    }
+
+    @Override
+    public Boolean print(OrderDetailQuery orderDetailQuery) {
+        //Boolean isOrderPrinted = false;
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery);
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderDetailQuery.getHumanreadableId());
+        //return isOrderPrinted;
+        return executePrint(formatOrderText(orderItems, orderInfo));
     }
 
     @Override
