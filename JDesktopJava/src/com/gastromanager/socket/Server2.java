@@ -5,6 +5,8 @@ import com.gastromanager.models.*;
 import com.gastromanager.models.xml.Choice;
 import com.gastromanager.models.xml.Item;
 import com.gastromanager.models.xml.Option;
+import com.gastromanager.print.PrintService;
+import com.gastromanager.print.PrintServiceImpl;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.SaxParserForGastromanager;
 import com.gastromanager.util.XmlUtil;
@@ -441,6 +443,18 @@ public class Server2 {
 
                         oos.writeObject(orderDetails);
                     }
+                } else if(clientMessage instanceof SignOffOrderInfo) {
+                    //send result to client
+                    SignOffOrderInfo signOffOrderInfo = (SignOffOrderInfo) clientMessage;
+                    PrintService printService = new PrintServiceImpl();
+                    oos.writeObject(printService.print(signOffOrderInfo.getOrderDetailQuery()));
+
+                } else if(clientMessage instanceof HumanReadableIdQuery) {
+                    //send result to client
+                    HumanReadableIdQuery humanReadableIdQuery = (HumanReadableIdQuery) clientMessage;
+                    oos.writeObject(DbUtil.getStartingHumanReadableOrderId(humanReadableIdQuery.getFloorId(),
+                            humanReadableIdQuery.getTableId()));
+
                 } else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;
                     System.out.println("Received request for " + request);

@@ -73,11 +73,12 @@ public class DbUtil {
         OrderInfo orderInfo = null;
         String query = "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME, T.NAME AS TABLE_NAME \n" +
                 "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F, TABLEDETAILS T\n" +
-                "WHERE O.ID = ?\n" +
+                "WHERE O.HUMANREADABLE_ID = ?\n" +
+                "AND DATE(O.DATETIME) = DATE('NOW','LOCALTIME')\n" +
                 "AND L.ID = O.LOCATION_ID\n" +
-                "AND O.STAFF_ID = S.ID\n" +
+                //"AND O.STAFF_ID = S.ID\n" +
                 "AND L.FLOOR_ID = F.ID\n" +
-                "AND L.TABLE_ID = T.ID";
+                "AND L.TABLE_ID = T.TABLE_ID";
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -277,6 +278,7 @@ public class DbUtil {
 
             Integer orderId = checkAndAddOrderId(orderItem);
             Integer newOrderItemId = getNewOrderItemId();
+            System.out.println("new order item id "+newOrderItemId);
             String insertOrderQuery = "INSERT INTO orderitem (\n" +
                     "                          order_id,\n" +
                     "                          item_id,\n" +
@@ -360,6 +362,33 @@ public class DbUtil {
             ResultSet result = stmt.executeQuery();
             if(result.next()) {
                 nextOrderId = result.getInt("MAX_ID") + 1;
+            } else {
+                nextOrderId = 1;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextOrderId;
+    }
+
+    public static Integer getStartingHumanReadableOrderId(Integer floorId, Integer tableId) {
+        Integer nextOrderId = null;
+        try {
+            String query = "SELECT MIN(O.HUMANREADABLE_ID) AS ID FROM ORDERS O, LOCATION L \n" +
+                    "WHERE L.FLOOR_ID = ?\n" +
+                    "AND L.TABLE_ID = ?\n" +
+                    "AND L.ID = O.LOCATION_ID\n" +
+                    "AND DATE(O.DATETIME) = DATE('NOW', 'LOCALTIME')";
+
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            stmt.setInt(1,floorId);
+            stmt.setInt(2,tableId);
+            ResultSet result = stmt.executeQuery();
+            if(result.next()) {
+                nextOrderId = result.getInt("ID");
             } else {
                 nextOrderId = 1;
             }
