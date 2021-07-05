@@ -83,7 +83,7 @@ public class MainActivity2 extends AppCompatActivity {
         floorIdInputTextField = findViewById(R.id.floorIdInputTextField);
         tableIdInputTextField = findViewById(R.id.tableIdInputTextField);
         tableIdInputTextField.setOnFocusChangeListener((v, hasFocus) -> {
-            if(hasFocus) {
+            if(!hasFocus) {
                 if(floorIdInputTextField.getText() != null &&
                 tableIdInputTextField.getText() != null) {
                     String floorId = floorIdInputTextField.getText().toString();
