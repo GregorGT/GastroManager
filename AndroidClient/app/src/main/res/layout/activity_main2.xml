@@ -36,6 +36,7 @@
         android:layout_marginTop="39dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
+        android:hint="Order id"
         android:inputType="text" />
 
     <EditText
@@ -47,6 +48,7 @@
         android:layout_marginTop="0dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
+        android:hint="Floor id"
         android:inputType="text" />
 
     <EditText
@@ -58,6 +60,7 @@
         android:layout_marginTop="0dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
+        android:hint="Table id"
         android:inputType="text" />
 
     <Button
@@ -72,7 +75,7 @@
     <Button
         android:id="@+id/prevOrderButton"
         android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:layout_alignLeft="@id/textView2"
         android:layout_marginLeft="198dp"
         android:layout_marginTop="120dp"
@@ -81,7 +84,7 @@
     <Button
         android:id="@+id/nextOrderButton"
         android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_height="35dp"
         android:layout_alignLeft="@id/textView2"
         android:layout_marginLeft="250dp"
         android:layout_marginTop="120dp"
@@ -138,6 +141,7 @@
         android:layout_marginTop="100dp"
         android:background="@color/cardview_light_background"
         android:ems="10"
+        android:hint="menu id"
         android:inputType="text" />
 
     <Button
