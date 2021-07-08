@@ -134,15 +134,14 @@ public class Server2 {
             Map<String, DrillDownMenuItemOptionDetail> itemOptionDetailMap = itemDetail.getOptionsMap();
             xmlMainItem = new Item();
             xmlMainItem.setName(item.getItemName());
-
+            DrillDownMenuItemOptionDetail optionDetail = null;
             SelectedOrderItemOption selectedOrderItemOption = item.getOption();
             if(selectedOrderItemOption != null) {
                 Option option = new Option();
                 option.setId(selectedOrderItemOption.getId());
                 option.setName(selectedOrderItemOption.getName());
-                DrillDownMenuItemOptionDetail optionDetail = itemOptionDetailMap.get(selectedOrderItemOption.getName());
+                optionDetail = itemOptionDetailMap.get(selectedOrderItemOption.getName());
                 if (optionDetail != null) {
-                    //item.setPrice(Double.valueOf((item.getPrice() == null ? Double.valueOf(0) : item.getPrice()) + optionDetail.getPrice()));
                     if (optionDetail.getOverwritePrice()) {
                         option.setOverwritePrice(optionDetail.getPrice().toString());
                         optionPriceMap.put(option.getId(), item.getPrice());
@@ -197,7 +196,12 @@ public class Server2 {
                 }
                 xmlMainItem.setItem(xmlSubItems);
             } else {
-                orderItem.setItemId(itemDetail.getUuid() == null ? null : Long.valueOf(itemDetail.getUuid()));
+                if(optionDetail != null) {
+                    orderItem.setItemId(optionDetail.getUuid() == null ? null : Long.valueOf(optionDetail.getUuid()));
+                } else {
+                    orderItem.setItemId(itemDetail.getUuid() == null ? null : Long.valueOf(itemDetail.getUuid()));
+                }
+
             }
 
         }

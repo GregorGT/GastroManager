@@ -148,6 +148,9 @@ public class SaxParserForGastromanager {
                         drillDownMenuItemOptionDetail.setMenuId(attributes.getValue("menu_id") == null ?
                                     null : attributes.getValue("menu_id"));
 
+                        drillDownMenuItemOptionDetail.setUuid(attributes.getValue("uuid") == null ?
+                                null : attributes.getValue("uuid"));
+
                         DrillDownMenuItemDetail currentItem  = itemStack.peek();
                         if(currentItem.getOptionsMap() == null) {
                             currentItem.setOptionsMap(new HashMap<>());
