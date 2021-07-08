@@ -25,7 +25,7 @@
 				<item name="pepperoni" menu_id="101" uuid="356152837">
 					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="101a" />
 					<option id="size" name="medium" overwrite_price="5.8" menu_id="101b" uuid="1284887162" />
-					<option id="size" name="large" 	price="1.2" menu_id="101c"/>
+					<option id="size" name="large" 	price="1.2" menu_id="101c" uuid="29383823" />
 				</item>
 				
 			</item>
@@ -40,12 +40,12 @@
 			<option id="size" name="large" price="1.2" >
 				<choice name="extra cheese" price="1.5" />
 			</option>
-			<item name="Capellini" menu_id="110">
+			<item name="Capellini" menu_id="110" uuid="39198183113">
 				<option id="size"  name="small" overwrite_price="5.5" uuid="3462565213" menu_id="110a" />
 				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b"/>
 				<option id="size" name="large" 	price="1.2" menu_id="110c"/>
 			</item>
-			<item name="Mostaccioli" menu_id="120">
+			<item name="Mostaccioli" menu_id="120" uuid="39198183423">
 				<option id="size"  name="small" overwrite_price="5.5" uuid="3412515213" menu_id="120a" />
 				<option id="size" name="medium" overwrite_price="5.8" menu_id="120b"/>
 				<option id="size" name="large" 	price="1.2" menu_id="120c"/>
@@ -61,21 +61,12 @@
 					<option id="size" name="medium" name_de="mittel" overwrite_price="2.25" menu_id="10b"/>
 					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
 				</item>
-				<item name="Fanta" displayname_en="Fanta" price="0.5"/>
+				<item name="Fanta" displayname_en="Fanta" price="0.5" uuid="391242183113"/>
 				
 		</item>
 	</menues>
 	<layout>
-		<floor value="1" name="firstfloor" name_de="erster stock" >
-			<image value=""/>
-			<table value="1" name_de="Tisch" name="table" x="3" y="0" width="100" heigh="100" rot="0">
-				<chair name="proper chair" x="10" y="0" width="50" height="50"/> 
-			</table>
-		</floor>
-		<floor name="secondfloor" value="2">
-			<image value=""/>
-			<table value="1" name="firsttable"/>
-		</floor>
+
 	</layout>
 	
 	
@@ -103,9 +94,9 @@
 		</drilldownmenu>
 		
 		<drilldownmenu name="Android Tablet" height="800" width="400">
-				<button name="Pizza" target="1976266538" x="50" y="50" height="50" width="100"/>
-				<button name="Pasta" target="19762674635" x="50" y="150" height="50" width="100"/>
-				<button name="Drink" target="381123886124" x="50" y="250" height="50" width="100"/>
+				<button name="Pizza" target="1976266538" x-position="50" y-position="50" height="50" width="100"/>
+				<button name="Pasta" target="19762674635" x-position="50" y-position="150" height="50" width="100"/>
+				<button name="Drink" target="381123886124" x-position="50" y-position="250" height="50" width="100"/>
 		</drilldownmenu>
 	</drilldownmenus>
 	

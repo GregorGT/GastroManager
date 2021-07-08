@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +39,7 @@ import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.SelectedOrderItem;
 import com.gastromanager.models.SelectedOrderItemOption;
+import com.gastromanager.models.SignOffOrderInfo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +82,21 @@ public class MainActivity2 extends AppCompatActivity {
         orderIdInputTextField = findViewById(R.id.orderIdInputTextField);
         floorIdInputTextField = findViewById(R.id.floorIdInputTextField);
         tableIdInputTextField = findViewById(R.id.tableIdInputTextField);
+        tableIdInputTextField.setOnFocusChangeListener((v, hasFocus) -> {
+            if(!hasFocus) {
+                if(floorIdInputTextField.getText() != null &&
+                tableIdInputTextField.getText() != null) {
+                    String floorId = floorIdInputTextField.getText().toString();
+                    String tableId = tableIdInputTextField.getText().toString();
+                    if(!floorId.trim().equals(Constants.EMPTY_RESULT)
+                            && !tableId.trim().equals(Constants.EMPTY_RESULT)) {
+new GetHumanReadableOrderIdTask().execute();
+                    }
+                }
+            }
+        }
+
+        );
         menuIdInputTextField = findViewById(R.id.menuIdInputTextField);
 
         fetchOrderDetailsButton = findViewById(R.id.fetchOrderInfoButton);
@@ -198,13 +215,37 @@ public class MainActivity2 extends AppCompatActivity {
 
         });
 
-
+        Button signOffOrderButton = findViewById(R.id.signOffOrderButton);
+        signOffOrderButton.setOnClickListener(v -> {
+            sendSignOffOrderRequest();
+        });
     }
 
     private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem selectedOrderItem) {
         return (selectedOrderItem.getSubItems() != null && selectedOrderItem.getSubItems().size() == 1
                 && selectedOrderItem.getSubItems().get(0).getOption() != null && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
 
+    }
+
+    private void sendSignOffOrderRequest() {
+        String inputOrderId = (orderIdInputTextField.getText() != null) ?
+                orderIdInputTextField.getText().toString() : null;
+        if(inputOrderId != null) {
+            OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+            orderDetailQuery.setHumanreadableId(inputOrderId);
+            if (floorIdInputTextField.getText() != null) {
+                orderDetailQuery.setFloorId(floorIdInputTextField.getText().toString());
+            }
+            if (tableIdInputTextField.getText() != null) {
+                orderDetailQuery.setTableId(tableIdInputTextField.getText().toString());
+            }
+            SignOffOrderInfo signOffOrderInfo = new SignOffOrderInfo();
+            signOffOrderInfo.setOrderDetailQuery(orderDetailQuery);
+            new SignOffOrdertask().execute(signOffOrderInfo, this);
+
+        } else {
+            showMessage("Order Id not provided !!");
+        }
     }
 
     private void buildAndSendOrderQuery(String inputOrderId) {
@@ -442,6 +483,11 @@ public class MainActivity2 extends AppCompatActivity {
 
     public void showMessage(String message) {
 
+        Toast.makeText(this.getApplicationContext(), message, Toast.LENGTH_SHORT ).show();
+    }
+
+    /*public void showMessage(String message) {
+
         AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity2.this);
         alert.setTitle(message);
         alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -451,13 +497,13 @@ public class MainActivity2 extends AppCompatActivity {
 
         });
 
-       /* alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+       *//* alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 //what you need to do after click "Cancel"
             }
-        });*/
+        });*//*
         alert.show();
-    }
+    }*/
 
     private void createAndLoadPopupWindow(View parentView, View currentView) {
         // inflate the layout of the popup window
@@ -576,11 +622,6 @@ public class MainActivity2 extends AppCompatActivity {
                                     } /*else {
                                         currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
                                     }*/
-                                   /* DrillDownMenuItemOptionDetail currMenuOptionDetail =
-                                            subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName());
-                                    if (currMenuOptionDetail != null && currMenuOptionDetail.getId().equals(mainSelectedOrderItem.getOption().getId())) {
-                                        currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
-                                    }*/
                                     loadOrderItemFromSelection();
                                     new AddOrderItemTask().execute(mainSelectedOrderItem);
                                     menuOptionsView.removeAllViews();
@@ -661,6 +702,47 @@ public class MainActivity2 extends AppCompatActivity {
             System.out.println("Sub items : " + mainSelectedOrderItem.getSubItems());
             orderDetailsView.setText(orderItemInfoBuilder.toString());
 
+        }
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private class SignOffOrdertask extends AsyncTask<Object, Void, Void> {
+        Boolean response;
+        MainActivity2 mainActivity2;
+        SignOffOrderInfo requestIdentifier;
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        protected Void doInBackground(Object... request) {
+            Iterator iterator = Arrays.stream(request).iterator();
+            int paramCount = 0;
+            while (iterator.hasNext()) {
+                Object param = iterator.next();
+                switch (paramCount) {
+                    case 0:
+                        requestIdentifier = (SignOffOrderInfo) param;
+                        break;
+                    case 1:
+                        mainActivity2 = (MainActivity2) param;
+                        break;
+                }
+                paramCount++;
+            }
+            Client client = new Client();
+            response = client.signOffOrder(requestIdentifier);
+            System.out.println("isOrderPrinted " + response);
+            client = null;
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            if (response) {
+                mainActivity2.showMessage("Order Details successfully sent to printer!!");
+            } else {
+                mainActivity2.showMessage("Failed to send order details to the printer!!");
+            }
+            super.onPostExecute(result);
         }
     }
 
@@ -772,6 +854,33 @@ public class MainActivity2 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Integer result) {
             orderIdInputTextField.setText(result.toString());
+            super.onPostExecute(result);
+        }
+    }
+
+    private class GetHumanReadableOrderIdTask extends AsyncTask<Void, Void, Integer> {
+        Integer response;
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            Client client = new Client();
+            response = client.getHumanReadableOrderId(floorIdInputTextField.getText().toString(),
+                    tableIdInputTextField.getText().toString());
+            System.out.println("Requesting for starting human readable order Id");
+            System.out.println("Response " + response);
+            client = null;
+            return response;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            if(result != null) {
+                orderIdInputTextField.setText(result.toString());
+            } else {
+                showMessage("No existing orders");
+            }
+
             super.onPostExecute(result);
         }
     }

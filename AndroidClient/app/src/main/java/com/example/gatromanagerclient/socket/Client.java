@@ -1,10 +1,12 @@
 package com.example.gatromanagerclient.socket;
 
 import com.example.gatromanagerclient.util.Constants;
+import com.gastromanager.models.HumanReadableIdQuery;
 import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderDetailsView;
 import com.gastromanager.models.SelectedOrderItem;
+import com.gastromanager.models.SignOffOrderInfo;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
@@ -51,6 +53,21 @@ public class Client {
         }
 
 
+    }
+
+    public Boolean signOffOrder(SignOffOrderInfo request) {
+        Boolean isOrderPrinted  = false;
+
+        try {
+            out.writeObject(request);
+            isOrderPrinted = (Boolean) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+
+        return isOrderPrinted;
     }
 
     public String getOrderInfo(OrderDetailQuery request) {
@@ -121,6 +138,27 @@ public class Client {
         }
 
         return newGenOrderId;
+    }
+
+    public Integer getHumanReadableOrderId(String floorId, String tableId) {
+        Object response = null;
+        Integer startingHumanReadableId = null;
+        try {
+            HumanReadableIdQuery humanReadableIdQuery = new HumanReadableIdQuery();
+            humanReadableIdQuery.setFloorId(Integer.parseInt(floorId));
+            humanReadableIdQuery.setTableId(Integer.parseInt(tableId));
+            out.writeObject(humanReadableIdQuery);
+            response = in.readObject();
+            startingHumanReadableId = (response == null) ? null : (Integer) response;
+            //}
+            //System.out.println("Client received order from Server: "+response);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+
+        return startingHumanReadableId;
     }
 
     public MenuDetail getMenuDetails(String request) {
