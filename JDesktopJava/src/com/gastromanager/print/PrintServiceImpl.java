@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PrintServiceImpl implements PrintService {
     @Override
     public boolean print(String orderId) {
-        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
         return executePrint(formatOrderText(orderItems, orderInfo));
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
@@ -37,16 +37,19 @@ public class PrintServiceImpl implements PrintService {
 
     @Override
     public Boolean print(OrderDetailQuery orderDetailQuery) {
-        //Boolean isOrderPrinted = false;
-        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery);
+        Boolean isOrderPrinted = false;
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderDetailQuery.getHumanreadableId());
-        //return isOrderPrinted;
-        return executePrint(formatOrderText(orderItems, orderInfo));
+        isOrderPrinted = executePrint(formatOrderText(orderItems, orderInfo));
+        if(isOrderPrinted) {
+            isOrderPrinted = DbUtil.updatePrintedOrderItems(orderDetailQuery, true);
+        }
+        return isOrderPrinted;
     }
 
     @Override
     public String getPrintInfo(String orderId) {
-        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId);
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
         return formatOrderText(orderItems, orderInfo);
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));

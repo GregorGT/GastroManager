@@ -1,10 +1,7 @@
 package com.gastromanager.util;
 
 import com.gastromanager.db.DbConnection;
-import com.gastromanager.models.Order;
-import com.gastromanager.models.OrderInfo;
-import com.gastromanager.models.OrderItem;
-import com.gastromanager.models.OrderDetailQuery;
+import com.gastromanager.models.*;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
@@ -18,7 +15,7 @@ import java.util.List;
 public class DbUtil {
 
     public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
-    public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery) {
+    public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
     	List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
@@ -26,12 +23,16 @@ public class DbUtil {
             if(locationId != null) {
                 Integer orderId = getOrderId(orderDetailQuery, locationId);
                 if(orderId != null) {
-                    PreparedStatement stmt=connection.prepareStatement(
-                            "SELECT * from ORDERITEM WHERE \n" +
-                                    "ORDER_ID = ?\n" +
-                                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
-                    stmt.setInt(1, orderId);
-                    ResultSet result = stmt.executeQuery();
+                    StringBuilder queryBuilder = new StringBuilder();
+                    queryBuilder.append("SELECT * from ORDERITEM WHERE" +
+                                " ORDER_ID = '"+ orderId +"'" +
+                                 " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                    if(queryForPrint) {
+                        queryBuilder.append(" AND PRINT_STATUS = 0");
+                    }
+                    Statement stmt=connection.createStatement();
+
+                    ResultSet result = stmt.executeQuery(queryBuilder.toString());
 
                     orderItems = loadResults(result);
                     if (orderItems == null || orderItems.size() == 0) {
@@ -52,11 +53,19 @@ public class DbUtil {
         return orderItems;
     }
 
-    public static List<OrderItem> getOrderDetails(String orderId) {
+    public static List<OrderItem> getOrderDetails(String orderId, Boolean queryForPrint) {
         List<OrderItem> orderItems = null;
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
-            PreparedStatement stmt=connection.prepareStatement("select * from orderitem where order_id=?");
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT * from ORDERITEM WHERE" +
+                    " ORDER_ID = '"+ orderId +"'" +
+                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+            if(queryForPrint) {
+                queryBuilder.append(" AND PRINT_STATUS = 0");
+            }
+
+            PreparedStatement stmt=connection.prepareStatement(queryBuilder.toString());
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
             orderItems = loadResults(result);
@@ -67,6 +76,43 @@ public class DbUtil {
         }
 
         return orderItems;
+    }
+
+    public static Boolean updatePrintedOrderItems(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
+        Boolean printStatusUpdated = false;
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Integer locationId = getLocationId(orderDetailQuery.getFloorId(), orderDetailQuery.getTableId());
+            if(locationId != null) {
+                Integer orderId = getOrderId(orderDetailQuery, locationId);
+                if(orderId != null) {
+                    StringBuilder queryBuilder = new StringBuilder();
+
+                    queryBuilder.append("UPDATE ORDERITEM SET PRINT_STATUS = 1 WHERE" + " ORDER_ID = '")
+                            .append(orderId)
+                            .append("'")
+                            .append(" AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                    if(queryForPrint) {
+                        queryBuilder.append(" AND PRINT_STATUS = 0");
+                    }
+                    Statement stmt=connection.createStatement();
+                    Integer rowsUpdated = stmt.executeUpdate(queryBuilder.toString());
+
+                    if(rowsUpdated > 0) {
+                        printStatusUpdated = true;
+                    }
+                    stmt.close();
+                } else {
+                    System.out.println("Order not found for humanreadableId: "+orderDetailQuery.getHumanreadableId() +" location: "+locationId);
+                }
+            } else {
+                System.out.println("Location not found for floor: "+orderDetailQuery.getFloorId() +" and table: "+orderDetailQuery.getTableId());
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return printStatusUpdated;
     }
 
     public static OrderInfo getOrderInfo(String orderId) {
@@ -329,12 +375,17 @@ public class DbUtil {
                         orderItems = new ArrayList<>();
                     }
                     OrderItem orderItem = new OrderItem();
-                    orderItem.setItemId(result.getInt("item_id"));
+                    orderItem.setItemId(result.getLong("item_id"));
                     orderItem.setRemark(result.getString("remark"));
                     orderItem.setXml(XmlUtil.loadXMLFromString(result.getString("xml")));
                     orderItem.setXmlText(result.getString("xml"));
                     orderItem.setPrice(result.getDouble("price"));
                     orderItem.setQuantity(result.getInt("quantity"));
+                    orderItem.setOrderId(result.getInt("order_id"));
+                    orderItem.setPrintStatus(result.getInt("print_status"));
+
+                    orderItem.setDateTime(LocalDateTime.parse(result.getString("datetime"),
+                            DATE_TME_FORMATTER));
                     orderItems.add(orderItem);
                 }
                 if (orderItems == null) {
@@ -348,6 +399,28 @@ public class DbUtil {
             }
 
         return orderItems;
+    }
+
+    public static Boolean removeOrderItem(OrderItemInfo orderItemInfo) {
+        Boolean isItemRemoved = false;
+        try {
+            String query = "DELETE FROM ORDERITEM" +
+                    " WHERE ORDER_ID='"+orderItemInfo.getOrderId()+"'"+
+                    " AND ITEM_ID ='"+orderItemInfo.getItemId()+"'" +
+                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')";
+            System.out.println(query);
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            PreparedStatement stmt=connection.prepareStatement(query);
+            Integer rowsDeleted = stmt.executeUpdate();
+            if(rowsDeleted > 0) {
+                isItemRemoved = true;
+            }
+            stmt.close();
+        } catch(SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return isItemRemoved;
     }
 
     public static Integer getNewHumanReadableOrderId() {
@@ -376,7 +449,7 @@ public class DbUtil {
     public static Integer getStartingHumanReadableOrderId(Integer floorId, Integer tableId) {
         Integer nextOrderId = null;
         try {
-            String query = "SELECT MIN(O.HUMANREADABLE_ID) AS ID FROM ORDERS O, LOCATION L \n" +
+            String query = "SELECT MAX(O.HUMANREADABLE_ID) AS ID FROM ORDERS O, LOCATION L \n" +
                     "WHERE L.FLOOR_ID = ?\n" +
                     "AND L.TABLE_ID = ?\n" +
                     "AND L.ID = O.LOCATION_ID\n" +
