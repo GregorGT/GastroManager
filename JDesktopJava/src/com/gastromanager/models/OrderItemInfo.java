@@ -1,16 +1,19 @@
 package com.gastromanager.models;
 
-import org.w3c.dom.Document;
+import com.gastromanager.util.XmlUtil;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class OrderItem implements Serializable {
+/**
+ * This is a twin class of OrderItem used for transferring objects over socket connections.
+ */
+public class OrderItemInfo implements Serializable {
+
     private Integer orderId;
     private Long itemId;
     private Integer quantity;
     private String remark;
-    private Document xml;
     private String xmlText;
     private Double price;
     private Integer printStatus;
@@ -18,6 +21,20 @@ public class OrderItem implements Serializable {
     private LocalDateTime dateTime;
     private Integer status;
     private Order order;
+
+    public OrderItemInfo(OrderItem orderItem) {
+        this.orderId = orderItem.getOrderId();
+        this.itemId = orderItem.getItemId();
+        this.quantity = orderItem.getQuantity();
+        this.remark = orderItem.getRemark();
+        this.xmlText = XmlUtil.formatOrderText(orderItem);
+        this.price = orderItem.getPrice();
+        this.printStatus = orderItem.getPrintStatus();
+        this.payed = orderItem.getPrintStatus();
+        this.dateTime = orderItem.getDateTime();
+        this.status = orderItem.getStatus();
+        this.order = orderItem.getOrder();
+    }
 
     public Integer getOrderId() {
         return orderId;
@@ -51,13 +68,6 @@ public class OrderItem implements Serializable {
         this.remark = remark;
     }
 
-    public Document getXml() {
-        return xml;
-    }
-
-    public void setXml(Document xml) {
-        this.xml = xml;
-    }
 
     public String getXmlText() {
         return xmlText;
@@ -114,5 +124,4 @@ public class OrderItem implements Serializable {
     public void setOrder(Order order) {
         this.order = order;
     }
-
 }

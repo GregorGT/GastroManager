@@ -197,7 +197,7 @@ public class Server2 {
                 }
                 xmlMainItem.setItem(xmlSubItems);
             } else {
-                orderItem.setItemId(itemDetail.getUuid() == null ? null :Integer.valueOf(itemDetail.getUuid()));
+                orderItem.setItemId(itemDetail.getUuid() == null ? null : Long.valueOf(itemDetail.getUuid()));
             }
 
         }
@@ -429,25 +429,37 @@ public class Server2 {
                     Integer noOfRowsInserted = DbUtil.insertOrder(dbOrderItem);
                     System.out.println((noOfRowsInserted ==1) ? "Order Inserted": " Order not inserted");
 
+                } else if(clientMessage instanceof OrderItemInfo) {
+                    OrderItemInfo orderItem = (OrderItemInfo) clientMessage;
+                    Boolean isItemDeleted = DbUtil.removeOrderItem(orderItem);
+
                 } else if(clientMessage instanceof OrderDetailQuery) {
                     //send result to client
-                    List<OrderItem> orderItems = DbUtil.getOrderDetails((OrderDetailQuery) clientMessage);
+                    List<OrderItem> orderItems = DbUtil.getOrderDetails((OrderDetailQuery) clientMessage, false);
+                    ArrayList<OrderItemInfo> orderItemArrayList =  null;
                     if(orderItems != null) {
-                        System.out.println(orderItems);
-                        ArrayList<String> orderDetails = new ArrayList<>();
-                        for (OrderItem orderItem : orderItems) {
-                            /*orderDetails.add(orderItem.getItemId() +" "
-                                    + orderItem.getQuantity() +"\n");*/
-                            orderDetails.add(XmlUtil.formatOrderText(orderItem));
+                        orderItemArrayList = new ArrayList<>();
+                        for(OrderItem orderItem: orderItems) {
+                            OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
+                            orderItemArrayList.add(orderItemInfo);
                         }
 
-                        oos.writeObject(orderDetails);
+                        System.out.println("order items count "+orderItemArrayList.size());
+                        oos.writeObject(orderItemArrayList);
+
+                    } else {
+                        System.out.println("No order items found");
                     }
+
                 } else if(clientMessage instanceof SignOffOrderInfo) {
                     //send result to client
                     SignOffOrderInfo signOffOrderInfo = (SignOffOrderInfo) clientMessage;
                     PrintService printService = new PrintServiceImpl();
-                    oos.writeObject(printService.print(signOffOrderInfo.getOrderDetailQuery()));
+                    Boolean isPrinted = printService.print(signOffOrderInfo.getOrderDetailQuery());
+                    if(isPrinted) {
+
+                    }
+                    oos.writeObject(isPrinted);
 
                 } else if(clientMessage instanceof HumanReadableIdQuery) {
                     //send result to client

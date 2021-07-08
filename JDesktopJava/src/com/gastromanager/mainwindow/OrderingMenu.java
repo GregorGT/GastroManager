@@ -120,7 +120,7 @@ public class OrderingMenu extends JPanel {
 //	    		 ResultSet a = null;
 //	    		 System.out.println("insert update");
 //	    		 a = makeQuery(connection, tfOrderID.getText());
-	    		List <OrderItem> list = dbUtil.getOrderDetails(tfOrderID.getText());
+	    		List <OrderItem> list = dbUtil.getOrderDetails(tfOrderID.getText(), false);
 	    		list.forEach((item) -> {
 	    			System.out.println(item.getItemId() + " <- ID" +
 	    								item.getQuantity());
