@@ -1,10 +1,10 @@
 package com.example.gatromanagerclient.socket;
 
-import com.example.gatromanagerclient.util.Constants;
 import com.gastromanager.models.HumanReadableIdQuery;
 import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderDetailsView;
+import com.gastromanager.models.OrderItemInfo;
 import com.gastromanager.models.SelectedOrderItem;
 import com.gastromanager.models.SignOffOrderInfo;
 
@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Client {
 
@@ -70,7 +71,30 @@ public class Client {
         return isOrderPrinted;
     }
 
-    public String getOrderInfo(OrderDetailQuery request) {
+    public List<OrderItemInfo> getOrderInfo(OrderDetailQuery request) {
+        ArrayList<OrderItemInfo> response = null;
+
+        try {
+            //sendTextData(request, out); //request could be orderId
+            out.writeObject(request);
+            response = (ArrayList<OrderItemInfo>) in.readObject();
+
+            //response = (List<OrderItem>) in.readObject();
+            if(response == null || response.size() == 0) {
+                System.out.println(" No items received");
+            } else {
+                System.out.println( "received item count " + response.size());
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+
+        return response;
+    }
+
+   /* public String getOrderInfo(OrderDetailQuery request) {
         StringBuilder responseBuilder = null;
 
         try {
@@ -96,7 +120,7 @@ public class Client {
         }
 
         return (responseBuilder == null) ? Constants.EMPTY_RESULT :responseBuilder.toString();
-    }
+    }*/
 
     public String getResponse(String request) {
         String response = null;
@@ -196,6 +220,17 @@ public class Client {
     public void sendOrderItemData(SelectedOrderItem orderItem) {
         try {
             System.out.println("sending order item info "+orderItem.getItemName());
+            out.writeObject(orderItem);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public void removeOrderItem(OrderItemInfo orderItem) {
+        try {
+            System.out.println("sending order item info for deletion "+orderItem.getOrderId());
             out.writeObject(orderItem);
         } catch (IOException e) {
             e.printStackTrace();
