@@ -16,7 +16,7 @@
 				<item name="margarita" menu_id="100" uuid="35652837">
 					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="100a" />
 					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b" uuid="1284887162" />
-					<option id="size" name="large" 	price="1.2" menu_id="100c"/>
+					<option id="size" name="large" 	price="1.2" menu_id="100c" uuid="12841245" />
 				</item>
 
 				<item name="pepperoni" menu_id="101" uuid="356152837">
@@ -24,7 +24,7 @@
 					<option id="size" name="medium" overwrite_price="5.8" menu_id="101b" uuid="1284887162" />
 					<option id="size" name="large" 	price="1.2" menu_id="101c" uuid="29383823" />
 				</item>
-				
+				 
 			</item>
 		</item>
 		<item name="Pasta" uuid="19762674635" printer="kitchen">
@@ -36,13 +36,13 @@
 			</option>
 			<item name="Capellini" menu_id="110" uuid="39198183113">
 				<option id="size"  name="small" overwrite_price="5.5" uuid="3462565213" menu_id="110a" />
-				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b"/>
-				<option id="size" name="large" 	price="1.2" menu_id="110c"/>
+				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b" uuid="3462562144"/>
+				<option id="size" name="large" 	price="1.2" menu_id="110c" uuid="346256785" />
 			</item>
 			<item name="Mostaccioli" menu_id="120" uuid="39198183423">
 				<option id="size"  name="small" overwrite_price="5.5" uuid="3412515213" menu_id="120a" />
-				<option id="size" name="medium" overwrite_price="5.8" menu_id="120b"/>
-				<option id="size" name="large" 	price="1.2" menu_id="120c"/>
+				<option id="size" name="medium" overwrite_price="5.8" menu_id="120b" uuid="346123244" />
+				<option id="size" name="large" 	price="1.2" menu_id="120c" uuid="3412512344"/>
 			</item>
 		</item>		
 		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
@@ -51,11 +51,11 @@
 				<option id="size" name="large" price="1.2" />
 				<ingridients name="sugar,water"/>
 				<item name="Coca Cola" name_en="Coce" menu_id="10" uuid="124453434">
-					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" />
-					<option id="size" name="medium" name_de="mittel" overwrite_price="2.25" menu_id="10b"/>
+					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" uuid="124451231" />
+					<option id="size" name="medium" name_de="mittel" overwrite_price="2.25" menu_id="10b" uuid="12444224"/>
 					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
 				</item>
-				<item name="Fanta" displayname_en="Fanta" price="0.5" uuid="391242183113"/>
+				<item name="Fanta" displayname_en="Fanta" price="0.5" menu_id="11" uuid="391283113"/>
 				
 		</item>
 	</menues>
