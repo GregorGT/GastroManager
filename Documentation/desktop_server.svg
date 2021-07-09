@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="297mm"
+   viewBox="0 0 210 297"
+   version="1.1"
+   id="svg8"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
+   sodipodi:docname="desktop_server.svg"
+   inkscape:export-filename="C:\workspace\RestaurantePoint\GastroManager\Documentation\desktop_server.png"
+   inkscape:export-xdpi="166.66017"
+   inkscape:export-ydpi="166.66017">
+  <defs
+     id="defs2" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="375.46366"
+     inkscape:cy="648.8737"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata5">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 25.70238,84.199404 h 110.36905 v -10.96131 h 45.35714 V 219.89285 H 26.080357 Z"
+       id="path815"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccccc" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:7.52583885px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.56443793"
+       x="146.39122"
+       y="82.252914"
+       id="text819"><tspan
+         sodipodi:role="line"
+         id="tspan817"
+         x="146.39122"
+         y="82.252914"
+         style="stroke-width:0.56443793">Server</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.19989014px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.61499172"
+       x="46.183094"
+       y="115.1273"
+       id="text823"><tspan
+         sodipodi:role="line"
+         id="tspan821"
+         x="46.183094"
+         y="115.1273"
+         style="stroke-width:0.61499172">Status</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:6.97457361px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.52309299"
+       x="47.763573"
+       y="125.99525"
+       id="text827"><tspan
+         sodipodi:role="line"
+         id="tspan825"
+         x="47.763573"
+         y="125.99525"
+         style="stroke-width:0.52309299">On Off</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 42.896759,129.68927 H 73.766388 V 117.66215 H 42.763125 Z"
+       id="path829"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 58.932931,117.92942 V 129.422"
+       id="path831"
+       inkscape:connector-curvature="0" />
+    <path
+       style="opacity:1;fill:#00ff39;fill-opacity:1;stroke:#ff0000;stroke-width:0.50587165;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 162.78495,478.81123 c 0,-5.78873 -0.1499,-15.6756 -0.3331,-21.97081 l -0.33311,-11.44584 h 29.88007 29.88007 v 21.97081 21.97082 h -29.54697 -29.54696 z m 31.98588,-2.79086 c 3.93527,-1.64426 6.09351,-6.98622 4.92753,-12.19636 -0.71136,-3.1787 -2.53196,-5.62789 -4.92753,-6.62882 -2.51056,-1.04898 -6.15738,-0.85253 -8.49983,0.45787 -5.84402,3.26924 -5.84402,14.64019 0,17.90943 2.34245,1.31041 5.98927,1.50686 8.49983,0.45788 z m 11.45068,-4.33806 c 0,-2.48706 0.25677,-5.08547 0.5706,-5.77424 0.76785,-1.68527 3.01346,-2.61063 4.45852,-1.83726 1.58111,0.84619 2.04195,2.56606 2.04195,7.62061 0,4.47694 0.01,4.51281 1.26269,4.51281 h 1.26269 v -5.58092 c 0,-6.74155 -0.57566,-8.23917 -3.50428,-9.1166 -1.72404,-0.51654 -2.2516,-0.46136 -4.03767,0.42231 -1.65524,0.81896 -2.0545,0.87506 -2.0545,0.28869 0,-0.49598 -0.4424,-0.67689 -1.38896,-0.56797 l -1.38896,0.15981 -0.14013,7.19734 -0.14014,7.19734 h 1.52909 1.5291 z"
+       id="path833"
+       inkscape:connector-curvature="0"
+       transform="scale(0.26458333)" />
+    <path
+       style="opacity:1;fill:#00ff39;fill-opacity:1;stroke:#ff0000;stroke-width:0.50587165;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 187.79314,473.08897 c -3.70798,-2.9167 -3.70798,-10.04568 0,-12.96238 2.61827,-2.05953 6.80789,-0.92082 8.1141,2.20536 0.92044,2.20293 0.92044,6.34872 0,8.55165 -1.30621,3.12618 -5.49583,4.2649 -8.1141,2.20537 z"
+       id="path835"
+       inkscape:connector-curvature="0"
+       transform="scale(0.26458333)" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.27761129;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect837"
+       width="135.82841"
+       height="70.546539"
+       x="42.23489"
+       y="143.32631" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:8.5241785px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.6393134"
+       x="47.293415"
+       y="154.59967"
+       id="text841"><tspan
+         sodipodi:role="line"
+         id="tspan839"
+         x="47.293415"
+         y="154.59967"
+         style="stroke-width:0.6393134">Client overview</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.94565868px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.74592441"
+       x="87.722054"
+       y="115.90336"
+       id="text845"><tspan
+         sodipodi:role="line"
+         id="tspan843"
+         x="87.722054"
+         y="115.90336"
+         style="stroke-width:0.74592441">IP</tspan></text>
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.29040337;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect847"
+       width="59.236118"
+       height="12.095239"
+       x="86.473701"
+       y="117.83929" />
+    <rect
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.26499999;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="rect851"
+       width="27.214285"
+       height="11.90625"
+       x="152.3244"
+       y="117.65029" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:9.94565964px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.74592447"
+       x="152.83264"
+       y="115.98384"
+       id="text845-0"><tspan
+         sodipodi:role="line"
+         id="tspan843-0"
+         x="152.83264"
+         y="115.98384"
+         style="stroke-width:0.74592447">Port</tspan></text>
+  </g>
+</svg>
