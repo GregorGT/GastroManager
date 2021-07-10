@@ -274,7 +274,7 @@ new GetHumanReadableOrderIdTask().execute();
             }
             if (inputOrderId != null && !inputOrderId.isEmpty()) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(500);
+                    TimeUnit.MILLISECONDS.sleep(1000);
                     new GetOrderDetailsTask().execute(orderDetailQuery, this);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
