@@ -51,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity2 extends AppCompatActivity implements OrderListAdapter.OrderItemClickListener {
 
@@ -72,6 +73,7 @@ public class MainActivity2 extends AppCompatActivity implements OrderListAdapter
     private OrderListAdapter orderListAdapter;
     private List<OrderItemInfo> orderItemInfoList  = new ArrayList<>();
 
+    @SuppressLint("NewApi")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,7 +273,14 @@ new GetHumanReadableOrderIdTask().execute();
                 orderDetailQuery.setTableId(tableIdInputTextField.getText().toString());
             }
             if (inputOrderId != null && !inputOrderId.isEmpty()) {
-                new GetOrderDetailsTask().execute(orderDetailQuery, this);
+                try {
+                    TimeUnit.MILLISECONDS.sleep(1000);
+                    new GetOrderDetailsTask().execute(orderDetailQuery, this);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    showMessage("Order details could not be fetched");
+                }
+
             }
         } else {
             showMessage("Order Id is required");
@@ -627,6 +636,12 @@ new GetHumanReadableOrderIdTask().execute();
                             System.out.println("Sub item " + menuItemName + " selected for " + mainItem);
                             orderSelectionStack.push(menuButtonView.getText().toString());
                             if (subItem.getSubItems() != null && subItem.getSubItems().size() > 0) {
+                                if(mainSelectedOrderItem == selectedOrderItem) {
+                                    if(mainSelectedOrderItem.getSubItems() == null) {
+                                        mainSelectedOrderItem.setSubItems(new ArrayList<>());
+                                    }
+                                    mainSelectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                                }
                                 loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
                                 loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
                             } else {
@@ -636,6 +651,10 @@ new GetHumanReadableOrderIdTask().execute();
                                                 subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName());
                                         if (currMenuOptionDetail != null && currMenuOptionDetail.getId().equals(mainSelectedOrderItem.getOption().getId())) {
                                             currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
+                                            if(selectedOrderItem.getSubItems() == null) {
+                                                selectedOrderItem.setSubItems(new ArrayList<>());
+                                            }
+                                            selectedOrderItem.getSubItems().add(currSelectedOrderItem);
                                         }
                                     } /*else {
                                         currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
@@ -647,10 +666,6 @@ new GetHumanReadableOrderIdTask().execute();
                                 }
 
                             }
-                            if (selectedOrderItem.getSubItems() == null) {
-                                selectedOrderItem.setSubItems(new ArrayList<>());
-                            }
-                            selectedOrderItem.getSubItems().add(currSelectedOrderItem);
                         }
                     });
                     menuOptionsView.addView(menuButtonView);
@@ -661,6 +676,7 @@ new GetHumanReadableOrderIdTask().execute();
 
     private void reloadOrderItemView() {
         System.out.println("Reloading Order item view details for order id " + orderIdInputTextField.getText());
+        orderDetailsView.removeAllViews();
         String inputOrderId = (orderIdInputTextField.getText() != null) ?
                 orderIdInputTextField.getText().toString() : null;
         if(inputOrderId != null) {
@@ -738,7 +754,7 @@ new GetHumanReadableOrderIdTask().execute();
     @Override
     public void onOrderItemClick(int position) {
         OrderItemInfo orderItemInfo = orderListAdapter.getOrderItems().get(position);
-        showMessage("Do you wish to remove the item "+orderItemInfo.getItemId(), orderItemInfo);
+        showMessage("Do you wish to remove the item "+orderItemInfo.getXmlText(), orderItemInfo);
         reloadOrderItemView();
     }
 

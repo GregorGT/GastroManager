@@ -178,6 +178,7 @@ public class Client {
             //System.out.println("Client received order from Server: "+response);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
+            startingHumanReadableId = 0;
         } finally {
             close();
         }

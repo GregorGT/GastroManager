@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 public class MainActivity extends AppCompatActivity implements ParentFragment.OnFragmentInteractionListener, ChildFragment.OnFragmentInteractionListener,
 SecondChildFragment.OnFragmentInteractionListener {
@@ -19,20 +18,20 @@ SecondChildFragment.OnFragmentInteractionListener {
         setContentView(R.layout.activity_main);
 
         // Begin the transaction
-        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+       /* FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.parent_fragment_container, new ParentFragment());
-        ft.commit();
+        ft.commit();*/
 
-        Button openActvity2Button = findViewById(R.id.openActivity2);
-        openActvity2Button.setOnClickListener(new View.OnClickListener() {
+        Button orderingMenuButton = findViewById(R.id.orderingMenuButton);
+        orderingMenuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openActivity2();
+                openOrderingMenu();
             }
         });
     }
 
-    private void openActivity2() {
+    private void openOrderingMenu() {
         Intent intent = new Intent(this, MainActivity2.class);
         startActivity(intent);
     }
