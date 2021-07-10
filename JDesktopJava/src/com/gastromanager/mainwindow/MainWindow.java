@@ -151,7 +151,9 @@ public class MainWindow extends JFrame {
 		
 		BookingsMenu tabBookings = new BookingsMenu();
 		tabbedPane.addTab("Bookings", null,tabBookings, null);
-	
+
+		ServerSocketMenu serverSocketMenu = new ServerSocketMenu();
+		tabbedPane.addTab("Server", null, serverSocketMenu, null);
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
