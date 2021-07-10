@@ -274,7 +274,7 @@ new GetHumanReadableOrderIdTask().execute();
             }
             if (inputOrderId != null && !inputOrderId.isEmpty()) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(1000);
+                    TimeUnit.MILLISECONDS.sleep(500);
                     new GetOrderDetailsTask().execute(orderDetailQuery, this);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -656,10 +656,17 @@ new GetHumanReadableOrderIdTask().execute();
                                             }
                                             selectedOrderItem.getSubItems().add(currSelectedOrderItem);
                                         }
-                                    } /*else {
-                                        currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
-                                    }*/
+                                    } else {
+                                        if(mainSelectedOrderItem == selectedOrderItem) {
+                                            if(mainSelectedOrderItem.getSubItems() == null) {
+                                                mainSelectedOrderItem.setSubItems(new ArrayList<>());
+                                            }
+                                            mainSelectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                                        }
+                                    }
+
                                     loadOrderItemFromSelection();
+                                    System.out.println("sub items count "+mainSelectedOrderItem.getSubItems().size());
                                     new AddOrderItemTask().execute(mainSelectedOrderItem);
                                     reloadOrderItemView();
                                     menuOptionsView.removeAllViews();
