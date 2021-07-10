@@ -352,7 +352,7 @@ public class DbUtil {
                     "                          '"+ translateToSqlDate(orderItem.getDateTime())+"',\n" +
                     "                          '"+ orderItem.getStatus()+"',\n" +
                     "                          '"+newOrderItemId+"',\n" +
-                    "                          '1',\n" +
+                    "                          'null',\n" +
                     "                          '"+ orderItem.getPrice()/orderItem.getQuantity()+"'\n" +
                     "                      )";
             System.out.println("Executing \n "+insertOrderQuery);
@@ -407,6 +407,7 @@ public class DbUtil {
             String query = "DELETE FROM ORDERITEM" +
                     " WHERE ORDER_ID='"+orderItemInfo.getOrderId()+"'"+
                     " AND ITEM_ID ='"+orderItemInfo.getItemId()+"'" +
+                    " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'"+
                     " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')";
             System.out.println(query);
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
