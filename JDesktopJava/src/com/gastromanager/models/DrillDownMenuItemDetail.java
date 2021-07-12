@@ -7,6 +7,7 @@ import java.util.Map;
 public class DrillDownMenuItemDetail implements Serializable {
     String menuItemName;
     String uuid;
+    Double price;
     Map<String, DrillDownMenuItemOptionDetail> options;
     List<DrillDownMenuItemDetail> subItems;
 
@@ -50,5 +51,13 @@ public class DrillDownMenuItemDetail implements Serializable {
 
     public void setUuid(String uuid) {
         this.uuid = uuid;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
     }
 }

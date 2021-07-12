@@ -7,6 +7,8 @@ import com.gastromanager.models.xml.Item;
 import com.gastromanager.models.xml.Option;
 import com.gastromanager.print.PrintService;
 import com.gastromanager.print.PrintServiceImpl;
+import com.gastromanager.service.PaymentService;
+import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.SaxParserForGastromanager;
 import com.gastromanager.util.XmlUtil;
@@ -160,6 +162,9 @@ public class Server3 extends Thread{
             Map<String, DrillDownMenuItemOptionDetail> itemOptionDetailMap = itemDetail.getOptionsMap();
             xmlMainItem = new Item();
             xmlMainItem.setName(item.getItemName());
+            if(itemDetail.getPrice() != null) {
+                xmlMainItem.setPrice(itemDetail.getPrice().toString());
+            }
             DrillDownMenuItemOptionDetail optionDetail = null;
             SelectedOrderItemOption selectedOrderItemOption = item.getOption();
             if(selectedOrderItemOption != null) {
@@ -225,6 +230,11 @@ public class Server3 extends Thread{
                 if(optionDetail != null) {
                     orderItem.setItemId(optionDetail.getUuid() == null ? null : Long.valueOf(optionDetail.getUuid()));
                 } else {
+                    System.out.println(" orderItem "+itemDetail.getMenuItemName()+ " price " +orderPrice.getPrice());
+                    if(orderPrice.getPrice() != null && orderPrice.getPrice() == 0.0 && itemDetail.getPrice() != null) {
+                        System.out.println("price set from item "+itemDetail.getPrice());
+                        orderPrice.setPrice(orderPrice.getPrice() + itemDetail.getPrice());
+                    }
                     orderItem.setItemId(itemDetail.getUuid() == null ? null : Long.valueOf(itemDetail.getUuid()));
                 }
 
@@ -489,6 +499,20 @@ public class Server3 extends Thread{
                     HumanReadableIdQuery humanReadableIdQuery = (HumanReadableIdQuery) clientMessage;
                     oos.writeObject(DbUtil.getStartingHumanReadableOrderId(humanReadableIdQuery.getFloorId(),
                             humanReadableIdQuery.getTableId()));
+
+                } else if(clientMessage instanceof OrderListQuery) {
+                    //send result to client
+                    OrderListQuery orderListQuery = (OrderListQuery) clientMessage;
+                    PaymentService paymentService = new PaymentServiceImpl();
+                    oos.writeObject(paymentService.retrieveOrders(orderListQuery));
+                    paymentService = null;
+
+                } else if(clientMessage instanceof OrderItemTransactionInfo) {
+                    //send result to client
+                    OrderItemTransactionInfo orderItemTransactionInfo = (OrderItemTransactionInfo) clientMessage;
+                    PaymentService paymentService = new PaymentServiceImpl();
+                    oos.writeObject(paymentService.processTransactionInfo(orderItemTransactionInfo));
+                    paymentService = null;
 
                 } else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;

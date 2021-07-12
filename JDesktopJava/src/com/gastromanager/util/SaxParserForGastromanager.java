@@ -129,6 +129,10 @@ public class SaxParserForGastromanager {
                     item = new DrillDownMenuItemDetail();
                     item.setMenuItemName(attributes.getValue("name"));
                     item.setUuid(attributes.getValue("uuid"));
+                    if(attributes.getValue("price") != null) {
+                        item.setPrice(Double.valueOf(attributes.getValue("price")));
+                    }
+
                     //System.out.println("start of item"+ qName);
                     itemStack.push(item);
                     break;
