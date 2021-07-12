@@ -44,7 +44,19 @@
 				<option id="size" name="medium" overwrite_price="5.8" menu_id="120b" uuid="346123244" />
 				<option id="size" name="large" 	price="1.2" menu_id="120c" uuid="3412512344"/>
 			</item>
-		</item>		
+		</item>	
+		<item name="sushi" printer="kitchen" uuid="1231414234">
+			<item name="maki" uuid="21231232">
+				<item name="2 rolls" price="4" uuid="1294231241"></item>
+				<item name="4 rolls" price="6" uuid="12942311"></item>
+				<item name="6 rolls" price="8" uuid="12942"></item>
+			</item>
+			<item name="nigiri" uuid="2123123322">
+				<option name="2 rolls" price="4" uuid="12943231"></option>
+				<option name="4 rolls" price="6" uuid="129489971"></option>
+				<option name="6 rolls" price="8" uuid="12123211"></option>
+			</item>
+		</item>
 		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
 				<option id="size" name="small" price="0.5" />
 				<option id="size" name="medium" price="0.8" />
@@ -85,6 +97,7 @@
 				<button name="Pizza" target="1976266538" x-position="50" y-position="50" height="50" width="100"/>
 				<button name="Pasta" target="19762674635" x-position="50" y-position="150" height="50" width="100"/>
 				<button name="Drink" target="381123886124" x-position="50" y-position="250" height="50" width="100"/>
+				<button name="Sushi" target="1231414234" x-position="50" y-position="350" height="50" width="100"/>
 		</drilldownmenu>
 	</drilldownmenus>
 	
