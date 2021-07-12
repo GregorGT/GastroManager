@@ -14,6 +14,9 @@ public class Item
     @XmlAttribute
     private String menu_id;
 
+    @XmlAttribute
+    private String price;
+
     @XmlElement
     private Option option;
 
@@ -55,6 +58,14 @@ public class Item
 
     public void setItem(List<Item> item) {
         this.item = item;
+    }
+
+    public String getPrice() {
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
     }
 
     @Override

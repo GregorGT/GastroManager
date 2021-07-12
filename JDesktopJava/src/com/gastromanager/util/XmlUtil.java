@@ -203,7 +203,7 @@ public class XmlUtil {
 					orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
 					//addOptionOrderInfo(item, orderDetailsBuilder);
 					//Linked items
-					addChildItemInfo(item.getChildNodes(), orderDetailsBuilder, item);
+					addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
 					//addChildItems(item, orderDetailsBuilder);
 					orderDetailsBuilder.append("\n");
 
@@ -213,49 +213,48 @@ public class XmlUtil {
 		return orderDetailsBuilder.toString().trim();
 	}
 
-	private static void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder, Node root) {
+	private static void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder) {
 		for (int childId = 0; childId < children.getLength(); childId++) {
 			Node child = children.item(childId);
 			String childItemName  = child.getNodeName();
 			if(childItemName == "item") {
 				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
-				addOptionOrderInfo(child, orderDetailsBuilder, root);
+				addOptionOrderInfo(child, orderDetailsBuilder);
 				//orderDetailsBuilder.append("\n");
 				if(child.hasChildNodes()) {
-					addChildItemInfo(child.getChildNodes(), orderDetailsBuilder, root);
+					addChildItemInfo(child.getChildNodes(), orderDetailsBuilder);
 				}
 			}
 		}
 	}
 
-	private static void addOptionOrderInfo(Node node, StringBuilder orderDetailsBuilder, Node root) {
-		NodeList childNodes  = node.getChildNodes();
-		Boolean optionInfoAdded = false;
-		for (int childId = 0; childId < childNodes.getLength(); childId++) {
-			Node child = childNodes.item(childId);
-			if(child.getNodeName() == "option") {
-				System.out.println("adding option information "+child.getAttributes().getNamedItem("name").getNodeValue());
-				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
-				if(child.hasChildNodes()) {
-					NodeList optionChildNodes  = child.getChildNodes();
-					for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
-						Node optionChild = optionChildNodes.item(optionChildId);
-						if(optionChild.getNodeName() == "choice") {
-							orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
-							break;
+	private static void addOptionOrderInfo(Node node, StringBuilder orderDetailsBuilder) {
+		if(node != null && node.hasChildNodes()) {
+			NodeList childNodes  = node.getChildNodes();
+			if (childNodes != null) {
+				for (int childId = 0; childId < childNodes.getLength(); childId++) {
+					Node child = childNodes.item(childId);
+					if (child.getNodeName() == "option") {
+						System.out.println("adding option information " + child.getAttributes().getNamedItem("name").getNodeValue());
+						orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+						if (child.hasChildNodes()) {
+							NodeList optionChildNodes = child.getChildNodes();
+							for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
+								Node optionChild = optionChildNodes.item(optionChildId);
+								if (optionChild.getNodeName() == "choice") {
+									orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
+									break;
+								}
+							}
 						}
+						orderDetailsBuilder.append("\n");
+						break;
 					}
-				}
-				orderDetailsBuilder.append("\n");
-				optionInfoAdded = true;
-				break;
-			}
 
+				}
+			}
 		}
-		//Add root item's option when no option info is available at the sub item level
-		if(!optionInfoAdded) {
-			addOptionOrderInfo(root, orderDetailsBuilder, root);
-		}
+
 	}
 
 }

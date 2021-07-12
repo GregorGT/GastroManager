@@ -52,9 +52,9 @@
 				<item name="6 rolls" price="8" uuid="12942"></item>
 			</item>
 			<item name="nigiri" uuid="2123123322">
-				<option name="2 rolls" price="4" uuid="12943231"></option>
-				<option name="4 rolls" price="6" uuid="129489971"></option>
-				<option name="6 rolls" price="8" uuid="12123211"></option>
+				<option id="rollCount" name="2 rolls" price="4" uuid="12943231"></option>
+				<option id="rollCount" name="4 rolls" price="6" uuid="129489971"></option>
+				<option id="rollCount" name="6 rolls" price="8" uuid="12123211"></option>
 			</item>
 		</item>
 		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
