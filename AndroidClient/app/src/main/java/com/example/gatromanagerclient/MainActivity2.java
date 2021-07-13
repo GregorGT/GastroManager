@@ -210,15 +210,6 @@ new GetHumanReadableOrderIdTask().execute();
                 selectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ? null : orderIdInputTextField.getText().toString());
 
                 if (checkIfItemIsReadyForSelection(selectedOrderItem)) {
-                    StringBuilder orderItemInfoBuilder = new StringBuilder();
-                    /*if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
-                        orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
-                    }
-                    orderItemInfoBuilder.append(selectedOrderItem.getItemName() + "\t" +
-                            selectedOrderItem.getSubItems().get(0).getItemName() + "\t" +
-                            selectedOrderItem.getSubItems().get(0).getOption().getName() + "\n");
-                    orderDetailsView.setText(orderItemInfoBuilder.toString());*/
-
                     new AddOrderItemTask().execute(selectedOrderItem);
                     reloadOrderItemView();
                 } else {
@@ -236,7 +227,7 @@ new GetHumanReadableOrderIdTask().execute();
 
     private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem selectedOrderItem) {
         return (selectedOrderItem.getSubItems() != null && selectedOrderItem.getSubItems().size() == 1
-                && selectedOrderItem.getSubItems().get(0).getOption() != null && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
+                 && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
 
     }
 
@@ -436,9 +427,17 @@ new GetHumanReadableOrderIdTask().execute();
                         orderSelectionStack = new Stack<>();
                     }
                     orderSelectionStack.push(itemName.toString());
-                    loadMenuItemOptionsView(menuButton.getMenuItemDetail(), menuButtonView,
-                            menuOptionView, true, itemName.toString(), mainSelectedOrderItem);
-                    loadMenuSubItems(menuButton.getMenuItemDetail(), menuOptionsView, itemName.toString(), mainSelectedOrderItem);
+                    DrillDownMenuItemDetail currentDrillDownMenuItemDetail = menuButton.getMenuItemDetail();
+                    if(currentDrillDownMenuItemDetail.getOptionsMap() != null) {
+                        loadMenuItemOptionsView(currentDrillDownMenuItemDetail, menuButtonView,
+                                menuOptionView, true, itemName.toString(), mainSelectedOrderItem);
+                    }
+                    if(currentDrillDownMenuItemDetail.getSubItems() != null) {
+                        loadMenuSubItems(currentDrillDownMenuItemDetail, menuOptionsView, itemName.toString(), mainSelectedOrderItem);
+                    }
+                    if(currentDrillDownMenuItemDetail.getSubItems() == null && currentDrillDownMenuItemDetail.getOptionsMap() == null) {
+                        addItemAndReload(mainSelectedOrderItem);
+                    }
                 }
             });
 
