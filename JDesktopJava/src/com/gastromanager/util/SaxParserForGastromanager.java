@@ -51,7 +51,8 @@ public class SaxParserForGastromanager {
         try {
             SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
             MenuDetail menuDetailInfo = null;
-            menuDetailInfo = parser.parseXml(XmlUtil.readFileToString("C:\\\\Users\\\\Admin\\\\IdeaProjects\\\\GastroManager\\\\JDesktopJava\\\\data\\\\sample_tempalte.xml",
+
+            menuDetailInfo = parser.parseXml(XmlUtil.readFileToString("C:\\Users\\Admin\\AndroidStudioProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
                     Charset.defaultCharset()));
             System.out.println(menuDetailInfo);
         } catch (IOException e) {
@@ -80,7 +81,7 @@ public class SaxParserForGastromanager {
             List<DrillDownMenuButton> buttons = menuType.getButtons();
             for(DrillDownMenuButton button: buttons) {
                 button.setMenuItemDetail(menuItemMap.get(button.getTarget()));
-                System.out.println("Added menuitem "+menuItemMap.get(button.getTarget()).getUuid() +" to "
+                System.out.println("Added menuitem "+menuItemMap.get(button.getTarget()).getMenuItemName() +" to "
                 +button.getName());
             }
         }
@@ -131,6 +132,9 @@ public class SaxParserForGastromanager {
                     item.setUuid(attributes.getValue("uuid"));
                     if(attributes.getValue("price") != null) {
                         item.setPrice(Double.valueOf(attributes.getValue("price")));
+                    }
+                    if(attributes.getValue("menu_id") != null) {
+                        item.setMenuId(attributes.getValue("menu_id"));
                     }
 
                     //System.out.println("start of item"+ qName);
@@ -200,6 +204,7 @@ public class SaxParserForGastromanager {
                         drillDownMenuButton.setyPosition(attributes.getValue("y-position"));
                         drillDownMenuButton.setTarget(attributes.getValue("target"));
                         drillDownMenuType.getButtons().add(drillDownMenuButton);
+                        System.out.println("Created button "+drillDownMenuButton.getName());
                     }
 
                     break;
@@ -242,11 +247,19 @@ public class SaxParserForGastromanager {
                             parentItem.setSubItems(new ArrayList<>());
                         }
                         parentItem.getSubItems().add(item);
+                        if(menu.getItemMap() == null) {
+                            menu.setItemMap(new HashMap<>());
+                        }
+                        menu.getItemMap().put(item.getUuid(), item);
                     } else { //add main item to map
                         if(menu.getItemMap() == null) {
                             menu.setItemMap(new HashMap<>());
                         }
                         menu.getItemMap().put(item.getUuid(), item);
+                        if(menu.getMainItemMap() == null) {
+                            menu.setMainItemMap(new HashMap<>());
+                        }
+                        menu.getMainItemMap().put(item.getUuid(), item);
                         itemStack = null;
                     }
                     break;

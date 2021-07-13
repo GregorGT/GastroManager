@@ -102,7 +102,7 @@ public class DbUtil {
                         "ID="+transactionInfo.getId();
                 Integer rowsInserted = statement.executeUpdate(removeTransactionStmt);
                 if(rowsInserted == 1) {
-                    transactionInfo.setId(null);
+                    transactionInfo.setId(-1);
                     transactionRemovedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
                 }
             } catch (SQLException sqlException) {

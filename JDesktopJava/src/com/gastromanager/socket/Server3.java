@@ -248,7 +248,7 @@ public class Server3 extends Thread{
     private MenuDetail loadMenu() {
         try {
             String xmlContent = XmlUtil.readFileToString(
-                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+                    "C:\\Users\\Admin\\AndroidStudioProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
                     Charset.defaultCharset());
             SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
             menuDetail = parser.parseXml(xmlContent);
@@ -264,7 +264,7 @@ public class Server3 extends Thread{
     private void loadQuickMenuMap(MenuDetail menuDetail) {
         Menu menu = menuDetail.getMenu();
         Stack<DrillDownMenuItemDetail> drillDownMenuItemDetailStack = null;
-        for(Map.Entry<String, DrillDownMenuItemDetail> orderItemEntry : menu.getItemMap().entrySet()) {
+        for(Map.Entry<String, DrillDownMenuItemDetail> orderItemEntry : menu.getMainItemMap().entrySet()) {
             DrillDownMenuItemDetail parent = orderItemEntry.getValue();
             System.out.println("item name "+parent.getMenuItemName());
             buildQuickMenuItem(parent, drillDownMenuItemDetailStack, menu);
@@ -279,16 +279,70 @@ public class Server3 extends Thread{
                     subItem.getOptionsMap() != null) {
                 addQuickMenuEntry(subItem, parent, menu, drillDownMenuItemDetailStack);
             } else {
-                if(subItem.getOptionsMap() != null) {
+                if(subItem.getOptionsMap() != null || subItem.getSubItems() != null) {
                     if (drillDownMenuItemDetailStack == null) {
                         drillDownMenuItemDetailStack = new Stack<>();
                     }
                     drillDownMenuItemDetailStack.push(parent);
                     drillDownMenuItemDetailStack.push(subItem);
                     buildQuickMenuItem(subItem, drillDownMenuItemDetailStack, menu);
+                } else { //no subitem and options
+                    buildQuickMenuEntry(subItem, parent, menu, drillDownMenuItemDetailStack);
                 }
             }
         }
+    }
+
+    private void buildQuickMenuEntry(DrillDownMenuItemDetail subItem, DrillDownMenuItemDetail parent,  Menu menu,
+                                     Stack<DrillDownMenuItemDetail> drillDownMenuItemDetailStack) {
+        if(drillDownMenuItemDetailStack == null) {
+            //main Item
+            SelectedOrderItem selectedOrderItem = buildParentChildOrderSelection(subItem, parent, null);
+            menu.getQuickMenuIdRefMap().put(subItem.getMenuId(), selectedOrderItem);
+            System.out.println("added entry for " + subItem.getMenuItemName() + "menu id = " + subItem.getMenuId());
+        } else {
+            Stack<DrillDownMenuItemDetail> localDrillDownMenuItemStack =
+                    (Stack<DrillDownMenuItemDetail>) drillDownMenuItemDetailStack.clone();
+            SelectedOrderItem parentItem = null;
+            Boolean isNestedItem = false;
+            SelectedOrderItem previousParent = null;
+            while (!localDrillDownMenuItemStack.empty()) {
+                DrillDownMenuItemDetail currentParentMenuItem = localDrillDownMenuItemStack.pop();
+                parentItem = buildParentChildOrderSelection(subItem, currentParentMenuItem, parentItem);
+                /*if(isNestedItem) {
+                    parentItem = buildParentChildOrderSelection(previousParent, currentParentMenuItem);
+                } else {
+                    parentItem = buildParentChildOrderSelection(subItem, currentParentMenuItem);
+                }
+                previousParent = parentItem;
+                isNestedItem = true;*/
+            }
+            menu.getQuickMenuIdRefMap().put(subItem.getMenuId(), parentItem);
+            System.out.println("added entry for " + subItem.getMenuItemName() + "menu id = " + subItem.getMenuId());
+
+        }
+    }
+
+    private SelectedOrderItem buildParentChildOrderSelection(DrillDownMenuItemDetail subItem, DrillDownMenuItemDetail parent,
+                                                             SelectedOrderItem child) {
+        SelectedOrderItem selectedOrderItem = new SelectedOrderItem();
+        selectedOrderItem.setItemName(parent.getMenuItemName());
+        selectedOrderItem.setTarget(parent.getUuid());
+        selectedOrderItem.setPrice(subItem.getPrice());
+        SelectedOrderItem selectedOrderSubItem = null;
+        if(child != null) {
+            selectedOrderSubItem = child;
+        } else {
+            selectedOrderSubItem = new SelectedOrderItem();
+            selectedOrderSubItem.setItemName(subItem.getMenuItemName());
+            selectedOrderSubItem.setTarget(subItem.getUuid());
+
+        }
+        List<SelectedOrderItem> selectedOrderItemList = new ArrayList<>();
+        selectedOrderItemList.add(selectedOrderSubItem);
+        selectedOrderItem.setSubItems(selectedOrderItemList);
+
+        return selectedOrderItem;
     }
 
 
@@ -309,7 +363,8 @@ public class Server3 extends Thread{
                 selectedOrderItem.setTarget(parent.getUuid());
                 selectedOrderItem.setPrice(optionDetail.getPrice());
                 //add option to parent
-                DrillDownMenuItemOptionDetail menuItemOptionDetail = parent.getOptionsMap().get(optionDetail.getName());
+                DrillDownMenuItemOptionDetail menuItemOptionDetail = (parent.getOptionsMap() != null) ? parent.getOptionsMap().get(optionDetail.getName())
+                        : null;
                 if(menuItemOptionDetail != null) {
                     SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
                     selectedOrderItemOption.setName(menuItemOptionDetail.getName());
@@ -337,18 +392,21 @@ public class Server3 extends Thread{
                     while (!localDrillDownMenuItemStack.empty()) {
                         DrillDownMenuItemDetail drillDownMenuItemDetail = localDrillDownMenuItemStack.pop();
                         Map<String, SelectedOrderItemOption> optionsMap = null;
-                        for (Map.Entry<String, DrillDownMenuItemOptionDetail> optionDetailEntry : drillDownMenuItemDetail.getOptionsMap().entrySet()) {
-                            DrillDownMenuItemOptionDetail drillDownMenuItemOptionDetail = optionDetailEntry.getValue();
-                            if (!drillDownMenuItemOptionDetail.getId().equals(selectedOrderItemOption.getId())) {
-                                SelectedOrderItemOption currItemOption = new SelectedOrderItemOption();
-                                currItemOption.setId(drillDownMenuItemOptionDetail.getId());
-                                currItemOption.setName(drillDownMenuItemOptionDetail.getName());
-                                if (optionsMap == null) {
-                                    optionsMap = new HashMap<>();
+                        Map<String, DrillDownMenuItemOptionDetail> menuItemOptionDetailMap = drillDownMenuItemDetail.getOptionsMap();
+                        if(menuItemOptionDetailMap != null) {
+                            for (Map.Entry<String, DrillDownMenuItemOptionDetail> optionDetailEntry : menuItemOptionDetailMap.entrySet()) {
+                                DrillDownMenuItemOptionDetail drillDownMenuItemOptionDetail = optionDetailEntry.getValue();
+                                if (!drillDownMenuItemOptionDetail.getId().equals(selectedOrderItemOption.getId())) {
+                                    SelectedOrderItemOption currItemOption = new SelectedOrderItemOption();
+                                    currItemOption.setId(drillDownMenuItemOptionDetail.getId());
+                                    currItemOption.setName(drillDownMenuItemOptionDetail.getName());
+                                    if (optionsMap == null) {
+                                        optionsMap = new HashMap<>();
+                                    }
+                                    optionsMap.put(currItemOption.getName(), currItemOption);
+                                } else {
+                                    break;
                                 }
-                                optionsMap.put(currItemOption.getName(), currItemOption);
-                            } else {
-                                break;
                             }
                         }
                         if(drillDownMenuItemDetail.getMenuItemName().equals(parent.getMenuItemName())) {
