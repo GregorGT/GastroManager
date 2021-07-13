@@ -47,15 +47,21 @@
 		</item>	
 		<item name="sushi" printer="kitchen" uuid="1231414234">
 			<item name="maki" uuid="21231232">
-				<item name="2 rolls" price="4" uuid="1294231241"></item>
-				<item name="4 rolls" price="6" uuid="12942311"></item>
-				<item name="6 rolls" price="8" uuid="12942"></item>
+				<item name="2 rolls" price="4" uuid="1294231241" menu_id="130a" ></item>
+				<item name="4 rolls" price="6" uuid="12942311" menu_id="130b"></item>
+				<item name="6 rolls" price="8" uuid="12942" menu_id="130c"></item>
 			</item>
 			<item name="nigiri" uuid="2123123322">
-				<option id="rollCount" name="2 rolls" price="4" uuid="12943231"></option>
-				<option id="rollCount" name="4 rolls" price="6" uuid="129489971"></option>
-				<option id="rollCount" name="6 rolls" price="8" uuid="12123211"></option>
+				<option name="2 rolls" id="rollcount"  price="4" uuid="12943231"  menu_id="131a"></option>
+				<option name="4 rolls" id="rollcount"  price="6" uuid="129489971" menu_id="131b"></option>
+				<option name="6 rolls" id="rollcount"  price="8" uuid="12123211" menu_id="131c"></option>
 			</item>
+		</item>
+		<item name="Salad" printer="kitchen" uuid="1244225331">
+			<item name="Chicken breast salad" price="6" uuid="129122941" menu_id="140" ></item>
+			<item name="Chicken breast salad - extra chicken" price="2" uuid="129122949" menu_id="140a" ></item>
+			<item name="Turkey breast salad" price="6" uuid="423424" menu_id="141" ></item>
+			<item name="Turkey breast salad - extra chicken" price="2" uuid="54532343" menu_id="141a" ></item>
 		</item>
 		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
 				<option id="size" name="small" price="0.5" />
@@ -73,10 +79,6 @@
 	</menues>
 	<layout>
 	</layout>
-	
-	
-	<reservations>
-	</reservations>
 	<drilldownmenus>
 		<drilldownmenu name="Main screens" width="700" height="600">
 			<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
@@ -98,6 +100,9 @@
 				<button name="Pasta" target="19762674635" x-position="50" y-position="150" height="50" width="100"/>
 				<button name="Drink" target="381123886124" x-position="50" y-position="250" height="50" width="100"/>
 				<button name="Sushi" target="1231414234" x-position="50" y-position="350" height="50" width="100"/>
+				<button name="Salad" target="1244225331" x-position="50" y-position="450" height="50" width="100"/>
+				<button name="Fanta" target="391283113" x-position="150" y-position="450" height="50" width="100"/>
+				
 		</drilldownmenu>
 	</drilldownmenus>
 	
