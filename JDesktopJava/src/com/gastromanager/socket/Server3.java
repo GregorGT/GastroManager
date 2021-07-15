@@ -5,9 +5,9 @@ import com.gastromanager.models.*;
 import com.gastromanager.models.xml.Choice;
 import com.gastromanager.models.xml.Item;
 import com.gastromanager.models.xml.Option;
-import com.gastromanager.print.PrintService;
-import com.gastromanager.print.PrintServiceImpl;
+import com.gastromanager.service.OrderService;
 import com.gastromanager.service.PaymentService;
+import com.gastromanager.service.impl.OrderServiceImpl;
 import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.SaxParserForGastromanager;
@@ -31,10 +31,15 @@ public class Server3 extends Thread{
     private MenuDetail menuDetail;
     private Boolean isRunning = false;
     private Integer serverSocketPort;
+    private OrderService orderService;
+    private PaymentService paymentService;
 
 
     public Server3(Integer serverSocketPort) {
+
         this.serverSocketPort = serverSocketPort;
+        orderService = new OrderServiceImpl();
+        paymentService = new PaymentServiceImpl();
     }
 
     public void startServer()
@@ -515,42 +520,18 @@ public class Server3 extends Thread{
 
                 Object clientMessage = ois.readObject();
                 if(clientMessage instanceof SelectedOrderItem) {
-                    SelectedOrderItem orderItem = (SelectedOrderItem) clientMessage;
-                    OrderItem dbOrderItem = buildOrderItemEntry(orderItem);
-                    Integer noOfRowsInserted = DbUtil.insertOrder(dbOrderItem);
-                    System.out.println((noOfRowsInserted ==1) ? "Order Inserted": " Order not inserted");
+                    orderService.addOrderItem((SelectedOrderItem) clientMessage);
 
                 } else if(clientMessage instanceof OrderItemInfo) {
-                    OrderItemInfo orderItem = (OrderItemInfo) clientMessage;
-                    Boolean isItemDeleted = DbUtil.removeOrderItem(orderItem);
+                    orderService.removeOrderItem((OrderItemInfo) clientMessage);
 
                 } else if(clientMessage instanceof OrderDetailQuery) {
                     //send result to client
-                    List<OrderItem> orderItems = DbUtil.getOrderDetails((OrderDetailQuery) clientMessage, false);
-                    ArrayList<OrderItemInfo> orderItemArrayList =  null;
-                    if(orderItems != null) {
-                        orderItemArrayList = new ArrayList<>();
-                        for(OrderItem orderItem: orderItems) {
-                            OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
-                            orderItemArrayList.add(orderItemInfo);
-                        }
-
-                        System.out.println("order items count "+orderItemArrayList.size());
-                        oos.writeObject(orderItemArrayList);
-
-                    } else {
-                        System.out.println("No order items found");
-                    }
+                    oos.writeObject(orderService.retrieveOrderItems((OrderDetailQuery) clientMessage));
 
                 } else if(clientMessage instanceof SignOffOrderInfo) {
                     //send result to client
-                    SignOffOrderInfo signOffOrderInfo = (SignOffOrderInfo) clientMessage;
-                    PrintService printService = new PrintServiceImpl();
-                    Boolean isPrinted = printService.print(signOffOrderInfo.getOrderDetailQuery());
-                    if(isPrinted) {
-
-                    }
-                    oos.writeObject(isPrinted);
+                    oos.writeObject(orderService.signOffOrder((SignOffOrderInfo) clientMessage));
 
                 } else if(clientMessage instanceof HumanReadableIdQuery) {
                     //send result to client
@@ -561,14 +542,12 @@ public class Server3 extends Thread{
                 } else if(clientMessage instanceof OrderListQuery) {
                     //send result to client
                     OrderListQuery orderListQuery = (OrderListQuery) clientMessage;
-                    PaymentService paymentService = new PaymentServiceImpl();
                     oos.writeObject(paymentService.retrieveOrders(orderListQuery));
                     paymentService = null;
 
                 } else if(clientMessage instanceof OrderItemTransactionInfo) {
                     //send result to client
                     OrderItemTransactionInfo orderItemTransactionInfo = (OrderItemTransactionInfo) clientMessage;
-                    PaymentService paymentService = new PaymentServiceImpl();
                     oos.writeObject(paymentService.processTransactionInfo(orderItemTransactionInfo));
                     paymentService = null;
 

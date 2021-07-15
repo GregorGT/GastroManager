@@ -30,14 +30,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public List<OrderItemInfo> processTransactionInfo(OrderItemTransactionInfo orderItemTransactionInfo) {
-        OrderItemInfo orderItemInfo = orderItemTransactionInfo.getOrderItemInfo();
+        List<OrderItemInfo> orderItemInfo = orderItemTransactionInfo.getOrderItemInfo();
         TransactionInfo transactionInfo = orderItemTransactionInfo.getTransactionInfo();
         if(orderItemTransactionInfo.getAddTransaction()) { //Add transaction
             DbUtil.addTransactionInfo(orderItemInfo, transactionInfo);
         } else { //remove transaction
             DbUtil.removeTransactionInfo(orderItemInfo, transactionInfo);
         }
-        return translateToOrderItemInfo(DbUtil.getOrderDetails(orderItemInfo.getOrderId().toString(), false));
+        return translateToOrderItemInfo(DbUtil.getOrderDetails(orderItemInfo.get(0).getOrderId().toString(), false));
     }
 
     private List<OrderItemInfo> translateToOrderItemInfo(List<OrderItem> orderItems) {

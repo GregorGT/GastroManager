@@ -5,12 +5,12 @@ import com.gastromanager.models.*;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 
-
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DbUtil {
 
@@ -53,7 +53,7 @@ public class DbUtil {
         return orderItems;
     }
 
-    public static Boolean addTransactionInfo(OrderItemInfo orderItemInfo, TransactionInfo transactionInfo) {
+    public static Boolean addTransactionInfo(List<OrderItemInfo> orderItemInfoList, TransactionInfo transactionInfo) {
         Boolean transactionAddedSuccessfully = false;
         Integer nextTransactionId = getNextTransactionId();
         if(transactionInfo == null) {
@@ -64,6 +64,12 @@ public class DbUtil {
             try {
                 Connection connection = DbConnection.getDbConnection().gastroDbConnection;
                 Statement statement = connection.createStatement();
+
+                Double price = orderItemInfoList.stream().map(orderItemInfo ->
+                        orderItemInfo.getPrice()
+                ).collect(Collectors.summingDouble(Double::doubleValue));
+
+                System.out.println("Total transaction price "+price);
                 String insertTransactionStmt = "INSERT INTO transactions (\n" +
                         "                             id,\n" +
                         "                             total_amount,\n" +
@@ -72,13 +78,15 @@ public class DbUtil {
                         "                         )\n" +
                         "                         VALUES (\n" +
                         "                             '"+transactionInfo.getId()+"',\n" +
-                        "                             '"+orderItemInfo.getPrice()+"',\n" +
+                        "                             '"+price+"',\n" +
                         "                             '"+transactionInfo.getPaymentMethod()+"',\n" +
                         "                             '"+transactionInfo.getTips()+"'\n" +
                         "                         )";
                 Integer rowsInserted = statement.executeUpdate(insertTransactionStmt);
                 if(rowsInserted == 1) {
-                    transactionAddedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                    for(OrderItemInfo orderItemInfo: orderItemInfoList) {
+                        transactionAddedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                    }
                 }
             } catch (SQLException sqlException) {
                 sqlException.printStackTrace();
@@ -91,7 +99,7 @@ public class DbUtil {
     }
 
 
-    public static Boolean removeTransactionInfo(OrderItemInfo orderItemInfo, TransactionInfo transactionInfo) {
+    public static Boolean removeTransactionInfo(List<OrderItemInfo> orderItemInfoList, TransactionInfo transactionInfo) {
         Boolean transactionRemovedSuccessfully = false;
 
         if(transactionInfo != null) {
@@ -103,7 +111,9 @@ public class DbUtil {
                 Integer rowsInserted = statement.executeUpdate(removeTransactionStmt);
                 if(rowsInserted == 1) {
                     transactionInfo.setId(-1);
-                    transactionRemovedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                    for(OrderItemInfo orderItemInfo: orderItemInfoList) {
+                        transactionRemovedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                    }
                 }
             } catch (SQLException sqlException) {
                 sqlException.printStackTrace();

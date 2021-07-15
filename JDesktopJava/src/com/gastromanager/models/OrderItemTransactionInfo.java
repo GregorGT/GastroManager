@@ -1,20 +1,21 @@
 package com.gastromanager.models;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class OrderItemTransactionInfo implements Serializable {
 
-    private OrderItemInfo orderItemInfo;
+    private List<OrderItemInfo> orderItemInfoList;
     private TransactionInfo transactionInfo;
     private Boolean addTransaction;
 
 
-    public OrderItemInfo getOrderItemInfo() {
-        return orderItemInfo;
+    public List<OrderItemInfo> getOrderItemInfo() {
+        return orderItemInfoList;
     }
 
-    public void setOrderItemInfo(OrderItemInfo orderItemInfo) {
-        this.orderItemInfo = orderItemInfo;
+    public void setOrderItemInfo(List<OrderItemInfo> orderItemInfoList) {
+        this.orderItemInfoList = orderItemInfoList;
     }
 
     public TransactionInfo getTransactionInfo() {
