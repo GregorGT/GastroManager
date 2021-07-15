@@ -7,13 +7,14 @@ public class Order implements Serializable {
     private Integer Id;
     private String floorId;
     private String tableId;
-    private String transactionId;
+    private Integer transactionId;
     private String humanReadableId;
     private String menuId;
     private String memberId;
     private String staffId;
     private LocalDateTime dateTime;
     private Double amount;
+    private Integer locationId;
 
     public Integer getId() {
         return Id;
@@ -39,11 +40,11 @@ public class Order implements Serializable {
         this.tableId = tableId;
     }
 
-    public String getTransactionId() {
+    public Integer getTransactionId() {
         return transactionId;
     }
 
-    public void setTransactionId(String transactionId) {
+    public void setTransactionId(Integer transactionId) {
         this.transactionId = transactionId;
     }
 
@@ -93,5 +94,13 @@ public class Order implements Serializable {
 
     public void setAmount(Double amount) {
         this.amount = amount;
+    }
+
+    public Integer getLocationId() {
+        return locationId;
+    }
+
+    public void setLocationId(Integer locationId) {
+        this.locationId = locationId;
     }
 }

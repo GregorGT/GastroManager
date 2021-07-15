@@ -210,15 +210,6 @@ new GetHumanReadableOrderIdTask().execute();
                 selectedOrderItem.setOrderId((orderIdInputTextField.getText() == null) ? null : orderIdInputTextField.getText().toString());
 
                 if (checkIfItemIsReadyForSelection(selectedOrderItem)) {
-                    StringBuilder orderItemInfoBuilder = new StringBuilder();
-                    /*if (orderDetailsView.getText() != null && orderDetailsView.getText().length() > 0) {
-                        orderItemInfoBuilder.append(orderDetailsView.getText() + "\n");
-                    }
-                    orderItemInfoBuilder.append(selectedOrderItem.getItemName() + "\t" +
-                            selectedOrderItem.getSubItems().get(0).getItemName() + "\t" +
-                            selectedOrderItem.getSubItems().get(0).getOption().getName() + "\n");
-                    orderDetailsView.setText(orderItemInfoBuilder.toString());*/
-
                     new AddOrderItemTask().execute(selectedOrderItem);
                     reloadOrderItemView();
                 } else {
@@ -236,7 +227,7 @@ new GetHumanReadableOrderIdTask().execute();
 
     private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem selectedOrderItem) {
         return (selectedOrderItem.getSubItems() != null && selectedOrderItem.getSubItems().size() == 1
-                && selectedOrderItem.getSubItems().get(0).getOption() != null && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
+                 && selectedOrderItem.getSubItems().get(0).getAllOptions() == null);
 
     }
 
@@ -436,9 +427,17 @@ new GetHumanReadableOrderIdTask().execute();
                         orderSelectionStack = new Stack<>();
                     }
                     orderSelectionStack.push(itemName.toString());
-                    loadMenuItemOptionsView(menuButton.getMenuItemDetail(), menuButtonView,
-                            menuOptionView, true, itemName.toString(), mainSelectedOrderItem);
-                    loadMenuSubItems(menuButton.getMenuItemDetail(), menuOptionsView, itemName.toString(), mainSelectedOrderItem);
+                    DrillDownMenuItemDetail currentDrillDownMenuItemDetail = menuButton.getMenuItemDetail();
+                    if(currentDrillDownMenuItemDetail.getOptionsMap() != null) {
+                        loadMenuItemOptionsView(currentDrillDownMenuItemDetail, menuButtonView,
+                                menuOptionView, true, itemName.toString(), mainSelectedOrderItem);
+                    }
+                    if(currentDrillDownMenuItemDetail.getSubItems() != null) {
+                        loadMenuSubItems(currentDrillDownMenuItemDetail, menuOptionsView, itemName.toString(), mainSelectedOrderItem);
+                    }
+                    if(currentDrillDownMenuItemDetail.getSubItems() == null && currentDrillDownMenuItemDetail.getOptionsMap() == null) {
+                        addItemAndReload(mainSelectedOrderItem);
+                    }
                 }
             });
 
@@ -474,6 +473,7 @@ new GetHumanReadableOrderIdTask().execute();
             menuItemOptionsSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    SelectedOrderItemOption selectedOrderItemOption = null;
                     System.out.println("Selected item " + menuItemOptionsSpinner.getSelectedItem().toString());
                     if (!menuItemOptionsSpinner.getSelectedItem().toString().equals("")) {
                         //orderSelectionStack.add(menuItemOptionsSpinner.getSelectedItem().toString());
@@ -482,10 +482,15 @@ new GetHumanReadableOrderIdTask().execute();
                         }
                         optionsSelectionMap.put(menuItemOptionsSpinner.getTransitionName(), menuItemOptionsSpinner.getSelectedItem().toString());
                         System.out.println("Option " + menuItemOptionsSpinner.getSelectedItem().toString() + " selected for " + mainItem);
-                        SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
+                        selectedOrderItemOption = new SelectedOrderItemOption();
                         selectedOrderItemOption.setId(getOptionId(optionsMap));
                         selectedOrderItemOption.setName(menuItemOptionsSpinner.getSelectedItem().toString());
                         selectedOrderItem.setOption(selectedOrderItemOption);
+                    }
+
+                    if(menuItemDetail.getSubItems() == null && selectedOrderItemOption != null) { //final selection
+                        selectedOrderItem.setOption(selectedOrderItemOption);
+                        addItemAndReload(mainSelectedOrderItem);
                     }
                 }
 
@@ -499,7 +504,15 @@ new GetHumanReadableOrderIdTask().execute();
             menuOptionsView.addView(menuItemOptionsSpinner);
             //createAndLoadPopupWindow(menuOptionsView, menuItemOptionsSpinner);
             //loadMenuSubItems(menuItemDetail, menuOptionsView, mainItem, mainSelectedOrderItem);
+        } else {
+            System.out.println("No options for the item "+menuItemDetail.getMenuItemName());
         }
+    }
+
+    private void addItemAndReload(SelectedOrderItem selectedOrderItem) {
+        new AddOrderItemTask().execute(selectedOrderItem);
+        reloadOrderItemView();
+        menuOptionsView.removeAllViews();
     }
 
     public void showMessage(String message) {
@@ -635,35 +648,42 @@ new GetHumanReadableOrderIdTask().execute();
                             currSelectedOrderItem.setItemName(menuItemName);
                             System.out.println("Sub item " + menuItemName + " selected for " + mainItem);
                             orderSelectionStack.push(menuButtonView.getText().toString());
-                            if (subItem.getSubItems() != null && subItem.getSubItems().size() > 0) {
-                                if(mainSelectedOrderItem == selectedOrderItem) {
-                                    if(mainSelectedOrderItem.getSubItems() == null) {
-                                        mainSelectedOrderItem.setSubItems(new ArrayList<>());
-                                    }
-                                    mainSelectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                            if(mainSelectedOrderItem == selectedOrderItem) {
+                                if(mainSelectedOrderItem.getSubItems() == null) {
+                                    mainSelectedOrderItem.setSubItems(new ArrayList<>());
                                 }
+                                mainSelectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                            }
+                            if (subItem.getSubItems() != null && subItem.getSubItems().size() > 0) {
                                 loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
                                 loadMenuSubItems(subItem, menuOptionsView, menuItemName, currSelectedOrderItem);
-                            } else {
-                                if (mainSelectedOrderItem.getOption() != null) {
-                                    if(subItem.getOptionsMap() != null) {
-                                        DrillDownMenuItemOptionDetail currMenuOptionDetail =
-                                                subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName());
-                                        if (currMenuOptionDetail != null && currMenuOptionDetail.getId().equals(mainSelectedOrderItem.getOption().getId())) {
-                                            currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
-                                            if(selectedOrderItem.getSubItems() == null) {
-                                                selectedOrderItem.setSubItems(new ArrayList<>());
-                                            }
-                                            selectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                            } else if(subItem.getOptionsMap() != null && subItem.getOptionsMap().size() > 0) {
+                                if(mainSelectedOrderItem.getOption() != null &&
+                                    subItem.getOptionsMap().get(mainSelectedOrderItem.getOption().getName()).getId().equals
+                                            (mainSelectedOrderItem.getOption().getId())) {
+                                    currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
+                                    if(mainSelectedOrderItem != selectedOrderItem) {
+                                        if (selectedOrderItem.getSubItems() == null) {
+                                            selectedOrderItem.setSubItems(new ArrayList<>());
                                         }
-                                    } /*else {
-                                        currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
-                                    }*/
-                                    loadOrderItemFromSelection();
-                                    new AddOrderItemTask().execute(mainSelectedOrderItem);
-                                    reloadOrderItemView();
-                                    menuOptionsView.removeAllViews();
+                                        selectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                                    }
+                                    System.out.println("sub items count "+mainSelectedOrderItem.getSubItems().size());
+                                    addItemAndReload(mainSelectedOrderItem);
+                                } else {
+                                    loadMenuItemOptionsView(subItem, menuButtonView, menuOptionsView, false, menuItemName, currSelectedOrderItem);
                                 }
+                            } else { //leaf selection item where the subitem does not contain options or sub items
+                                if(currSelectedOrderItem.getOption() == null) {
+                                    currSelectedOrderItem.setOption(mainSelectedOrderItem.getOption());
+                                }
+                                if(mainSelectedOrderItem != selectedOrderItem) {
+                                    if (selectedOrderItem.getSubItems() == null) {
+                                        selectedOrderItem.setSubItems(new ArrayList<>());
+                                    }
+                                    selectedOrderItem.getSubItems().add(currSelectedOrderItem);
+                                }
+                                addItemAndReload(mainSelectedOrderItem);
 
                             }
                         }
@@ -724,7 +744,7 @@ new GetHumanReadableOrderIdTask().execute();
         ;
         while (!orderSelectionStack.empty()) {
             String itemName = orderSelectionStack.pop();
-            String itemOptionSelected = optionsSelectionMap.get(itemName + "Options");
+            String itemOptionSelected = (optionsSelectionMap != null) ? optionsSelectionMap.get(itemName + "Options"): null;
 
             if (itemOptionSelected == null) {
                 orderDetailOutputStack.push(itemName);

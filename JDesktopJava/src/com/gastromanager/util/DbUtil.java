@@ -34,7 +34,7 @@ public class DbUtil {
 
                     ResultSet result = stmt.executeQuery(queryBuilder.toString());
 
-                    orderItems = loadResults(result);
+                    orderItems = loadOrderItems(result);
                     if (orderItems == null || orderItems.size() == 0) {
                         System.out.println("No order items found for orderId " + orderId + " today");
                     }
@@ -53,6 +53,113 @@ public class DbUtil {
         return orderItems;
     }
 
+    public static Boolean addTransactionInfo(OrderItemInfo orderItemInfo, TransactionInfo transactionInfo) {
+        Boolean transactionAddedSuccessfully = false;
+        Integer nextTransactionId = getNextTransactionId();
+        if(transactionInfo == null) {
+            transactionInfo = new TransactionInfo();
+        }
+        transactionInfo.setId(nextTransactionId);
+        if(nextTransactionId != null) {
+            try {
+                Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+                Statement statement = connection.createStatement();
+                String insertTransactionStmt = "INSERT INTO transactions (\n" +
+                        "                             id,\n" +
+                        "                             total_amount,\n" +
+                        "                             payment_method,\n" +
+                        "                             tips\n" +
+                        "                         )\n" +
+                        "                         VALUES (\n" +
+                        "                             '"+transactionInfo.getId()+"',\n" +
+                        "                             '"+orderItemInfo.getPrice()+"',\n" +
+                        "                             '"+transactionInfo.getPaymentMethod()+"',\n" +
+                        "                             '"+transactionInfo.getTips()+"'\n" +
+                        "                         )";
+                Integer rowsInserted = statement.executeUpdate(insertTransactionStmt);
+                if(rowsInserted == 1) {
+                    transactionAddedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                }
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        } else {
+            System.out.println("Unable to add transaction");
+        }
+
+        return transactionAddedSuccessfully;
+    }
+
+
+    public static Boolean removeTransactionInfo(OrderItemInfo orderItemInfo, TransactionInfo transactionInfo) {
+        Boolean transactionRemovedSuccessfully = false;
+
+        if(transactionInfo != null) {
+            try {
+                Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+                Statement statement = connection.createStatement();
+                String removeTransactionStmt = "DELETE FROM TRANSACTION WHERE "+
+                        "ID="+transactionInfo.getId();
+                Integer rowsInserted = statement.executeUpdate(removeTransactionStmt);
+                if(rowsInserted == 1) {
+                    transactionInfo.setId(-1);
+                    transactionRemovedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                }
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+        } else {
+            System.out.println("Unable to remove transaction");
+        }
+
+        return transactionRemovedSuccessfully;
+    }
+
+
+
+    public static Boolean updateOrderItemTransactionRef(OrderItemInfo orderItemInfo, TransactionInfo transactionInfo) {
+        Boolean isOrderItemUpdated = false;
+
+        StringBuilder updateStmtBuilder = new StringBuilder("UPDATE ORDERITEM SET TRANSACTION_ID ='"+ transactionInfo.getId() +"'");
+        if(transactionInfo.getId() != null) {
+            updateStmtBuilder.append(", payed = 1");
+        }
+        updateStmtBuilder.append(" WHERE ORDER_ID='"+ orderItemInfo.getOrderId() +"'"+
+                " AND ITEM_ID='"+ orderItemInfo.getItemId()+"'"+
+                " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'");
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Statement statement = connection.createStatement();
+            Integer rowsUpdated = statement.executeUpdate(updateStmtBuilder.toString());
+            if(rowsUpdated == 1) {
+                isOrderItemUpdated = true;
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+        return isOrderItemUpdated;
+    }
+
+    private static Integer getNextTransactionId() {
+        Integer nextTransactionId = null;
+        String query = "SELECT MAX(ID) AS MAX_ID FROM TRANSACTIONS";
+
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+            if(resultSet.next()) {
+                nextTransactionId = resultSet.getInt("MAX_ID") + 1;
+            } else {
+                System.out.println("Unable to get the next transaction id");
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+
+        return nextTransactionId;
+    }
+
     public static List<OrderItem> getOrderDetails(String orderId, Boolean queryForPrint) {
         List<OrderItem> orderItems = null;
         try {
@@ -68,7 +175,7 @@ public class DbUtil {
             PreparedStatement stmt=connection.prepareStatement(queryBuilder.toString());
             stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
-            orderItems = loadResults(result);
+            orderItems = loadOrderItems(result);
             stmt.close();
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
@@ -175,6 +282,7 @@ public class DbUtil {
 
         return orderItemXmlInfo;
     }
+
 
     public static Integer checkAndAddOrderId(OrderItem orderItem) {
         //String query = "select * from orders where id = '"+orderItem.getOrderId() +"'";
@@ -318,6 +426,28 @@ public class DbUtil {
         return orderId;
     }
 
+    public static List<Order> getOrderList(String floorId, String tableId) {
+        List<Order> orderList  = null;
+        Integer locationId = getLocationId(floorId, tableId);
+        if(locationId != null) {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            try {
+                PreparedStatement stmt=connection.prepareStatement(
+                        "SELECT * from ORDERS WHERE \n" +
+                                "LOCATION_ID = ?" +
+                                " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                stmt.setInt(1,locationId);
+                ResultSet resultOrders = stmt.executeQuery();
+                orderList = loadOrders(resultOrders);
+                stmt.close();
+            } catch (SQLException sqlException) {
+                sqlException.printStackTrace();
+            }
+
+        }
+        return orderList;
+    }
+
     public static Integer insertOrder(OrderItem orderItem) {
         Integer noOfRowsInserted = 0;
         try {
@@ -352,7 +482,7 @@ public class DbUtil {
                     "                          '"+ translateToSqlDate(orderItem.getDateTime())+"',\n" +
                     "                          '"+ orderItem.getStatus()+"',\n" +
                     "                          '"+newOrderItemId+"',\n" +
-                    "                          '1',\n" +
+                    "                          'null',\n" +
                     "                          '"+ orderItem.getPrice()/orderItem.getQuantity()+"'\n" +
                     "                      )";
             System.out.println("Executing \n "+insertOrderQuery);
@@ -367,7 +497,33 @@ public class DbUtil {
         return noOfRowsInserted;
     }
 
-    private static List<OrderItem> loadResults(ResultSet result) {
+    private static List<Order> loadOrders(ResultSet result) {
+        List<Order> orderList = null;
+        try {
+            while(result.next()) {
+                if(null == orderList) {
+                    orderList = new ArrayList<>();
+                }
+                Order order = new Order();
+                order.setId(result.getInt("id"));
+                order.setMenuId(result.getString("menu_id"));
+                order.setHumanReadableId(result.getString("humanreadable_id"));
+                order.setLocationId(result.getInt("location_id"));
+                order.setTransactionId(result.getInt("transaction_id"));
+                order.setDateTime(LocalDateTime.parse(result.getString("datetime"),
+                        DATE_TME_FORMATTER));
+                orderList.add(order);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return orderList;
+    }
+
+    private static List<OrderItem> loadOrderItems(ResultSet result) {
             List<OrderItem> orderItems = null;
             try {
                 while(result.next()) {
@@ -407,6 +563,7 @@ public class DbUtil {
             String query = "DELETE FROM ORDERITEM" +
                     " WHERE ORDER_ID='"+orderItemInfo.getOrderId()+"'"+
                     " AND ITEM_ID ='"+orderItemInfo.getItemId()+"'" +
+                    " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'"+
                     " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')";
             System.out.println(query);
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;

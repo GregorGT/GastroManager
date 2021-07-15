@@ -229,26 +229,32 @@ public class XmlUtil {
 	}
 
 	private static void addOptionOrderInfo(Node node, StringBuilder orderDetailsBuilder) {
-		NodeList childNodes  = node.getChildNodes();
-		for (int childId = 0; childId < childNodes.getLength(); childId++) {
-			Node child = childNodes.item(childId);
-			if(child.getNodeName() == "option") {
-				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
-				if(child.hasChildNodes()) {
-					NodeList optionChildNodes  = child.getChildNodes();
-					for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
-						Node optionChild = optionChildNodes.item(optionChildId);
-						if(optionChild.getNodeName() == "choice") {
-							orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
-							break;
+		if(node != null && node.hasChildNodes()) {
+			NodeList childNodes  = node.getChildNodes();
+			if (childNodes != null) {
+				for (int childId = 0; childId < childNodes.getLength(); childId++) {
+					Node child = childNodes.item(childId);
+					if (child.getNodeName() == "option") {
+						System.out.println("adding option information " + child.getAttributes().getNamedItem("name").getNodeValue());
+						orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+						if (child.hasChildNodes()) {
+							NodeList optionChildNodes = child.getChildNodes();
+							for (int optionChildId = 0; optionChildId < optionChildNodes.getLength(); optionChildId++) {
+								Node optionChild = optionChildNodes.item(optionChildId);
+								if (optionChild.getNodeName() == "choice") {
+									orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + optionChild.getAttributes().getNamedItem("name").getNodeValue());
+									break;
+								}
+							}
 						}
+						orderDetailsBuilder.append("\n");
+						break;
 					}
-				}
-				orderDetailsBuilder.append("\n");
-				break;
-			}
 
+				}
+			}
 		}
+
 	}
 
 }

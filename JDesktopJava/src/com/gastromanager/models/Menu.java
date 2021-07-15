@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class Menu implements Serializable {
     Map<String, DrillDownMenuItemDetail> itemMap;
+    Map<String, DrillDownMenuItemDetail> mainItemMap;
     Map<String, SelectedOrderItem> quickMenuIdRefMap;
 
     public Map<String, DrillDownMenuItemDetail> getItemMap() {
@@ -13,6 +14,14 @@ public class Menu implements Serializable {
 
     public void setItemMap(Map<String, DrillDownMenuItemDetail> itemMap) {
         this.itemMap = itemMap;
+    }
+
+    public Map<String, DrillDownMenuItemDetail> getMainItemMap() {
+        return mainItemMap;
+    }
+
+    public void setMainItemMap(Map<String, DrillDownMenuItemDetail> mainItemMap) {
+        this.mainItemMap = mainItemMap;
     }
 
     public Map<String, SelectedOrderItem> getQuickMenuIdRefMap() {
