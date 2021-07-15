@@ -10,5 +10,6 @@ public interface OrderService {
     void addOrderItem(SelectedOrderItem selectedOrderItem);
     void removeOrderItem(OrderItemInfo orderItemInfo);
     Boolean signOffOrder(SignOffOrderInfo signOffOrderInfo);
-    Integer getStartingHumanReadableId(HumanReadableIdQuery humanReadableIdQuery);;
+    Integer getStartingHumanReadableId(HumanReadableIdQuery humanReadableIdQuery);
+    void setMenuDetail(MenuDetail menuDetail);
 }
