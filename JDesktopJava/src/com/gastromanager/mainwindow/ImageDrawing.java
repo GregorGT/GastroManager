@@ -1,12 +1,10 @@
 package com.gastromanager.mainwindow;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +17,7 @@ import java.awt.image.BufferedImage;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.sql.Connection;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
@@ -35,7 +34,7 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 	private static final long serialVersionUID = 1L;
 	
 	private static final int recW = 30;
-    private static final int MAX = 100;
+    private static final int MAX = 20000;
     
 	private BufferedImage img = null;
 	private String pathToImage;
@@ -48,18 +47,23 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
     private boolean resize = false;
     private boolean activate  = false;
     private String floorId;
+    private Connection connection;
+    private LayoutMenu layoutMenu;
+    private ArrayList<Tables> deletedTables;
     
-	public ImageDrawing(String pathToImage, String floorId) {
+	public ImageDrawing(String pathToImage, String floorId, Connection connection, LayoutMenu layoutMenu) {
 		this.floorId = floorId;
 		this.pathToImage = pathToImage;
+		this.connection = connection;
+		this.layoutMenu = layoutMenu;
+		this.deletedTables = new ArrayList<>();
 		
 		 try {
              img = ImageIO.read(new FileInputStream(pathToImage));
          } catch (NullPointerException e) {
         	 System.err.println("NULL POINTER EXCEPTION");
-         } catch (IOException ex) {
-        	 System.err.println("NO IMAGE");    
-         } 
+         } catch (IOException ex) 
+		 	{ } 
 		 
 		 this.addComponentListener(new ComponentAdapter() {
 	           public void componentResized(ComponentEvent e) {
@@ -113,22 +117,22 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 	@Override
     protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-	
+		Graphics2D g2d = (Graphics2D) g.create();
+		
 		if (rotate || resize || activate) {
 			repaint();
-			revalidate();	
-			rotate = resize = activate = false;
+			revalidate();
+			rotate = resize = activate = false;	
 		}
 		
-    	Graphics2D g2d = (Graphics2D) g.create();
-        if (img != null) {
+		if (img != null) {
             g2d.drawImage(img, 0, 0, img.getWidth(), img.getHeight(), null);
         } else {
         	return;
         }
    	
         this.setPreferredSize(new Dimension(img.getWidth(), img.getHeight()));
-
+		
         for (int i=0; i<numOfRecs; ++i) {
         	tables[i].drawTable(g2d, img);
         }
@@ -145,29 +149,39 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
     	return -1;
     }
     
+    public void addTable(String value, boolean isInDb, boolean isInDbLocationTable) {
+		this.addTable(0, 0, recW, recW, 0, value, isInDb, isInDbLocationTable);
+	}
+	
     public void addTable(int x, int y, int width, int height, int rotate, String value, boolean isInDb, boolean isInDbLocationTable) {
     	if (numOfRecs < MAX) {
     		tables[numOfRecs] = new Tables(x, y, width, height, rotate, value, floorId, isInDb, isInDbLocationTable);
 			currentSquareIndex = numOfRecs;
-			numOfRecs++;
+			++numOfRecs;
 			repaint();
 		}
     }
-	
 
-	@Override
-    public void remove(int n) {
+    public void removeTable(int n) {
 		 if (n < 0 || n >= numOfRecs) {
 		 	  return;
 		 }
 		 
-		  numOfRecs--;
-		  tables[n] = tables[numOfRecs];
-		  if (currentSquareIndex == n) {
-			  currentSquareIndex = -1;
-		  }
- 
-		  repaint();
+		 for (int i = n; i < tables.length - 1; ++i) {
+			 Tables temp = tables[i];
+			 tables[i] = tables[i + 1];
+			 tables[i + 1] = temp;
+			 if (tables[i] != null) {
+				 tables[i].setValue(String.valueOf(Integer.parseInt(tables[i].getValue()) - 1));
+			 }
+		 }
+
+		 deletedTables.add(tables[tables.length - 1]);
+		 
+		 tables[tables.length - 1] = null;
+		 numOfRecs--;
+
+		 repaint();
     }
 
 	@Override
@@ -193,19 +207,8 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
   			  setCursor(Cursor.getDefaultCursor());
   		 }
 	}
-	
-	
 	 
-	public void addTable(String value, boolean isInDb, boolean isInDbLocationTable) {
-		this.addTable(0, 0, recW, recW, 0, value, isInDb, isInDbLocationTable);
-	}
-	
-
-	
 	 private class PopUpDemo extends JPopupMenu {
-  		/**
-		 * 
-		 */
 		private static final long serialVersionUID = 1L;
 		private JMenuItem anItem;
 	    private ArrayList<JMenuItem> allItems;
@@ -219,6 +222,8 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 	        anItem = new JMenuItem("Resize");
 	        allItems.add(anItem);
 	        anItem = new JMenuItem("Activate");
+	        allItems.add(anItem);
+	        anItem = new JMenuItem("Delete");
 	        allItems.add(anItem);
 	        
 	        for (JMenuItem m: allItems) {
@@ -244,7 +249,6 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 					                JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
 					    	if (result == JOptionPane.OK_OPTION) {
-					    		System.out.println(Integer.parseInt(width.getText()) + "   "+ Integer.parseInt(height.getText()));
 					    		try {
 					    			width.setText(width.getText().trim());
 					    			height.setText(height.getText().trim());
@@ -252,16 +256,20 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 					    					(Integer.parseInt(height.getText()) > img.getHeight())) {
 					    				return;
 					    			}
-					    			tables[currentSquareIndex].setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+//					    			tables[currentSquareIndex].setSize(Integer.parseInt(width.getText()), Integer.parseInt(height.getText()));
+					    			tables[currentSquareIndex].width = Integer.parseInt(width.getText());
+					    			tables[currentSquareIndex].height = Integer.parseInt(height.getText());
+					    			resize = true;
 					    		} catch (NumberFormatException e) {
 					    			e.printStackTrace();
 					    		}
 				    		} 
-					    	resize = true;
-					    	
 						} else if (m.getText().equals("Activate")) {
-							tables[currentSquareIndex].setColor(Color.YELLOW);
+							tables[currentSquareIndex].changeColor();
 							activate = true;
+						} else if (m.getText().equals("Delete")) {
+							removeTable(currentSquareIndex);
+							layoutMenu.removeNodeFromTree(deletedTables.get(deletedTables.size()-1).getValue(), deletedTables.get(deletedTables.size()-1).getFloorId());
 						}
 	        		}
 	        	});
@@ -292,9 +300,11 @@ public class ImageDrawing extends JPanel implements MouseMotionListener{
 	public int getNumOfRecs() {
 		return numOfRecs;
 	}
-
-	
-
-
+	public ArrayList<Tables> getDeletedTables() {
+		return deletedTables;
+	}
+	public void setDeletedTables(ArrayList<Tables> deletedTables) {
+		this.deletedTables = deletedTables;
+	}
 }
 

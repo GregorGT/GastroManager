@@ -38,6 +38,7 @@ import javax.swing.tree.DefaultTreeModel;
 import org.w3c.dom.Document;
 
 import com.gastromanager.util.XmlUtil;
+import com.sun.star.xforms.Model;
 
 
 public class MainWindow extends JFrame {
@@ -55,6 +56,7 @@ public class MainWindow extends JFrame {
 	public DrillDownMenu drillDownMenu;
 	public XmlUtil xmlUtil;
 	private Document doc;
+	private String openedFile;
 	
 	/**
 	 * Launch the application.
@@ -109,7 +111,6 @@ public class MainWindow extends JFrame {
 		tabView.setLayout(null);
 
 
-		
 		tree = new GMTree(root);
 		tree.rootItem = root;
 		root.setTree(tree);
@@ -124,9 +125,12 @@ public class MainWindow extends JFrame {
 		treeScroll = new JScrollPane();
 		defaultModel = (DefaultTreeModel) tree.getModel(); 
 
+		
 		LayoutMenu tabLayout = new LayoutMenu(this);
 		tabbedPane.addTab("Layout", null, tabLayout, null);
 		tabLayout.setLayout(new FlowLayout());
+		tree.setLayoutMenu(tabLayout);
+		
 		
 		drillDownMenu = new DrillDownMenu(root, defaultModel, tree, newMElement);
 		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu, 
@@ -151,7 +155,7 @@ public class MainWindow extends JFrame {
 		
 		BookingsMenu tabBookings = new BookingsMenu();
 		tabbedPane.addTab("Bookings", null,tabBookings, null);
-	
+
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
@@ -163,13 +167,14 @@ public class MainWindow extends JFrame {
 				fc.setFileFilter(filterExt);
 
 				int returnVal = fc.showDialog(null, "Open XML File...");
-				String selected = fc.getSelectedFile().toString();
+//				String selected = fc.getSelectedFile().toString();
+				openedFile = fc.getSelectedFile().toString();
 				
 				try {
-					String fstr = xmlUtil.readFileToString(selected, Charset.defaultCharset());
+					String fstr = xmlUtil.readFileToString(openedFile, Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
 					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
-					tree.init(tree, drillDownMenu);
+					tree.init(tree, drillDownMenu, root);
 					tree.loaded = true;
 					tabLayout.setIsFileLoaded(true);
 
@@ -189,17 +194,19 @@ public class MainWindow extends JFrame {
 
 				tabLayout.saveToXmlAndDb();
 				
+				root = (GMTreeItem) defaultModel.getRoot();
+				
 				
 				String newString = xmlUtil.writeTreeIntoString(root);
 
 				File saveFile = new File("C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml");
+//				File saveFile = new File(openedFile);
 				try {
 						FileWriter fileWriter = new FileWriter(saveFile);
 						fileWriter.write(newString);
 						fileWriter.flush();
 						fileWriter.close();
 				} catch (IOException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 				}
 //				System.out.println(newString);
@@ -216,7 +223,7 @@ public class MainWindow extends JFrame {
 					fstr = xmlUtil.readFileToString("C:\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
 					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
-					tree.init(tree, drillDownMenu);
+					tree.init(tree, drillDownMenu, root);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} catch (Exception e1) {

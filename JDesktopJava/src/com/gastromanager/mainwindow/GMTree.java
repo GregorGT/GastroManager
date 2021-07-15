@@ -7,16 +7,14 @@ import java.awt.event.MouseListener;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Random;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
@@ -26,8 +24,9 @@ public class GMTree extends JTree {
 	public GMTreeItem rootItem;
 	private int height, width, btnHeight, btnWidth, btnX, btnY;
 	private String drilldownName, btnName, btnTarget, btnID;
+	private LayoutMenu layoutMenu;
 
-	public void init(GMTree tree, DrillDownMenu menu) { //GMTreeItem root, 
+	public void init(GMTree tree, DrillDownMenu menu, GMTreeItem root) { 
 
 		JPopupMenu treeContextMenu = new JPopupMenu();
 
@@ -121,7 +120,6 @@ public class GMTree extends JTree {
 	}
 
 	public void selectToDelete(GMTree tree) {
-
 		DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
 
 		TreePath[] paths = tree.getSelectionPaths();
@@ -129,12 +127,29 @@ public class GMTree extends JTree {
 			for (TreePath path : paths) {
 				GMTreeItem node = (GMTreeItem) path.getLastPathComponent();
 				if (node.getParent() != null && node.toString() != "root") {
-					model.removeNodeFromParent(node);
+					if (node.getXmlName().equals("floor")) {
+						GMTreeItem parent = (GMTreeItem) node.getParent();
+//						System.out.println(node.getName());
+						model.removeNodeFromParent(node);
+		    			node.removeFromParent();
+		    			parent.children.remove(node);
+		    			deleteFloor(node.getName());
+					}
 				}
 			}
 		}
-
 	}
+	
+	private void deleteFloor(String name) {
+		Map<Floor, ImageDrawing> floors = layoutMenu.getAllFloors();
+		for (Map.Entry<Floor, ImageDrawing> f: floors.entrySet()) {
+			if (f.getKey().getTitle().equals(name)) {
+				f.getKey().setToDelete(true);
+				return;
+			}
+		}
+	}
+	
 
 	public void showOnEditor(GMTreeItem selectedItem, DrillDownMenu menu) {
 
@@ -258,4 +273,11 @@ public class GMTree extends JTree {
 		// TODO Auto-generated constructor stub
 	}
 
+	
+	public LayoutMenu getLayoutMenu() {
+		return layoutMenu;
+	}
+	public void setLayoutMenu(LayoutMenu layoutMenu) {
+		this.layoutMenu = layoutMenu;
+	}
 }

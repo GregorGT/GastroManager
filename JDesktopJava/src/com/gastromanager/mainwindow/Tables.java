@@ -19,6 +19,8 @@ public class Tables extends Rectangle {
 	private static final String XML_TAG = "table";
 	private static final Color TEXT_COLOR = Color.RED;
 	private static final String INSERT_TO_TABLEDETAILS = "INSERT INTO tabledetails VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String DELETE_TO_TABLEDETAILS = "delete from tabledetails where table_id = ? and floor_id = ?";
+	private static final String UPDATE_TO_TABLEDETAILS = "update tabledetails set table_id = ? where table_id = ? and floor_id = ?";
 	private static final String SELECT_MAX_ID = "SELECT max(id)+1 FROM tabledetails";
 	private static final String DATE_PATTERN = "yyyy-MM-dd HH:mm:ss";
 	
@@ -30,12 +32,13 @@ public class Tables extends Rectangle {
 	private boolean isInDbLocationTable;
 	private String createdDate;
 	private String lastModifiedDate;
-	
+	private String previousValue;
+
 	public Tables(int x, int y, int width, int height, int rotate, String value, String floorId, boolean isInDb, boolean isInDbLocationTable) {
 		super(x, y, width, height);
 		this.rotate = rotate;
 		this.color = Color.BLACK;
-		this.value = value;
+		this.value = this.previousValue = value;
 		this.floorId = floorId;
 		this.isInDb = isInDb;
 		this.isInDbLocationTable = isInDbLocationTable;
@@ -85,7 +88,7 @@ public class Tables extends Rectangle {
 				
 				
 				int rows = preparedStatement.executeUpdate();
-				System.out.println(rows + " rows inserted into TABLEDETAILS table");
+//				System.out.println(rows + " rows inserted into TABLEDETAILS table");
 				
 				isInDb = true;
 				
@@ -96,10 +99,50 @@ public class Tables extends Rectangle {
 				e.printStackTrace();
 			}
     	} else {
-    		System.out.println("Table with value: " + value + " and floorid: " + floorId + " is in DB.");
+//    		System.out.println("Table with value: " + value + " and floorid: " + floorId + " is in DB.");
     	}
     }
     
+    public void delete(Connection connection) {
+    	try (PreparedStatement pr = connection.prepareStatement(DELETE_TO_TABLEDETAILS)) {
+    		pr.setInt(1, Integer.parseInt(value));
+    		pr.setInt(2, Integer.parseInt(floorId));
+    		pr.executeUpdate();
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public void update(Connection connection) {
+    	try (PreparedStatement pr = connection.prepareStatement(UPDATE_TO_TABLEDETAILS)) {
+    		pr.setInt(1, Integer.parseInt(value));
+    		pr.setInt(2, Integer.parseInt(previousValue));
+    		pr.setInt(3, Integer.parseInt(floorId));
+    		pr.executeUpdate();
+    		this.previousValue = value;
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    public void changeColor() {
+    	if (this.color == Color.BLACK) {
+    		this.color = Color.YELLOW;
+    	} else {
+    		this.color = Color.BLACK;
+    	}
+    }
+    
+    public void fixValues() {
+    	this.previousValue = value;
+    }
+    
+	public String getFloorId() {
+		return floorId;
+	}
+	public void setFloorId(String floorId) {
+		this.floorId = floorId;
+	}
 	public int getRotate() {
 		return rotate;
 	}
@@ -116,7 +159,8 @@ public class Tables extends Rectangle {
 		return value;
 	}
 	public void setValue(String value) {
-		this.value = value;
+		this.previousValue = this.value;
+		this.value = value;	
 	}
 	public boolean isInDbLocationTable() {
 		return isInDbLocationTable;
@@ -139,5 +183,11 @@ public class Tables extends Rectangle {
 		Date date = new Date();
 		SimpleDateFormat sdf = new SimpleDateFormat(DATE_PATTERN);
 		this.lastModifiedDate = sdf.format(date);
+	}
+	public String getPreviousValue() {
+		return previousValue;
+	}
+	public void setPreviousValue(String previousValue) {
+		this.previousValue = previousValue;
 	}
 }

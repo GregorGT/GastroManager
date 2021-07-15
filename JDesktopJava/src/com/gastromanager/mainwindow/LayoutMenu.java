@@ -8,10 +8,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -68,11 +70,10 @@ public class LayoutMenu extends JPanel {
 	
 	
 	public LayoutMenu(MainWindow mainWindow) {
-		
 		try {
 			connection = DbConnection.getDbConnection().gastroDbConnection;
 		} catch (Exception e) {
-			System.err.println("Failed to connect to database.\nClass: LayoutMenu.java\tLine: 69");
+			System.err.println("Failed to connect to database.\nClass: LayoutMenu.java\tMethod: LayoutMenu");
 		}
 		
 		this.root = mainWindow.getRoot();
@@ -82,7 +83,7 @@ public class LayoutMenu extends JPanel {
 		
 		this.mainWindow = mainWindow;
     	JButton newFloorButton = new JButton("<html>New<br/>floor</html>");
-		JButton newTableButton = new JButton("<html>New<br/>table</html>");
+    	JButton newTableButton = new JButton("<html>New<br/>table</html>");
 
 		newFloorButton.setPreferredSize(new Dimension(100, 100));
 		newTableButton.setPreferredSize(new Dimension(100, 100));
@@ -107,8 +108,6 @@ public class LayoutMenu extends JPanel {
 			    chooser.setFileFilter(filter);
 			    int returnVal = chooser.showOpenDialog(frameForImageSelection);
 			    if(returnVal == JFileChooser.APPROVE_OPTION) {
-			       System.out.println("You chose to open this file: " +
-			       		chooser.getSelectedFile().getAbsolutePath());
 			       absolutePathToImage = chooser.getSelectedFile().getAbsolutePath();
 			       filePathString.setText(chooser.getSelectedFile().getAbsolutePath());
 			       displayImage();
@@ -127,8 +126,6 @@ public class LayoutMenu extends JPanel {
 		imageSelectPanel.add(browseImageButton);
 		this.add(imageSelectPanel);
 		
-		
-
 		scrollPane = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPane.setPreferredSize(new Dimension(windowWidth-30, windowHeight-220));
 		scrollPane.setBorder(tb);
@@ -185,13 +182,14 @@ public class LayoutMenu extends JPanel {
 		btn.setName("table");
 
 		GMTreeItem newItem = new GMTreeItem("table");
-		newItem.setName("table");
-		newItem.setXmlName("table");
+		
 		for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
 			if (map.getKey().getTitle().equals(floorName)) {
 				newItem.addAttributes("value", String.valueOf(map.getValue().getNumOfRecs()+1));		
 			}
 		}
+
+		newItem.setXmlName("table");
 		newItem.addAttributes("name", "table");
 		newItem.addAttributes("x", "");
 		newItem.addAttributes("y", "");
@@ -232,8 +230,6 @@ public class LayoutMenu extends JPanel {
 		
 		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), "layout", btn, "floor", floorItem);
 		
-		
-		
 		btn = new JButton();
 
 		GMTreeItem imageItem = new GMTreeItem("image");
@@ -243,8 +239,7 @@ public class LayoutMenu extends JPanel {
 		
 		componentToTree(mainWindow.getRoot(), mainWindow.getDefaultModel(), op, btn, "image", imageItem);
 
-		allFloors.put(new Floor(op, String.valueOf(allFloors.size()+1), "", false), new ImageDrawing("", String.valueOf(allFloors.size()+1)));
-		
+		allFloors.put(new Floor(op, String.valueOf(allFloors.size()+1), "", false), new ImageDrawing("", String.valueOf(allFloors.size()+1), connection, this));
 	}
 	
 
@@ -252,12 +247,9 @@ public class LayoutMenu extends JPanel {
 		Enumeration enumer = treeItem.children();
 
 		if (treeItem.toString().equals(parent)) {
-
 			newItem.addMenuElements(treeItem.menuElement);
 			newItem.treeParent = treeItem.getTree();
-			
 			newItem.setTree(treeItem.getTree());
-		
 			defaultModel.insertNodeInto(newItem, treeItem, 0);
 			treeItem.children.add(newItem);
 		}
@@ -265,6 +257,30 @@ public class LayoutMenu extends JPanel {
 		if(enumer != null) {
 			while (enumer.hasMoreElements()) {
 				componentToTree((GMTreeItem)enumer.nextElement(), model, parent , comp, xmlName, newItem);
+			}
+		}
+	}
+	
+	public void removeNodeFromTree(String id, String floorId) {
+		removeNodeFromTree(root, defaultModel, "table", id, floorId);
+		changeTableAttributesInTree(root, id);
+	}
+	
+	private void removeNodeFromTree(GMTreeItem treeItem, DefaultTreeModel model, String nodeName, String id, String floorId) {
+		Enumeration en = treeItem.children();
+	    
+    	if (treeItem.getXmlName().equals("table") && treeItem.getAttribute("value").equals(id)) {
+    		GMTreeItem parent = (GMTreeItem) treeItem.getParent();
+    		if (parent.getAttribute("value").equals(floorId)) {
+    			defaultModel.removeNodeFromParent(treeItem);
+    			treeItem.removeFromParent();
+    			parent.children.remove(treeItem);
+    		}
+    	}        	
+
+	    if(en != null) {
+			while (en.hasMoreElements()) {
+				removeNodeFromTree((GMTreeItem) en.nextElement(), model, nodeName, id, floorId);
 			}
 		}
 	}
@@ -295,6 +311,39 @@ public class LayoutMenu extends JPanel {
 			changeImageInTree((GMTreeItem)enumer.nextElement());
 		}
 	}
+
+	private void changeTableAttributesInTree(GMTreeItem root, String id) {
+		Enumeration enumer = root.children();
+		
+		try {
+			if (root.getXmlName().equals("table")) {
+				String currentValue = root.getAttribute("value");		
+				for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+
+					if (root.getParent().toString().equals(map.getKey().getTitle())) { 
+						Tables[] tables = map.getValue().getTables();
+						
+						for (int i=0; i<tables.length; ++i) {
+							if (tables[i] == null) {
+								continue;
+							}
+							if (tables[i].getPreviousValue().equals(currentValue)) {
+								root.addAttributes("value", String.valueOf(tables[i].getValue()));
+							}
+						}
+					}
+				}
+			}
+		} catch (NullPointerException e) 
+			{ }
+		
+		if(enumer != null) {
+			while (enumer.hasMoreElements()) {
+				changeTableAttributesInTree((GMTreeItem)enumer.nextElement(), id);
+			}
+		}
+				
+	}
 	
 	private void changeTableAttributesInTree(GMTreeItem root) {
 		Enumeration enumer = root.children();
@@ -320,9 +369,9 @@ public class LayoutMenu extends JPanel {
 					}
 				}
 			}
-		} catch (NullPointerException e) {
-			
-		}
+		} catch (NullPointerException e) 
+			{ }
+		
 		while (enumer.hasMoreElements()) {
 			changeTableAttributesInTree((GMTreeItem)enumer.nextElement());
 		}
@@ -369,7 +418,7 @@ public class LayoutMenu extends JPanel {
     }
     
 	private ImageDrawing createFloor(String floorName) {
-		ImageDrawing im = new ImageDrawing(null, String.valueOf(allFloors.size()+1));
+		ImageDrawing im = new ImageDrawing(null, String.valueOf(allFloors.size()+1), connection, this);
 		allFloors.put(new Floor(floorName, String.valueOf(allFloors.size()+1), "", false), im);
 		return im;
 	}
@@ -390,7 +439,7 @@ public class LayoutMenu extends JPanel {
 				NodeList images = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
 				
 				String imgPath = images.item(0).getAttributes().getNamedItem("value").getNodeValue();
-				ImageDrawing imgDrawing = new ImageDrawing(imgPath, flrValue);
+				ImageDrawing imgDrawing = new ImageDrawing(imgPath, flrValue, connection, this);
 
 				expr = xpath.compile("/root/layout/floor[@name=\""+flrName+"\"]/table");
 				NodeList tables = (NodeList) expr.evaluate(mainWindow.getDoc(), XPathConstants.NODESET);
@@ -410,6 +459,14 @@ public class LayoutMenu extends JPanel {
 						width = 30;
 						height = 30;
 						rotate = 0;
+						value = j + 1;
+					} catch (NumberFormatException e) {
+						x = 0;
+						y = 0;
+						width = 30;
+						height = 30;
+						rotate = 0;
+						value = j + 1;
 					}
 					
 					imgDrawing.addTable(x, y, width, height, rotate, String.valueOf(value), true, true);
@@ -422,7 +479,6 @@ public class LayoutMenu extends JPanel {
 			e.printStackTrace();
 		}
     }
-    
     
     public void saveToXmlAndDb() {
     	Thread t1 = new Thread() {
@@ -437,17 +493,45 @@ public class LayoutMenu extends JPanel {
     			saveToDB();
     	    }
     	};
-    	
-    	t1.start();
-    	t2.start();
+    	Thread t3 = new Thread() {
+			 @Override
+			 public void run() {
+				 deleteTables();
+			 }
+		 };
+		 
+		t1.start();
+		t2.start();
+    	t3.start();
     	try {
-			t1.join();
-			t2.join();
+    		t1.join();
+    		t2.join();
+			t3.join();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
+		}    	
     }
+    
+    private void deleteTables() {
+    	for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
+    		ArrayList<Tables> deletedTables = map.getValue().getDeletedTables();
+    		if (deletedTables.size() == 0) {
+    			continue;
+    		}
+    		Tables[] tables = map.getValue().getTables();
+    		for (Tables t: deletedTables) {
+				 t.delete(connection);	
+    	   	} 
 
+    		for (Tables t: tables) {
+    	   		if (t != null) {
+    	   			t.update(connection);
+    	   		}
+    	   	}		
+    		map.getValue().setDeletedTables(new ArrayList<Tables>());
+    	}	
+	}
+    
     private void saveToDB() {
 		try {
     		PreparedStatement statement = connection.prepareStatement(SELECT_MAX_ID);
@@ -458,8 +542,15 @@ public class LayoutMenu extends JPanel {
 			PreparedStatement preparedStatement = connection.prepareStatement(INSERT_TO_LOCATION);
 			PreparedStatement updateStatement = connection.prepareStatement(UPDATE_TO_LOCATION);
 			
+			
+			Map<Floor, ImageDrawing> deleteFloors = new HashMap<>();
+			
 			for (Map.Entry<Floor, ImageDrawing> map: allFloors.entrySet()) {
 				map.getKey().save(connection);
+				if (map.getKey().isToDelete()) {
+					deleteFloors.put(map.getKey(), map.getValue());
+					continue;
+				}
 				
 				String flrName = map.getKey().getTitle();
 				int flrId = Integer.parseInt(map.getKey().getValue());
@@ -492,11 +583,11 @@ public class LayoutMenu extends JPanel {
 				}
 				
 				int[] results = preparedStatement.executeBatch();
-				System.out.println(results.length + " rows added to location.");
 				results = updateStatement.executeBatch();
-				System.out.println(results.length + " rows updated to location.");
-				preparedStatement.close();
-				updateStatement.close();
+			}
+			
+			for (Map.Entry<Floor, ImageDrawing> del: deleteFloors.entrySet()) {
+				allFloors.remove(del.getKey(), del.getValue());
 			}
 			
 		} catch (SQLException e) {
@@ -504,18 +595,6 @@ public class LayoutMenu extends JPanel {
 		}
     }
     
-    public void changeAttributesToXml(GMTreeItem treeItem, String xmlTag, String id) {
-    	Enumeration enumer = treeItem.children();
-    	
-    	if (xmlTag.equals(treeItem.getXmlName())) {
-    		System.out.println(xmlTag);
-    	}
-    	
-    	if (enumer.hasMoreElements()) {
-    		changeAttributesToXml((GMTreeItem)enumer.nextElement(), xmlTag, id);
-    	}
-    }
-
 	public MainWindow getMainWindow() {
 		return mainWindow;
 	}
@@ -533,5 +612,8 @@ public class LayoutMenu extends JPanel {
 		if (this.isFileLoaded == true) {
 			loadFloorFromFile();
 		}
+	}
+	public Map<Floor, ImageDrawing> getAllFloors() {
+		return allFloors;
 	}
 }
