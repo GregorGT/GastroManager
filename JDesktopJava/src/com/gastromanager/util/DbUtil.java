@@ -150,6 +150,25 @@ public class DbUtil {
         return isOrderItemUpdated;
     }
 
+    public static Boolean undoPayment(OrderItemInfo orderItemInfo) {
+        Boolean isPaymentStatusReset = false;
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            Statement statement = connection.createStatement();
+            String resetPaymentForOrderItem = "UPDATE ORDERITEM SET PAYED=0"+
+                    " WHERE ORDER_ID='"+ orderItemInfo.getOrderId() +"'"+
+                    " AND ITEM_ID='"+ orderItemInfo.getItemId()+"'"+
+                    " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'";
+            Integer rowsUpdated = statement.executeUpdate(resetPaymentForOrderItem);
+            if(rowsUpdated == 1) {
+                isPaymentStatusReset = true;
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+        return isPaymentStatusReset;
+    }
+
     private static Integer getNextTransactionId() {
         Integer nextTransactionId = null;
         String query = "SELECT MAX(ID) AS MAX_ID FROM TRANSACTIONS";
@@ -183,7 +202,6 @@ public class DbUtil {
             }
 
             PreparedStatement stmt=connection.prepareStatement(queryBuilder.toString());
-            stmt.setInt(1,Integer.parseInt(orderId));
             ResultSet result = stmt.executeQuery();
             orderItems = loadOrderItems(result);
             stmt.close();
@@ -549,6 +567,7 @@ public class DbUtil {
                     orderItem.setQuantity(result.getInt("quantity"));
                     orderItem.setOrderId(result.getInt("order_id"));
                     orderItem.setPrintStatus(result.getInt("print_status"));
+                    orderItem.setPayed(result.getInt("payed"));
 
                     orderItem.setDateTime(LocalDateTime.parse(result.getString("datetime"),
                             DATE_TME_FORMATTER));

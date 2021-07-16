@@ -40,6 +40,11 @@ public class PaymentServiceImpl implements PaymentService {
         return translateToOrderItemInfo(DbUtil.getOrderDetails(orderItemInfo.get(0).getOrderId().toString(), false));
     }
 
+    @Override
+    public void undoPayment(OrderItemInfo orderItemInfo) {
+        Boolean isPaymentReset = DbUtil.undoPayment(orderItemInfo);
+    }
+
     private List<OrderItemInfo> translateToOrderItemInfo(List<OrderItem> orderItems) {
         List<OrderItemInfo> orderItemInfoList =  null;
         if(orderItems != null) {

@@ -14,7 +14,7 @@ public class OrderItemListTableModel extends AbstractTableModel {
     };
 
     private final Class[] columnClass = new Class[] {
-            String.class, Double.class, Integer.class
+            String.class, Double.class, Integer.class, Integer.class
     };
 
     public OrderItemListTableModel(List<OrderItemInfo> orderItemInfoList) {
@@ -40,7 +40,7 @@ public class OrderItemListTableModel extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return 3;
+        return 4;
     }
     @Override
     public Class<?> getColumnClass(int columnIndex)
@@ -59,6 +59,8 @@ public class OrderItemListTableModel extends AbstractTableModel {
                      break;
             case 2 : value = orderItemInfo.getItemId();
                      break;
+            case 3 : value = orderItemInfo.getPayed();
+                break;
         }
 
         return value;

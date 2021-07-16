@@ -12,7 +12,5 @@ public interface PaymentService {
 
     List<OrderItemInfo> processTransactionInfo(OrderItemTransactionInfo orderItemTransactionInfo);
 
-
-
-
+    void undoPayment(OrderItemInfo orderItemInfo);
 }

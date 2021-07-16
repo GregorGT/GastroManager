@@ -1,13 +1,13 @@
 package com.gastromanager.mainwindow;
 
-import com.gastromanager.models.Order;
-import com.gastromanager.models.OrderDetailQuery;
-import com.gastromanager.models.OrderItemInfo;
+import com.gastromanager.comparator.OrderItemComparator;
+import com.gastromanager.models.*;
 import com.gastromanager.service.PaymentService;
 import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.ui.OrderItemListTableModel;
 
 import javax.swing.*;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -40,13 +40,30 @@ public class PaymentMenu  extends Panel{
 		//leftItemsList.setLineWrap(true);
 		//leftItemsList.setSelectionColor(Color.green);
 		//this.add(leftItemsList);
-		orderItemsListTable = new JTable(new OrderItemListTableModel(orderItemInfoList));
+		orderItemsListTable = new JTable(new OrderItemListTableModel(orderItemInfoList)) {
+			@Override
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				Component c = super.prepareRenderer(renderer, row, col);
+				Integer payed = (Integer) getValueAt(row, 3);
+				System.out.println("Row "+row + " value "+payed);
+				if(payed == 1) {
+					c.setBackground(Color.GREEN);
+				} else {
+					c.setBackground(Color.WHITE);
+				}
+				return c;
+			}
+		};
+
 		orderItemsListTable.setRowHeight(65);
 		orderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 		//hide the item id column
 		orderItemsListTable.getColumnModel().getColumn(2).setWidth(0);
 		orderItemsListTable.getColumnModel().getColumn(2).setMinWidth(0);
 		orderItemsListTable.getColumnModel().getColumn(2).setMaxWidth(0);
+		orderItemsListTable.getColumnModel().getColumn(3).setWidth(0);
+		orderItemsListTable.getColumnModel().getColumn(3).setMinWidth(0);
+		orderItemsListTable.getColumnModel().getColumn(3).setMaxWidth(0);
 		JScrollPane scrollPane = new JScrollPane(orderItemsListTable);
 		//leftItemsList.add(scrollPane, BorderLayout.CENTER);
 		leftItemListPanel.add(scrollPane, BorderLayout.CENTER);
@@ -56,6 +73,7 @@ public class PaymentMenu  extends Panel{
 		selectedItemsListPanel = new JPanel();
 		selectedItemsListPanel.setLayout(new BorderLayout());
 		selectedItemsListPanel.setBounds(390, 220, 250, 300);
+		selectedOrderItemInfoList = new ArrayList<>();
 		selectedOrderItemsListTable = new JTable(new OrderItemListTableModel(selectedOrderItemInfoList));
 		selectedOrderItemsListTable.setRowHeight(65);
 		selectedOrderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
@@ -139,43 +157,135 @@ public class PaymentMenu  extends Panel{
 		addButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("table row selected "+orderItemsListTable.getSelectedRow());
-				Long selectedOrderItemId = Long.parseLong(orderItemsListTable.getValueAt(orderItemsListTable.getSelectedRow(), 2).toString());
-				System.out.println("selected item id "+orderItemsListTable.getValueAt(orderItemsListTable.getSelectedRow(), 2));
-				loadSelectedOrderItemTable(selectedOrderItemId);
+				System.out.println("table rows selected "+orderItemsListTable.getSelectedRows());
+				processOperation(false);
+				/*int[] selectedRows = orderItemsListTable.getSelectedRows();
+				for(int i=0; i<selectedRows.length ; i++) {
+					Long selectedOrderItemId = Long.parseLong(orderItemsListTable.getValueAt(i, 2).toString());
+					System.out.println("selected item id "+orderItemsListTable.getValueAt(i, 2));
+					//loadSelectedOrderItemTable(selectedOrderItemId);
+					processOperation(false);
+				}*/
 			}
 		});
 		this.add(addButton);
 
-		JButton removButton = new JButton("Remove");
-		removButton.setBounds(305, 345, 80, 30);
-		this.add(removButton);
+		JButton removeButton = new JButton("Remove");
+		removeButton.setBounds(305, 345, 80, 30);
+		removeButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("table rows selected "+selectedOrderItemsListTable.getSelectedRows());
+				processOperation(true);
+				/*int[] selectedRows = selectedOrderItemsListTable.getSelectedRows();
+				for(int i=0; i<selectedRows.length ; i++) {
+					Long selectedOrderItemId = Long.parseLong(selectedOrderItemsListTable.getValueAt(i, 2).toString());
+					System.out.println("selected item id "+selectedOrderItemsListTable.getValueAt(i, 2));
+					//loadSelectedOrderItemTable(selectedOrderItemId);
+					processOperation(true);
+				}*/
+			}
+		});
+		this.add(removeButton);
 
 		JButton undoButton = new JButton("Undo");
 		undoButton.setBounds(135, 530, 80, 30);
+		undoButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int[] selectedRowIndexes = orderItemsListTable.getSelectedRows();
+				for(int i=0 ; i<selectedRowIndexes.length; i++) {
+					Long selectedOrderItemId = Long.parseLong(orderItemsListTable.getValueAt(selectedRowIndexes[i], 2).toString());
+					OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, false);
+					System.out.println("Undo payment for order item "+orderItemInfo.getItemId());
+					paymentService.undoPayment(orderItemInfo);
+				}
+				loadOrderItems(false, false);
+				((OrderItemListTableModel) orderItemsListTable.getModel()).fireTableDataChanged();
+			}
+		});
 		this.add(undoButton);
 
 		JButton payedButton = new JButton("Payed");
 		payedButton.setBounds(480, 530, 80, 30);
+		payedButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int[] selectedRowIndexes = selectedOrderItemsListTable.getSelectedRows();
+				OrderItemTransactionInfo orderItemTransactionInfo = null;
+				List<OrderItemInfo> orderItemInfoList = null;
+				for(int i=0 ; i<selectedRowIndexes.length; i++) {
+					Long selectedOrderItemId = Long.parseLong(selectedOrderItemsListTable.getValueAt(selectedRowIndexes[i], 2).toString());
+					OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, true);
+					System.out.println("Set payment for order item "+orderItemInfo.getItemId());
+					if(orderItemInfoList == null) {
+						orderItemInfoList = new ArrayList<>();
+					}
+					orderItemInfoList.add(orderItemInfo);
+				}
+				orderItemTransactionInfo = new OrderItemTransactionInfo();
+				orderItemTransactionInfo.setOrderItemInfo(orderItemInfoList);
+				orderItemTransactionInfo.setAddTransaction(true);
+				paymentService.processTransactionInfo(orderItemTransactionInfo);
+				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList().removeAll(orderItemInfoList);
+				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+			}
+		});
 		this.add(payedButton);
 
 	}
 
-	private void loadSelectedOrderItemTable(Long itemId){
-		OrderItemInfo orderItemInfo = getSelectedOrderItem(itemId);
-		selectedOrderItemInfoList = ((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList();
-		if(selectedOrderItemInfoList == null) {
-			selectedOrderItemInfoList = new ArrayList<>();
-			((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).setOrderItemInfoList(selectedOrderItemInfoList);
+	private void addItemToTable(OrderItemInfo orderItemInfo, JTable table) {
+		List<OrderItemInfo> tableItems = ((OrderItemListTableModel) table.getModel()).getOrderItemInfoList();
+		if(tableItems == null) {
+			tableItems = new ArrayList<>();
+			((OrderItemListTableModel) table.getModel()).setOrderItemInfoList(tableItems);
 		}
-		selectedOrderItemInfoList.add(orderItemInfo);
-		((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
-		System.out.println("loaded the selected item "+itemId);
+		tableItems.add(orderItemInfo);
+		((OrderItemListTableModel) table.getModel()).fireTableDataChanged();
 	}
 
-	private OrderItemInfo getSelectedOrderItem(Long itemId) {
-		return orderItemInfoList.stream().filter(orderItemInfo ->
-				orderItemInfo.getItemId().equals(itemId)).findAny().orElse(null);
+	private void removeItemFromTable(OrderItemInfo orderItemInfo, JTable table) {
+		List<OrderItemInfo> tableItems = ((OrderItemListTableModel) table.getModel()).getOrderItemInfoList();
+		tableItems.remove(orderItemInfo);
+		((OrderItemListTableModel) table.getModel()).fireTableDataChanged();
+	}
+
+	private void processOperation(Boolean isRemove){
+		JTable leftTable = orderItemsListTable;
+		JTable rightTable  = selectedOrderItemsListTable;
+
+		if(!isRemove) { //add
+			int[] selectedRowIndexes = leftTable.getSelectedRows();
+			for(int i=0 ; i<selectedRowIndexes.length; i++) {
+				Long selectedOrderItemId = Long.parseLong(leftTable.getValueAt(selectedRowIndexes[i], 2).toString());
+				OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, isRemove);
+				addItemToTable(orderItemInfo, rightTable);
+				removeItemFromTable(orderItemInfo, leftTable);
+			}
+		} else {
+			int[] selectedRowIndexes = rightTable.getSelectedRows();
+			for(int i=0 ; i<selectedRowIndexes.length; i++) {
+				Long selectedOrderItemId = Long.parseLong(rightTable.getValueAt(selectedRowIndexes[i], 2).toString());
+				OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, isRemove);
+				addItemToTable(orderItemInfo, leftTable);
+				removeItemFromTable(orderItemInfo, rightTable);
+			}
+		}
+
+	}
+
+	private OrderItemInfo getSelectedOrderItem(Long itemId, Boolean isRemove) {
+		OrderItemInfo orderItemInfo = null;
+		if(isRemove) {
+			orderItemInfo = selectedOrderItemInfoList.stream().filter(currOrderItemInfo ->
+					currOrderItemInfo.getItemId().equals(itemId)).findAny().orElse(null);
+		} else {
+			orderItemInfo = orderItemInfoList.stream().filter(currOrderItemInfo ->
+					currOrderItemInfo.getItemId().equals(itemId)).findAny().orElse(null);
+		}
+
+		return orderItemInfo;
 	}
 
 	private void loadOrderItems(Boolean isPrev, Boolean isNext) {
@@ -198,12 +308,11 @@ public class PaymentMenu  extends Panel{
 			txtFieldOrderID.setText(humanReadableId.toString());
 			orderDetailQuery.setHumanreadableId(humanReadableId.toString());
 			orderItemInfoList = paymentService.retrieveOrderItems(orderDetailQuery);
+			orderItemInfoList.sort(new OrderItemComparator());
 			//loadLeftOrderItemList(orderItemInfoList);
 			//orderItemsListTable.setModel(new OrderItemListTableModel(orderItemInfoList)); ** WORKS
 			((OrderItemListTableModel) orderItemsListTable.getModel()).setOrderItemInfoList(orderItemInfoList);
 			((OrderItemListTableModel) orderItemsListTable.getModel()).fireTableDataChanged();
-			System.out.println("show table "+orderItemsListTable.getSelectedRow());
-			//orderItemsListTable.setVisible(true);
 		}
 	}
 
@@ -211,58 +320,5 @@ public class PaymentMenu  extends Panel{
 		// TODO Auto-generated method stub
 
 	}
-
-	/*private void loadLeftOrderItemList(List<OrderItemInfo> orderItemInfoList) {
-		OrderItemListTableModel model  = new OrderItemListTableModel(orderItemInfoList);
-		int rowCount = model.getRowCount();
-		String[] headers = model.getColumnNames();
-		StringBuilder headerRow = new StringBuilder();
-		for(int currColHeaderIndex = 0 ; currColHeaderIndex < headers.length ; currColHeaderIndex++) {
-			switch (currColHeaderIndex) {
-				case 0: headerRow.append(headers[currColHeaderIndex]);
-					break;
-				case 1: headerRow.append("\t"+"\t");
-					headerRow.append(headers[currColHeaderIndex]);
-					break;
-			}
-		}
-		leftItemsList.append(headerRow.toString()+"\n");
-
-		//load data
-		for(int rowIndex = 0 ; rowIndex < rowCount ; rowIndex++) {
-			leftItemsList.append(model.getValueAt(rowIndex, 0).toString());
-			leftItemsList.append(model.getValueAt(rowIndex, 1).toString());
-			leftItemsList.append("\n");
-		}
-		*//*model.addTableModelListener(new TableModelListener() {
-										@Override
-										public void tableChanged(TableModelEvent e) {
-											int rowCount = model.getRowCount();
-											String[] headers = model.getColumnNames();
-											StringBuilder headerRow = new StringBuilder();
-											for(int currColHeaderIndex = 0 ; currColHeaderIndex < headers.length ; currColHeaderIndex++) {
-													switch (currColHeaderIndex) {
-														case 0: headerRow.append(headers[currColHeaderIndex]);
-														        break;
-														case 1: headerRow.append("\t"+"\t");
-														        headerRow.append(headers[currColHeaderIndex]);
-														        break;
-													}
-											}
-											leftItemsList.append(headerRow.toString()+"\n");
-
-											//load data
-											for(int rowIndex = 0 ; rowIndex < rowCount ; rowIndex++) {
-												leftItemsList.append(model.getValueAt(rowIndex, 0).toString());
-												leftItemsList.append(model.getValueAt(rowIndex, 1).toString());
-												leftItemsList.append("\n");
-											}
-										}
-									}
-
-		);*//*
-		*//*orderItemsListTable = new JTable(model);
-		this.add(orderItemsListTable);*//*
-	}*/
 
 }
