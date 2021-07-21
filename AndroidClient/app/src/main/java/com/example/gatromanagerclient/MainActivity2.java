@@ -644,6 +644,7 @@ new GetHumanReadableOrderIdTask().execute();
                     menuButtonView.setOnClickListener(new View.OnClickListener() {
                         public void onClick(View v) {
                             // your handler code here
+                            menuButtonView.setEnabled(false);
                             SelectedOrderItem currSelectedOrderItem = new SelectedOrderItem();
                             currSelectedOrderItem.setItemName(menuItemName);
                             System.out.println("Sub item " + menuItemName + " selected for " + mainItem);
