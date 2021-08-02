@@ -134,6 +134,7 @@ public class GMTree extends JTree {
 		    			node.removeFromParent();
 		    			parent.children.remove(node);
 		    			deleteFloor(node.getName());
+		    			layoutMenu.getScrollPane().setViewportView(null);
 					}
 				}
 			}
@@ -149,7 +150,6 @@ public class GMTree extends JTree {
 			}
 		}
 	}
-	
 
 	public void showOnEditor(GMTreeItem selectedItem, DrillDownMenu menu) {
 

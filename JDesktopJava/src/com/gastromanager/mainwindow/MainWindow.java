@@ -140,7 +140,7 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Drill Down Menu", null, drillDownScroll, null);
 		drillDownMenu.setLayout(null);
 
-		tabOrdering = new OrderingMenu(connection, drillDownItems, drillDownMenu);
+		tabOrdering = new OrderingMenu();
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
 		
