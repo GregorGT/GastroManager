@@ -9,6 +9,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.gatromanagerclient.ui.payment.PaymentActivity;
+
 public class MainActivity extends AppCompatActivity implements ParentFragment.OnFragmentInteractionListener, ChildFragment.OnFragmentInteractionListener,
 SecondChildFragment.OnFragmentInteractionListener {
 
@@ -21,6 +23,12 @@ SecondChildFragment.OnFragmentInteractionListener {
        /* FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.parent_fragment_container, new ParentFragment());
         ft.commit();*/
+
+        Button btnPayment = findViewById(R.id.paymentMenuButton);
+        btnPayment.setOnClickListener(v -> {
+            Intent intent = new Intent(this, PaymentActivity.class);
+            startActivity(intent);
+        });
 
         Button orderingMenuButton = findViewById(R.id.orderingMenuButton);
         orderingMenuButton.setOnClickListener(new View.OnClickListener() {

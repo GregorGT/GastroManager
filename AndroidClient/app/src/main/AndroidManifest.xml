@@ -12,6 +12,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.GatromanagerClient">
+        <activity android:name=".ui.payment.PaymentActivity"
+            android:theme="@style/Theme.GatromanagerClient.NoActionBar">
+        </activity>
         <activity
             android:name=".MainActivity2"
             android:label="@string/title_activity_main2"

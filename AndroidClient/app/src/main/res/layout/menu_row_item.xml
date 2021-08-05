@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="5dp"
+    android:background="@drawable/black_rounder_rectangle"
+    android:clickable="true"
+    android:focusable="true"
+    android:tag="1"
+    android:orientation="horizontal"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/tv_item_name"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:text="Vege piza"
+        android:gravity="center_vertical"
+        android:textColor="@color/black" />
+
+    <TextView
+        android:id="@+id/tv_item_price"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:autoSizeMaxTextSize="20sp"
+        android:autoSizeMinTextSize="14sp"
+        android:text="30"
+        android:gravity="center_vertical"
+        android:textColor="@color/black" />
+
+    <ImageView
+        android:id="@+id/iv_edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@drawable/ic_edit"/>
+
+    <ImageView
+        android:id="@+id/iv_delete_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@drawable/ic_cancel"/>
+
+    <ImageView
+        android:id="@+id/iv_push_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:src="@drawable/ic_arrow_right_green"/>
+
+
+</LinearLayout>
