@@ -19,6 +19,7 @@
         android:autoSizeMaxTextSize="20sp"
         android:autoSizeMinTextSize="14sp"
         android:text="Vege piza"
+        android:textStyle="bold"
         android:gravity="center_vertical"
         android:textColor="@color/black" />
 
@@ -27,6 +28,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1"
+        android:textStyle="bold"
         android:autoSizeMaxTextSize="20sp"
         android:autoSizeMinTextSize="14sp"
         android:text="30"

@@ -33,14 +33,14 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void updateOrderItemList(List<OrderItemInfo> orderItemInfoList) {
-        menuItems.clear();
-        if (orderItemInfoList != null && orderItemInfoList.size() > 0) {
-            menuItems.addAll(orderItemInfoList);
-            menuItems.sort(new OrderItemComparator());
-        }
+        this.menuItems = orderItemInfoList;
         notifyDataSetChanged();
     }
 
+    public void clearList(){
+        menuItems.clear();
+        notifyDataSetChanged();
+    }
     public List<OrderItemInfo> getOrderItems() {
         return menuItems;
     }
@@ -76,6 +76,7 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
 
         holder.ivEditBtn.setVisibility(View.GONE);
         holder.ivDeleteBtn.setVisibility(View.GONE);
+        holder.ivPushBtn.setVisibility(View.VISIBLE);
         holder.tvItemName.setText(splitString[0]);
         holder.tvItemPrice.setText(String.format("%s EURO", orderItem.getPrice().toString()));
         if(orderItem.getPayed() == 0){
@@ -83,6 +84,7 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
             holder.llRootLayout.setBackgroundResource(R.drawable.black_rounder_rectangle);
         } else {
             holder.llRootLayout.setClickable(false);
+            holder.ivPushBtn.setVisibility(View.INVISIBLE);
             holder.llRootLayout.setBackgroundResource(R.drawable.yellow_rounder_rectangle);
         }
 

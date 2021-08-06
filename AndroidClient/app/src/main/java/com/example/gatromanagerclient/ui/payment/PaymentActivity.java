@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.example.gatromanagerclient.R;
 import com.example.gatromanagerclient.socket.Client;
@@ -34,6 +35,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     private TextInputEditText etFloorId, etTableId, etOrderId;
     private ImageView ivFloorLeft, ivFloorRight, ivTableLeft, ivTableRight, ivOrderLeft, ivOrderRight;
     private AppCompatButton btnClear, btnSubmit, btnSelectOrder;
+    private TextView tvTotalAmount;
     private RecyclerView rvMenuItem, rvSelectedMenuItem;
     private Dialog progressDialog;
     private MenuItemsAdapter menuItemsAdapter;
@@ -72,6 +74,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         etFloorId = findViewById(R.id.et_floor_Id);
         etTableId = findViewById(R.id.et_table_Id);
         etOrderId = findViewById(R.id.et_order_Id);
+        tvTotalAmount = findViewById(R.id.tv_total_amount);
 
         rvMenuItem = findViewById(R.id.rv_menu_items);
         menuItemsAdapter = new MenuItemsAdapter(menuItemInfoList,this);
@@ -141,7 +144,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println("MyAppLogs right table");
                 break;
             case R.id.btn_clear:
-                System.out.println("MyAppLogs button clear all");
+                onClearClicked();
                 break;
             case R.id.btn_submit:
                 System.out.println("MyAppLogs button submit");
@@ -215,6 +218,26 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
             menuItemsAdapter.removeItem(orderItemInfo);
             selectedMenuItemsList = selectedMenuItemsAdapter.getOrderItems();
         }
+        updateTotalAmountUI();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.N)
+    private void onClearClicked(){
+        List<OrderItemInfo> list = selectedMenuItemsAdapter.getOrderItems();
+        menuItemInfoList.addAll(list);
+        menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+        selectedMenuItemsAdapter.clearList();
+        updateTotalAmountUI();
+    }
+
+    @Override
+    public void updateTotalAmount() {
+        updateTotalAmountUI();
+    }
+
+    private void updateTotalAmountUI(){
+        Double totalAmount = selectedMenuItemsAdapter.getTotalAmount(selectedMenuItemsList);
+        tvTotalAmount.setText(String.format("Total: %s Euro", totalAmount));
     }
 
     private class GetOrderID extends AsyncTask<Void, Void, Integer> {
@@ -271,6 +294,8 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         @Override
         protected void onPostExecute(Void result) {
             menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+            selectedMenuItemsAdapter.clearList();
+            updateTotalAmountUI();
             if (menuItemInfoList == null) {
                 Util.showToast(PaymentActivity.this, "Order Details not found!!");
             } else {

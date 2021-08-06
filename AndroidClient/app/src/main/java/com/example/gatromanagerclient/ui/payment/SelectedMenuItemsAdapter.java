@@ -4,15 +4,12 @@ import android.app.Dialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.gatromanagerclient.R;
 import com.gastromanager.models.OrderItemInfo;
 
@@ -29,16 +26,22 @@ public class SelectedMenuItemsAdapter extends RecyclerView.Adapter<SelectedMenuI
         this.myListener = menuItemClickListener;
     }
 
-    public void updateOrderItemList(List<OrderItemInfo> orderItemInfoList) {
-        selectedMenuItems.clear();
-        if (orderItemInfoList != null && orderItemInfoList.size() > 0) {
-            selectedMenuItems.addAll(orderItemInfoList);
+    public double getTotalAmount(List<OrderItemInfo> list) {
+        Double totalPrice = null;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            totalPrice = list.stream().mapToDouble(OrderItemInfo::getPrice).sum();
         }
-        notifyDataSetChanged();
+        return totalPrice;
     }
 
     public List<OrderItemInfo> getOrderItems() {
         return selectedMenuItems;
+    }
+
+
+    public void clearList() {
+        selectedMenuItems.clear();
+        notifyDataSetChanged();
     }
 
     public void removeItem(OrderItemInfo orderItemInfo) {
@@ -146,6 +149,7 @@ public class SelectedMenuItemsAdapter extends RecyclerView.Adapter<SelectedMenuI
     public void updateItemPrice(int position, Double price) {
         selectedMenuItems.get(position).setPrice(price);
         notifyDataSetChanged();
+        myListener.updateTotalAmount();
     }
 
 }
