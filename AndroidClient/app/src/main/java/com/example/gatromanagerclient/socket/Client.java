@@ -5,6 +5,7 @@ import com.gastromanager.models.MenuDetail;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderDetailsView;
 import com.gastromanager.models.OrderItemInfo;
+import com.gastromanager.models.OrderItemTransactionInfo;
 import com.gastromanager.models.SelectedOrderItem;
 import com.gastromanager.models.SignOffOrderInfo;
 
@@ -27,7 +28,7 @@ public class Client {
     public Client() {
         try {
             //send to server
-            socket = new Socket("192.168.1.8", serverPort);
+            socket = new Socket("192.168.1.5", serverPort);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 
@@ -92,6 +93,29 @@ public class Client {
         }
 
         return response;
+    }
+
+
+    public List<OrderItemInfo> payOrderItems(OrderItemTransactionInfo requestBody) {
+        Object response = null;
+        try {
+            out.writeObject(requestBody);
+            if(in != null){
+                response = in.readObject();
+            }
+
+            if(response == null ) {
+                System.out.println("Server Error");
+            } else {
+                response = (response == null) ? null : (List<OrderItemInfo>) response;
+                System.out.println( "Items Payed Successfully!!");
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            close();
+        }
+        return (List<OrderItemInfo>) response;
     }
 
    /* public String getOrderInfo(OrderDetailQuery request) {

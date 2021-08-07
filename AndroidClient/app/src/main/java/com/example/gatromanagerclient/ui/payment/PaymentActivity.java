@@ -22,6 +22,8 @@ import com.example.gatromanagerclient.util.Constants;
 import com.example.gatromanagerclient.util.Util;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderItemInfo;
+import com.gastromanager.models.OrderItemTransactionInfo;
+import com.gastromanager.models.TransactionInfo;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     private SelectedMenuItemsAdapter selectedMenuItemsAdapter;
     private List<OrderItemInfo> menuItemInfoList = new ArrayList<>();
     private List<OrderItemInfo> selectedMenuItemsList = new ArrayList<>();
-
+    private Client client;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +136,6 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 break;
             case R.id.iv_right_order_id:
                 if (validateFloorAndTableInputs()) {
-                    setProgressbar(true);
                 }
                 break;
             case R.id.iv_left_table_id:
@@ -147,15 +148,24 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 onClearClicked();
                 break;
             case R.id.btn_submit:
-                System.out.println("MyAppLogs button submit");
+                payForItemsOnSubmitClicked();
                 break;
         }
+    }
+
+    private void payForItemsOnSubmitClicked() {
+        OrderItemTransactionInfo request =  new OrderItemTransactionInfo();
+        request.setOrderItemInfo(selectedMenuItemsAdapter.getOrderItems());
+        request.setAddTransaction(true);
+        request.setTransactionInfo(new TransactionInfo());
+        setProgressbar(true);
+        new payForItems().execute(request,this);
     }
 
     private void getSelectOrderId() {
         String orderId = (etOrderId.getText() != null) ?
                 etOrderId.getText().toString() : null;
-        if (orderId != null && orderId.length() > 0) {
+        if (orderId != null && orderId.length() >= 0) {
 //            int currentOrderId = Integer.parseInt(orderId);
 //            etOrderId.setText(String.valueOf(currentOrderId + 1));
 //            orderId = (etOrderId.getText() != null) ?
@@ -240,6 +250,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         tvTotalAmount.setText(String.format("Total: %s Euro", totalAmount));
     }
 
+    // async task for calling socket
     private class GetOrderID extends AsyncTask<Void, Void, Integer> {
         Integer response;
 
@@ -301,6 +312,43 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
             } else {
                 System.out.println("Order item details loaded");
             }
+            super.onPostExecute(result);
+        }
+    }
+
+    private class payForItems extends AsyncTask<Object, Void, Void> {
+        PaymentActivity paymentActivity;
+        OrderItemTransactionInfo requestBody;
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        protected Void doInBackground(Object... request) {
+            Iterator iterator = Arrays.stream(request).iterator();
+            int paramCount = 0;
+            while (iterator.hasNext()) {
+                Object param = iterator.next();
+                switch (paramCount) {
+                    case 0:
+                        requestBody = (OrderItemTransactionInfo) param;
+                        break;
+                    case 1:
+                        paymentActivity = (PaymentActivity) param;
+                        break;
+                }
+                paramCount++;
+            }
+            Client client =  new Client();
+            menuItemInfoList = client.payOrderItems(requestBody);
+            return null;
+        }
+
+        @RequiresApi(api = Build.VERSION_CODES.N)
+        @Override
+        protected void onPostExecute(Void result) {
+            menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+            updateTotalAmountUI();
+            selectedMenuItemsAdapter.clearList();
+            setProgressbar(false);
             super.onPostExecute(result);
         }
     }
