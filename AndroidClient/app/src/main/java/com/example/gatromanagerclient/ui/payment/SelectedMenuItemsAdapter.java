@@ -71,7 +71,10 @@ public class SelectedMenuItemsAdapter extends RecyclerView.Adapter<SelectedMenuI
 
         holder.ivPushBtn.setVisibility(View.GONE);
 
-        holder.tvItemName.setText(splitString[0]);
+//        holder.tvItemName.setText(splitString[0]);
+
+        holder.tvItemName.setText(xmlString);
+
         holder.tvItemPrice.setText(String.format("%s EURO", orderItem.getPrice().toString()));
 
         holder.ivDeleteBtn.setOnClickListener(new View.OnClickListener() {

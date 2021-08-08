@@ -1,6 +1,5 @@
 package com.example.gatromanagerclient.ui.payment;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,14 +7,10 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.example.gatromanagerclient.OrderItemComparator;
 import com.example.gatromanagerclient.R;
 import com.gastromanager.models.OrderItemInfo;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +19,6 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
     private List<OrderItemInfo> menuItems;
     private List<OrderItemInfo> selectedMenuItems = new ArrayList<>();
     public final MenuItemClickListener myListener;
-
 
     public MenuItemsAdapter(List<OrderItemInfo> orderItems, MenuItemClickListener menuItemClickListener) {
         this.menuItems = orderItems;
@@ -41,6 +35,7 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
         menuItems.clear();
         notifyDataSetChanged();
     }
+
     public List<OrderItemInfo> getOrderItems() {
         return menuItems;
     }
@@ -77,7 +72,14 @@ public class MenuItemsAdapter extends RecyclerView.Adapter<MenuItemsAdapter.View
         holder.ivEditBtn.setVisibility(View.GONE);
         holder.ivDeleteBtn.setVisibility(View.GONE);
         holder.ivPushBtn.setVisibility(View.VISIBLE);
-        holder.tvItemName.setText(splitString[0]);
+
+        holder.tvItemName.setText(xmlString);
+
+//        if (splitString.length >= 4) {
+//            holder.tvItemName.setText(String.format("%s %s", splitString[0], splitString[2]));
+//        } else {
+//            holder.tvItemName.setText(String.format("%s ", splitString[0]));
+//        }
         holder.tvItemPrice.setText(String.format("%s EURO", orderItem.getPrice().toString()));
         if(orderItem.getPayed() == 0){
             holder.llRootLayout.setClickable(true);

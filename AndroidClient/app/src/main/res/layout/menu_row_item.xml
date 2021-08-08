@@ -31,8 +31,8 @@
         android:textStyle="bold"
         android:autoSizeMaxTextSize="20sp"
         android:autoSizeMinTextSize="14sp"
-        android:text="30"
-        android:gravity="center_vertical"
+        android:text="30 EURO"
+        android:gravity="center_vertical|end"
         android:textColor="@color/black" />
 
     <ImageView

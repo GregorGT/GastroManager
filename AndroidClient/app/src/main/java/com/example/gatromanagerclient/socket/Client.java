@@ -14,8 +14,11 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.socket.client.IO;
 
 public class Client {
 
@@ -24,11 +27,11 @@ public class Client {
     ObjectInputStream in = null;
     Integer serverPort = 5000;
     static Client client = null;
-
+    io.socket.client.Socket socketIO;
     public Client() {
         try {
             //send to server
-            socket = new Socket("192.168.1.5", serverPort);
+            socket = new Socket("192.168.1.8", serverPort);
             out = new ObjectOutputStream(socket.getOutputStream());
             in = new ObjectInputStream(new BufferedInputStream(socket.getInputStream()));
 
@@ -50,11 +53,13 @@ public class Client {
             socket.close();
             out.close();
             in.close();
+            socketIO.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-
+    private void attemptSend() {
     }
 
     public Boolean signOffOrder(SignOffOrderInfo request) {
@@ -95,27 +100,27 @@ public class Client {
         return response;
     }
 
+    public List<OrderItemInfo> payOrderItems(OrderItemTransactionInfo request) {
+        ArrayList<OrderItemInfo> response = null;
 
-    public List<OrderItemInfo> payOrderItems(OrderItemTransactionInfo requestBody) {
-        Object response = null;
         try {
-            out.writeObject(requestBody);
-            if(in != null){
-                response = in.readObject();
-            }
+            //sendTextData(request, out); //request could be orderId
+            out.writeObject(request);
+            response = (ArrayList<OrderItemInfo>) in.readObject();
 
-            if(response == null ) {
-                System.out.println("Server Error");
+            //response = (List<OrderItem>) in.readObject();
+            if(response == null || response.size() == 0) {
+                System.out.println(" No items received");
             } else {
-                response = (response == null) ? null : (List<OrderItemInfo>) response;
-                System.out.println( "Items Payed Successfully!!");
+                System.out.println( "received item count " + response.size());
             }
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         } finally {
             close();
         }
-        return (List<OrderItemInfo>) response;
+
+        return response;
     }
 
    /* public String getOrderInfo(OrderDetailQuery request) {

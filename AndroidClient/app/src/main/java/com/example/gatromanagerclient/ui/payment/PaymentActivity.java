@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.gatromanagerclient.R;
@@ -25,6 +26,7 @@ import com.gastromanager.models.OrderItemInfo;
 import com.gastromanager.models.OrderItemTransactionInfo;
 import com.gastromanager.models.TransactionInfo;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 public class PaymentActivity extends AppCompatActivity implements View.OnClickListener, MenuItemClickListener {
 
     private TextInputEditText etFloorId, etTableId, etOrderId;
+    private TextInputLayout tlfFloor, tlfTable, tlfOrder;
+    private LinearLayout llMenuItemsEmpty, llSelectedMenuItemsEmpty;
     private ImageView ivFloorLeft, ivFloorRight, ivTableLeft, ivTableRight, ivOrderLeft, ivOrderRight;
     private AppCompatButton btnClear, btnSubmit, btnSelectOrder;
     private TextView tvTotalAmount;
@@ -77,15 +81,21 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         etTableId = findViewById(R.id.et_table_Id);
         etOrderId = findViewById(R.id.et_order_Id);
         tvTotalAmount = findViewById(R.id.tv_total_amount);
+        tlfFloor = findViewById(R.id.text_layout_floor);
+        tlfTable = findViewById(R.id.text_layout_table);
+        tlfOrder = findViewById(R.id.text_layout_order_id);
+
+        llMenuItemsEmpty = findViewById(R.id.ll_menuItems_empty);
+        llSelectedMenuItemsEmpty = findViewById(R.id.ll_selectedItems_empty);
 
         rvMenuItem = findViewById(R.id.rv_menu_items);
-        menuItemsAdapter = new MenuItemsAdapter(menuItemInfoList,this);
+        menuItemsAdapter = new MenuItemsAdapter(menuItemInfoList, this);
         rvMenuItem.setHasFixedSize(true);
         rvMenuItem.setLayoutManager(new LinearLayoutManager(this));
         rvMenuItem.setAdapter(menuItemsAdapter);
 
         rvSelectedMenuItem = findViewById(R.id.rv_selected_menu_items);
-        selectedMenuItemsAdapter = new SelectedMenuItemsAdapter(selectedMenuItemsList,this);
+        selectedMenuItemsAdapter = new SelectedMenuItemsAdapter(selectedMenuItemsList, this);
         rvSelectedMenuItem.setHasFixedSize(true);
         rvSelectedMenuItem.setLayoutManager(new LinearLayoutManager(this));
         rvSelectedMenuItem.setAdapter(selectedMenuItemsAdapter);
@@ -128,15 +138,14 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println("MyAppLogs right floor");
                 break;
             case R.id.btn_select_order:
-                getSelectOrderId();
-                System.out.println("MyAppLogs select order");
+                if (validateInputFields()) {
+                    getSelectOrderId();
+                }
                 break;
             case R.id.iv_left_order_id:
                 System.out.println("MyAppLogs left order");
                 break;
             case R.id.iv_right_order_id:
-                if (validateFloorAndTableInputs()) {
-                }
                 break;
             case R.id.iv_left_table_id:
                 System.out.println("MyAppLogs left table");
@@ -154,15 +163,20 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     private void payForItemsOnSubmitClicked() {
-        OrderItemTransactionInfo request =  new OrderItemTransactionInfo();
-        request.setOrderItemInfo(selectedMenuItemsAdapter.getOrderItems());
-        request.setAddTransaction(true);
-        request.setTransactionInfo(new TransactionInfo());
-        setProgressbar(true);
-        new payForItems().execute(request,this);
+        if (selectedMenuItemsAdapter.getOrderItems() == null || selectedMenuItemsAdapter.getOrderItems().isEmpty()) {
+            setEmptyIconsVisibility();
+        } else {
+            OrderItemTransactionInfo request = new OrderItemTransactionInfo();
+            request.setOrderItemInfo(selectedMenuItemsAdapter.getOrderItems());
+            request.setAddTransaction(true);
+            request.setTransactionInfo(new TransactionInfo());
+            setProgressbar(true);
+            new payForItems().execute(request);
+        }
     }
 
     private void getSelectOrderId() {
+        setProgressbar(true);
         String orderId = (etOrderId.getText() != null) ?
                 etOrderId.getText().toString() : null;
         if (orderId != null && orderId.length() >= 0) {
@@ -170,7 +184,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 //            etOrderId.setText(String.valueOf(currentOrderId + 1));
 //            orderId = (etOrderId.getText() != null) ?
 //                    etOrderId.getText().toString() : null;
-
+            etOrderId.setError(null);
             OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
             orderDetailQuery.setHumanreadableId(orderId);
 
@@ -181,22 +195,29 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 orderDetailQuery.setTableId(etTableId.getText().toString());
 
             if (orderId != null && !orderId.isEmpty()) {
-                setProgressbar(false);
                 new GetOrderDetails().execute(orderDetailQuery, this);
             }
+        } else {
+            etOrderId.setError("Enter order id ");
         }
     }
 
-    private boolean validateFloorAndTableInputs() {
-        etFloorId.setError(null);
-        etTableId.setError(null);
+    private boolean validateInputFields() {
+        tlfFloor.setError(null);
+        tlfTable.setError(null);
+        tlfOrder.setError(null);
 
         if (Util.isEmptyOrNull(etFloorId)) {
-            etFloorId.setError("Add Floor Id");
+            tlfFloor.setError("Enter Floor id");
             return false;
         }
         if (Util.isEmptyOrNull(etTableId)) {
-            etTableId.setError("Add Table Id");
+            tlfTable.setError("Enter Table id");
+            return false;
+        }
+
+        if (Util.isEmptyOrNull(etOrderId)) {
+            tlfOrder.setError("Enter Order id");
             return false;
         }
         return true;
@@ -219,7 +240,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     }
 
     public void onMenuItemClickListener(OrderItemInfo orderItemInfo, boolean isSelectedMenuList) {
-        if(isSelectedMenuList){
+        if (isSelectedMenuList) {
             menuItemsAdapter.addItemToList(orderItemInfo);
             selectedMenuItemsAdapter.removeItem(orderItemInfo);
             menuItemInfoList = menuItemsAdapter.getOrderItems();
@@ -229,15 +250,33 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
             selectedMenuItemsList = selectedMenuItemsAdapter.getOrderItems();
         }
         updateTotalAmountUI();
+        setEmptyIconsVisibility();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
-    private void onClearClicked(){
-        List<OrderItemInfo> list = selectedMenuItemsAdapter.getOrderItems();
-        menuItemInfoList.addAll(list);
-        menuItemsAdapter.updateOrderItemList(menuItemInfoList);
-        selectedMenuItemsAdapter.clearList();
-        updateTotalAmountUI();
+    private void onClearClicked() {
+        if (selectedMenuItemsAdapter.getOrderItems() != null) {
+            List<OrderItemInfo> list = selectedMenuItemsAdapter.getOrderItems();
+            menuItemInfoList.addAll(list);
+            menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+            selectedMenuItemsAdapter.clearList();
+            updateTotalAmountUI();
+        }
+        setEmptyIconsVisibility();
+    }
+
+    private void setEmptyIconsVisibility() {
+        if (selectedMenuItemsAdapter.getOrderItems() != null && selectedMenuItemsAdapter.getOrderItems().isEmpty()) {
+            llSelectedMenuItemsEmpty.setVisibility(View.VISIBLE);
+        } else {
+            llSelectedMenuItemsEmpty.setVisibility(View.GONE);
+        }
+
+        if (menuItemsAdapter.getOrderItems() != null && menuItemsAdapter.getOrderItems().isEmpty()) {
+            llMenuItemsEmpty.setVisibility(View.VISIBLE);
+        } else {
+            llMenuItemsEmpty.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -245,9 +284,10 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         updateTotalAmountUI();
     }
 
-    private void updateTotalAmountUI(){
+    private void updateTotalAmountUI() {
         Double totalAmount = selectedMenuItemsAdapter.getTotalAmount(selectedMenuItemsList);
         tvTotalAmount.setText(String.format("Total: %s Euro", totalAmount));
+        Util.hideKeyboard(PaymentActivity.this);
     }
 
     // async task for calling socket
@@ -304,14 +344,15 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         @RequiresApi(api = Build.VERSION_CODES.N)
         @Override
         protected void onPostExecute(Void result) {
-            menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+            if (menuItemInfoList != null)
+                menuItemsAdapter.updateOrderItemList(menuItemInfoList);
+            else
+                menuItemsAdapter.updateOrderItemList(new ArrayList<OrderItemInfo>());
             selectedMenuItemsAdapter.clearList();
             updateTotalAmountUI();
-            if (menuItemInfoList == null) {
-                Util.showToast(PaymentActivity.this, "Order Details not found!!");
-            } else {
-                System.out.println("Order item details loaded");
-            }
+            setEmptyIconsVisibility();
+            Util.hideKeyboard(PaymentActivity.this);
+            setProgressbar(false);
             super.onPostExecute(result);
         }
     }
@@ -337,7 +378,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 }
                 paramCount++;
             }
-            Client client =  new Client();
+            Client client = new Client();
             menuItemInfoList = client.payOrderItems(requestBody);
             return null;
         }
@@ -346,8 +387,9 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         @Override
         protected void onPostExecute(Void result) {
             menuItemsAdapter.updateOrderItemList(menuItemInfoList);
-            updateTotalAmountUI();
             selectedMenuItemsAdapter.clearList();
+            updateTotalAmountUI();
+            setEmptyIconsVisibility();
             setProgressbar(false);
             super.onPostExecute(result);
         }

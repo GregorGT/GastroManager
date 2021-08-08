@@ -12,10 +12,10 @@
         android:layout_width="175dp"
         android:layout_height="wrap_content"
         android:hint="@string/floor"
-        android:paddingStart="20dp"
-        android:paddingLeft="20dp"
         android:paddingTop="20dp"
         app:boxBackgroundColor="@color/white"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toStartOf="@+id/text_layout_table"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -29,7 +29,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_layout_table"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -37,10 +36,10 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
         android:hint="@string/table_id"
-        android:paddingStart="20dp"
-        android:paddingLeft="20dp"
         android:paddingTop="20dp"
         app:boxBackgroundColor="@color/white"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toStartOf="@+id/text_layout_order_id"
         app:layout_constraintStart_toEndOf="@+id/text_layout_floor"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -60,10 +59,10 @@
         android:layout_height="wrap_content"
         android:backgroundTint="@color/white"
         android:hint="@string/order_id"
-        android:paddingStart="20dp"
-        android:paddingLeft="20dp"
         android:paddingTop="20dp"
         app:boxBackgroundColor="@color/white"
+        app:errorEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/text_layout_table"
         app:layout_constraintTop_toTopOf="parent">
 
@@ -110,7 +109,6 @@
             android:src="@drawable/ic_go_right" />
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/ll_table_btns"
         android:layout_width="wrap_content"
@@ -149,9 +147,8 @@
         android:id="@+id/btn_select_order"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginStart="25dp"
+        android:layout_marginLeft="10dp"
         android:background="@drawable/custombutton"
         android:text="Select"
         android:textColor="@color/white"
@@ -167,6 +164,7 @@
         android:layout_marginLeft="20dp"
         android:gravity="center_horizontal"
         android:orientation="horizontal"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="@+id/btn_select_order"
         app:layout_constraintStart_toStartOf="@id/text_layout_order_id"
         app:layout_constraintTop_toBottomOf="@+id/btn_select_order">
@@ -238,23 +236,89 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ll_order_btns">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_menu_items"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="450dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="20dp"
             android:layout_marginRight="20dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounder_rectangle" />
+            android:layout_weight="1">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_selected_menu_items"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_menu_items"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounder_rectangle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/ll_menuItems_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_empty" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No item found" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="450dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_weight="1"
-            android:background="@drawable/rounder_rectangle" />
+            android:layout_weight="1">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_selected_menu_items"
+                android:layout_width="match_parent"
+                android:layout_height="450dp"
+                android:layout_weight="1"
+                android:background="@drawable/rounder_rectangle"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:id="@+id/ll_selectedItems_empty"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_empty" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No item found" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </LinearLayout>
 
