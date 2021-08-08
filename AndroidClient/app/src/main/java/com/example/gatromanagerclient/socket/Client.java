@@ -18,8 +18,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.socket.client.IO;
-
 public class Client {
 
     Socket socket  = null;
@@ -27,7 +25,6 @@ public class Client {
     ObjectInputStream in = null;
     Integer serverPort = 5000;
     static Client client = null;
-    io.socket.client.Socket socketIO;
     public Client() {
         try {
             //send to server
@@ -53,7 +50,6 @@ public class Client {
             socket.close();
             out.close();
             in.close();
-            socketIO.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

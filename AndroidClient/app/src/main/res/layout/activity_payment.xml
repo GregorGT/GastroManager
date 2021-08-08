@@ -75,74 +75,6 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <LinearLayout
-        android:id="@+id/ll_floor_btns"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_layout_floor">
-
-        <ImageView
-            android:id="@+id/iv_left_floor_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custombutton"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_go_left" />
-
-        <ImageView
-            android:id="@+id/iv_right_floor_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginLeft="35dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custombutton"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_go_right" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/ll_table_btns"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="invisible"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_layout_floor">
-
-        <ImageView
-            android:id="@+id/iv_left_table_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginLeft="50dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custombutton"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_go_left" />
-
-        <ImageView
-            android:id="@+id/iv_right_table_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="35dp"
-            android:layout_marginLeft="35dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/custombutton"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/ic_go_right" />
-    </LinearLayout>
-
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_select_order"
         android:layout_width="150dp"
@@ -338,7 +270,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="end"
-            android:text="Total:0 EURO"
+            android:text="Total:0 Euro"
             android:textColor="@android:color/holo_red_dark"
             android:textSize="24sp"
             android:textStyle="bold" />

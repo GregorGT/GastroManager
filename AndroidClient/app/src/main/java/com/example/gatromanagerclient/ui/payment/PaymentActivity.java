@@ -39,7 +39,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     private TextInputEditText etFloorId, etTableId, etOrderId;
     private TextInputLayout tlfFloor, tlfTable, tlfOrder;
     private LinearLayout llMenuItemsEmpty, llSelectedMenuItemsEmpty;
-    private ImageView ivFloorLeft, ivFloorRight, ivTableLeft, ivTableRight, ivOrderLeft, ivOrderRight;
+    private ImageView ivOrderLeft, ivOrderRight;
     private AppCompatButton btnClear, btnSubmit, btnSelectOrder;
     private TextView tvTotalAmount;
     private RecyclerView rvMenuItem, rvSelectedMenuItem;
@@ -100,17 +100,6 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
         rvSelectedMenuItem.setLayoutManager(new LinearLayoutManager(this));
         rvSelectedMenuItem.setAdapter(selectedMenuItemsAdapter);
 
-
-        ivFloorLeft = findViewById(R.id.iv_left_floor_id);
-        ivFloorRight = findViewById(R.id.iv_right_floor_id);
-        ivFloorLeft.setOnClickListener(this);
-        ivFloorRight.setOnClickListener(this);
-
-        ivTableLeft = findViewById(R.id.iv_left_table_id);
-        ivTableRight = findViewById(R.id.iv_right_table_id);
-        ivTableLeft.setOnClickListener(this);
-        ivTableRight.setOnClickListener(this);
-
         ivOrderLeft = findViewById(R.id.iv_left_order_id);
         ivOrderRight = findViewById(R.id.iv_right_order_id);
         ivOrderLeft.setOnClickListener(this);
@@ -131,12 +120,6 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.iv_left_floor_id:
-                System.out.println("MyAppLogs left floor");
-                break;
-            case R.id.iv_right_floor_id:
-                System.out.println("MyAppLogs right floor");
-                break;
             case R.id.btn_select_order:
                 if (validateInputFields()) {
                     getSelectOrderId();
@@ -146,12 +129,6 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
                 System.out.println("MyAppLogs left order");
                 break;
             case R.id.iv_right_order_id:
-                break;
-            case R.id.iv_left_table_id:
-                System.out.println("MyAppLogs left table");
-                break;
-            case R.id.iv_right_table_id:
-                System.out.println("MyAppLogs right table");
                 break;
             case R.id.btn_clear:
                 onClearClicked();
@@ -165,6 +142,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
     private void payForItemsOnSubmitClicked() {
         if (selectedMenuItemsAdapter.getOrderItems() == null || selectedMenuItemsAdapter.getOrderItems().isEmpty()) {
             setEmptyIconsVisibility();
+            Util.showSnackBar(findViewById(android.R.id.content),"Please select items first!");
         } else {
             OrderItemTransactionInfo request = new OrderItemTransactionInfo();
             request.setOrderItemInfo(selectedMenuItemsAdapter.getOrderItems());
@@ -255,7 +233,7 @@ public class PaymentActivity extends AppCompatActivity implements View.OnClickLi
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void onClearClicked() {
-        if (selectedMenuItemsAdapter.getOrderItems() != null) {
+        if (selectedMenuItemsAdapter.getOrderItems() != null && menuItemInfoList != null) {
             List<OrderItemInfo> list = selectedMenuItemsAdapter.getOrderItems();
             menuItemInfoList.addAll(list);
             menuItemsAdapter.updateOrderItemList(menuItemInfoList);

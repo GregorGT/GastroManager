@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Objects;
@@ -44,5 +45,10 @@ public class Util {
             view = new View(activity);
         }
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+
+    public static void showSnackBar(View parentLayout,String message){
+        Snackbar.make(parentLayout, message, Snackbar.LENGTH_LONG).show();
     }
 }
