@@ -1,5 +1,6 @@
 package com.gastromanager.mainwindow;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -7,7 +8,7 @@ import java.awt.event.MouseListener;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.swing.JPanel;
+import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
 public class DrillDownGroup extends JPanel{
@@ -35,6 +36,14 @@ public class DrillDownGroup extends JPanel{
     	
     	ddmenu.add(this);
     	this.setVisible(true);   		
+	}
+
+	public DrillDownGroup(int width, int height, String name) {
+		this.setLayout(null);
+		this.setPreferredSize(new Dimension(1000, 1000));
+		this.setBorder(new TitledBorder(null, name, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		this.name = name;
+		this.setVisible(true);
 	}
 	
 	public void setId(String id) {

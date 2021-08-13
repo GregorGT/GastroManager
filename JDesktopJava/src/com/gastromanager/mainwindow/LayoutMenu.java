@@ -598,15 +598,18 @@ public class LayoutMenu extends JPanel {
 	public MainWindow getMainWindow() {
 		return mainWindow;
 	}
-
 	public void setMainWindow(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 	}
-
 	public boolean getIsFileLoaded() {
 		return isFileLoaded;
 	}
-
+	public JScrollPane getScrollPane() {
+		return scrollPane;
+	}
+	public void setScrollPane(JScrollPane scrollPane) {
+		this.scrollPane = scrollPane;
+	}
 	public void setIsFileLoaded(boolean isFileLoaded) {
 		this.isFileLoaded = isFileLoaded;
 		if (this.isFileLoaded == true) {

@@ -146,7 +146,7 @@ public class BookingsMenu extends JPanel{
 	                20, //maximum value  
 	                1); //step  
 	    spinner = new JSpinner(value);   
-	            spinner.setBounds(100,100,50,30); 
+		spinner.setBounds(100,100,50,30);
 	    northPanel.add(spinner);
 	    
 	    textField = new JTextField();

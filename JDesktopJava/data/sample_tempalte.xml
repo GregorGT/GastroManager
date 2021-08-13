@@ -3,12 +3,6 @@
 	<!-- menues node-->
 	<menues>
 		<item name="Pizza" uuid="1976266538" printer="kitchen">
-			<option id="size"  name="small" price="0.5" uuid="124456611" >
-			</option>
-			<option id="size" name="medium" price="0.8" >
-			</option>
-			<option id="size" name="large" price="1.2" >
-			</option>
 			<item name="topping" name_en="topping">	
 				<option id="toppingammount" name="few" price="0.5" />
 				<option id="toppingammount" name="more" price="0.8" />
@@ -28,12 +22,6 @@
 			</item>
 		</item>
 		<item name="Pasta" uuid="19762674635" printer="kitchen">
-			<option id="size"  name="small" price="0.5" uuid="124456611345" >
-			</option>
-			<option id="size" name="medium" price="0.8" >
-			</option>
-			<option id="size" name="large" price="1.2" >
-			</option>
 			<item name="Capellini" menu_id="110" uuid="39198183113">
 				<option id="size"  name="small" overwrite_price="5.5" uuid="3462565213" menu_id="110a" />
 				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b" uuid="3462562144"/>
@@ -64,9 +52,6 @@
 			<item name="Turkey breast salad - extra chicken" price="2" uuid="54532343" menu_id="141a" ></item>
 		</item>
 		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
-				<option id="size" name="small" price="0.5" />
-				<option id="size" name="medium" price="0.8" />
-				<option id="size" name="large" price="1.2" />
 				<ingridients name="sugar,water"/>
 				<item name="Coca Cola" name_en="Coce" menu_id="10" uuid="124453434">
 					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" uuid="124451231" />

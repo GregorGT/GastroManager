@@ -110,7 +110,6 @@ public class DrillDownMenu extends JPanel {
 		btnAddDrillDown.addActionListener(addDrillDownButton);
 		panelDrillDown.add(btnAddDrillDown);
 
-
 		JPanel panelButtons = new JPanel();
 		panelButtons.setLayout(null);
 		panelButtons
