@@ -10,7 +10,7 @@ public class OrderItemListTableModel extends AbstractTableModel {
     private List<OrderItemInfo> orderItemInfoList;
 
     private final String[] columnNames = new String[] {
-            "Item Info", "Price"
+            "Item Info", "Price", "Item Id","Payed"
     };
 
     private final Class[] columnClass = new Class[] {
@@ -31,6 +31,11 @@ public class OrderItemListTableModel extends AbstractTableModel {
 
     public void setOrderItemInfoList(List<OrderItemInfo> orderItemInfoList) {
         this.orderItemInfoList = orderItemInfoList;
+    }
+
+    @Override
+    public String getColumnName(int col) {
+        return columnNames[col];
     }
 
     @Override
@@ -64,6 +69,34 @@ public class OrderItemListTableModel extends AbstractTableModel {
         }
 
         return value;
+    }
+
+
+    public void setValueAt(Object value, int row, int col) {
+        System.out.println("Existing value "+getValueAt(row, 1));
+        OrderItemInfo orderItemInfo = orderItemInfoList.get(row);
+        //if(isCellEditable(row, col)) {
+           if(col == 1) {
+               orderItemInfo.setPrice((Double) value);
+               System.out.println("New value "+getValueAt(row, 1));
+           }
+        //}
+    }
+
+    public void addTotal() {
+        Double total =  orderItemInfoList.stream().mapToDouble(OrderItemInfo::getPrice).sum();
+        OrderItemInfo orderTipInfo = new OrderItemInfo();
+        orderTipInfo.setPrice(total);
+        orderTipInfo.setXmlText("Total:");
+        this.orderItemInfoList.add(orderTipInfo);
+    }
+
+    public void addTip(Double tipAmount) {
+        OrderItemInfo orderTipInfo = new OrderItemInfo();
+        orderTipInfo.setPrice(tipAmount);
+        orderTipInfo.setXmlText("Tip:");
+        this.orderItemInfoList.add(orderTipInfo);
+
     }
 
     /*private String[] buildRowInfo(OrderItemInfo orderItemInfo) {

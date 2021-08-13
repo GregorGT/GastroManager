@@ -213,6 +213,14 @@ public class XmlUtil {
 		return orderDetailsBuilder.toString().trim();
 	}
 
+	public static String getMainOrderItem(OrderItem orderItem) {
+    	String orderItemInfo = formatOrderText(orderItem);
+    	if(orderItemInfo != null && orderItemInfo.length() > 0) {
+    		orderItemInfo = orderItemInfo.substring(0, orderItemInfo.indexOf(" "));
+		}
+    	return orderItemInfo;
+	}
+
 	private static void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder) {
 		for (int childId = 0; childId < children.getLength(); childId++) {
 			Node child = children.item(childId);

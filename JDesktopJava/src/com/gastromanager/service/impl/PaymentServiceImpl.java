@@ -3,6 +3,7 @@ package com.gastromanager.service.impl;
 import com.gastromanager.models.*;
 import com.gastromanager.service.PaymentService;
 import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.XmlUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ public class PaymentServiceImpl implements PaymentService {
         if(orderItems != null) {
             orderItemInfoList = new ArrayList<>();
             for(OrderItem orderItem: orderItems) {
+                orderItem.setXmlText(XmlUtil.getMainOrderItem(orderItem));
                 OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
                 orderItemInfoList.add(orderItemInfo);
             }
@@ -50,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         if(orderItems != null) {
             orderItemInfoList = new ArrayList<>();
             for(OrderItem orderItem: orderItems) {
+                orderItem.setXmlText(XmlUtil.getMainOrderItem(orderItem));
                 OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
                 orderItemInfoList.add(orderItemInfo);
             }

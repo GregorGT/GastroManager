@@ -20,6 +20,9 @@ public class OrderItemInfo implements Serializable {
     private Integer status;
     private Order order;
 
+    public OrderItemInfo() {
+    }
+
     public OrderItemInfo(OrderItem orderItem) {
         this.orderId = orderItem.getOrderId();
         this.itemId = orderItem.getItemId();
@@ -28,7 +31,7 @@ public class OrderItemInfo implements Serializable {
         this.xmlText = orderItem.getXmlText();
         this.price = orderItem.getPrice();
         this.printStatus = orderItem.getPrintStatus();
-        this.payed = orderItem.getPrintStatus();
+        this.payed = orderItem.getPayed();
         this.dateTime = orderItem.getDateTime();
         this.status = orderItem.getStatus();
         this.order = orderItem.getOrder();

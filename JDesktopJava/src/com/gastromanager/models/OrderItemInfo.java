@@ -1,7 +1,5 @@
 package com.gastromanager.models;
 
-import com.gastromanager.util.XmlUtil;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -22,12 +20,15 @@ public class OrderItemInfo implements Serializable {
     private Integer status;
     private Order order;
 
+    public OrderItemInfo() {
+    }
+
     public OrderItemInfo(OrderItem orderItem) {
         this.orderId = orderItem.getOrderId();
         this.itemId = orderItem.getItemId();
         this.quantity = orderItem.getQuantity();
         this.remark = orderItem.getRemark();
-        this.xmlText = XmlUtil.formatOrderText(orderItem);
+        this.xmlText = orderItem.getXmlText();
         this.price = orderItem.getPrice();
         this.printStatus = orderItem.getPrintStatus();
         this.payed = orderItem.getPayed();

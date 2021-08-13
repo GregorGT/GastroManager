@@ -1,10 +1,14 @@
 package com.gastromanager.mainwindow;
 
 import com.gastromanager.comparator.OrderItemComparator;
-import com.gastromanager.models.*;
+import com.gastromanager.models.Order;
+import com.gastromanager.models.OrderDetailQuery;
+import com.gastromanager.models.OrderItemInfo;
+import com.gastromanager.models.OrderItemTransactionInfo;
 import com.gastromanager.service.PaymentService;
 import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.ui.OrderItemListTableModel;
+import com.gastromanager.util.Util;
 
 import javax.swing.*;
 import javax.swing.table.TableCellRenderer;
@@ -22,6 +26,7 @@ public class PaymentMenu  extends Panel{
 	private JTextField txtFieldFloor;
 	private JTextField txtFieldTableID;
 	private JTextField txtFieldOrderID;
+	private JTextField txtFieldTipAmount;
 	private PaymentService paymentService;
 	private List<Order> orderList;
 	private List<OrderItemInfo> orderItemInfoList;
@@ -32,14 +37,9 @@ public class PaymentMenu  extends Panel{
 	public PaymentMenu() {
 		paymentService = new PaymentServiceImpl();
 
-	    //leftItemsList = new JTextArea();
 		leftItemListPanel = new JPanel();
 		leftItemListPanel.setLayout(new BorderLayout());
-		//leftItemsList.setBounds(50, 220, 250, 300);
 		leftItemListPanel.setBounds(50, 220, 250, 300);
-		//leftItemsList.setLineWrap(true);
-		//leftItemsList.setSelectionColor(Color.green);
-		//this.add(leftItemsList);
 		orderItemsListTable = new JTable(new OrderItemListTableModel(orderItemInfoList)) {
 			@Override
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
@@ -56,16 +56,17 @@ public class PaymentMenu  extends Panel{
 		};
 
 		orderItemsListTable.setRowHeight(65);
-		orderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
-		//hide the item id column
-		orderItemsListTable.getColumnModel().getColumn(2).setWidth(0);
-		orderItemsListTable.getColumnModel().getColumn(2).setMinWidth(0);
-		orderItemsListTable.getColumnModel().getColumn(2).setMaxWidth(0);
-		orderItemsListTable.getColumnModel().getColumn(3).setWidth(0);
-		orderItemsListTable.getColumnModel().getColumn(3).setMinWidth(0);
-		orderItemsListTable.getColumnModel().getColumn(3).setMaxWidth(0);
+		if(orderItemsListTable.getColumnModel().getColumnCount() > 0) {
+			orderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
+			//hide the item id column
+			orderItemsListTable.getColumnModel().getColumn(2).setWidth(0);
+			orderItemsListTable.getColumnModel().getColumn(2).setMinWidth(0);
+			orderItemsListTable.getColumnModel().getColumn(2).setMaxWidth(0);
+			orderItemsListTable.getColumnModel().getColumn(3).setWidth(0);
+			orderItemsListTable.getColumnModel().getColumn(3).setMinWidth(0);
+			orderItemsListTable.getColumnModel().getColumn(3).setMaxWidth(0);
+		}
 		JScrollPane scrollPane = new JScrollPane(orderItemsListTable);
-		//leftItemsList.add(scrollPane, BorderLayout.CENTER);
 		leftItemListPanel.add(scrollPane, BorderLayout.CENTER);
 		leftItemListPanel.setVisible(true);
 		this.add(leftItemListPanel);
@@ -74,13 +75,23 @@ public class PaymentMenu  extends Panel{
 		selectedItemsListPanel.setLayout(new BorderLayout());
 		selectedItemsListPanel.setBounds(390, 220, 250, 300);
 		selectedOrderItemInfoList = new ArrayList<>();
-		selectedOrderItemsListTable = new JTable(new OrderItemListTableModel(selectedOrderItemInfoList));
+		selectedOrderItemsListTable = new JTable(new OrderItemListTableModel(selectedOrderItemInfoList)){
+			public boolean isCellEditable(int rowIndex, int colIndex) {
+				return (colIndex == 1 && rowIndex != selectedOrderItemsListTable.getModel().getRowCount()-1) ? true : false;
+			}
+
+		};
+
 		selectedOrderItemsListTable.setRowHeight(65);
 		selectedOrderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 		//hide the item id column
 		selectedOrderItemsListTable.getColumnModel().getColumn(2).setWidth(0);
 		selectedOrderItemsListTable.getColumnModel().getColumn(2).setMinWidth(0);
 		selectedOrderItemsListTable.getColumnModel().getColumn(2).setMaxWidth(0);
+		selectedOrderItemsListTable.getColumnModel().getColumn(3).setWidth(0);
+		selectedOrderItemsListTable.getColumnModel().getColumn(3).setMinWidth(0);
+		selectedOrderItemsListTable.getColumnModel().getColumn(3).setMaxWidth(0);
+
 		JScrollPane selectedOrderItemsListScrollPane = new JScrollPane(selectedOrderItemsListTable);
 		//leftItemsList.add(scrollPane, BorderLayout.CENTER);
 		selectedItemsListPanel.add(selectedOrderItemsListScrollPane, BorderLayout.CENTER);
@@ -211,18 +222,9 @@ public class PaymentMenu  extends Panel{
 		payedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int[] selectedRowIndexes = selectedOrderItemsListTable.getSelectedRows();
 				OrderItemTransactionInfo orderItemTransactionInfo = null;
 				List<OrderItemInfo> orderItemInfoList = null;
-				for(int i=0 ; i<selectedRowIndexes.length; i++) {
-					Long selectedOrderItemId = Long.parseLong(selectedOrderItemsListTable.getValueAt(selectedRowIndexes[i], 2).toString());
-					OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, true);
-					System.out.println("Set payment for order item "+orderItemInfo.getItemId());
-					if(orderItemInfoList == null) {
-						orderItemInfoList = new ArrayList<>();
-					}
-					orderItemInfoList.add(orderItemInfo);
-				}
+				orderItemInfoList = ((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList();
 				orderItemTransactionInfo = new OrderItemTransactionInfo();
 				orderItemTransactionInfo.setOrderItemInfo(orderItemInfoList);
 				orderItemTransactionInfo.setAddTransaction(true);
@@ -232,6 +234,36 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 		this.add(payedButton);
+
+
+		txtFieldTipAmount = new JTextField("Tip Amount");
+		txtFieldTipAmount.setBounds(420, 30, 150, 30);
+		this.add(txtFieldOrderID);
+		JButton addTipButton = new JButton("Add Tip");
+		addTipButton.setBounds(420, 60, 150, 30);
+		addTipButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(Util.isNumeric(txtFieldTipAmount.getText())) {
+					((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).addTip(Double.parseDouble(txtFieldTipAmount.getText()));
+					((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+				}
+			}
+		});
+
+		JButton calcTotalButton = new JButton("Calculate Total");
+		calcTotalButton.setBounds(420, 90, 150, 30);
+		calcTotalButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).addTotal();
+				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+			}
+		});
+
+		this.add(txtFieldTipAmount);
+		this.add(addTipButton);
+		this.add(calcTotalButton);
 
 	}
 
@@ -308,7 +340,9 @@ public class PaymentMenu  extends Panel{
 			txtFieldOrderID.setText(humanReadableId.toString());
 			orderDetailQuery.setHumanreadableId(humanReadableId.toString());
 			orderItemInfoList = paymentService.retrieveOrderItems(orderDetailQuery);
-			orderItemInfoList.sort(new OrderItemComparator());
+			if(orderItemInfoList != null) {
+				orderItemInfoList.sort(new OrderItemComparator());
+			}
 			//loadLeftOrderItemList(orderItemInfoList);
 			//orderItemsListTable.setModel(new OrderItemListTableModel(orderItemInfoList)); ** WORKS
 			((OrderItemListTableModel) orderItemsListTable.getModel()).setOrderItemInfoList(orderItemInfoList);

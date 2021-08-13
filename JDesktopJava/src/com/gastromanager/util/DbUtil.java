@@ -55,44 +55,50 @@ public class DbUtil {
 
     public static Boolean addTransactionInfo(List<OrderItemInfo> orderItemInfoList, TransactionInfo transactionInfo) {
         Boolean transactionAddedSuccessfully = false;
-        Integer nextTransactionId = getNextTransactionId();
-        if(transactionInfo == null) {
-            transactionInfo = new TransactionInfo();
-        }
-        transactionInfo.setId(nextTransactionId);
-        if(nextTransactionId != null) {
-            try {
-                Connection connection = DbConnection.getDbConnection().gastroDbConnection;
-                Statement statement = connection.createStatement();
-
-                Double price = orderItemInfoList.stream().map(orderItemInfo ->
-                        orderItemInfo.getPrice()
-                ).collect(Collectors.summingDouble(Double::doubleValue));
-
-                System.out.println("Total transaction price "+price);
-                String insertTransactionStmt = "INSERT INTO transactions (\n" +
-                        "                             id,\n" +
-                        "                             total_amount,\n" +
-                        "                             payment_method,\n" +
-                        "                             tips\n" +
-                        "                         )\n" +
-                        "                         VALUES (\n" +
-                        "                             '"+transactionInfo.getId()+"',\n" +
-                        "                             '"+price+"',\n" +
-                        "                             '"+transactionInfo.getPaymentMethod()+"',\n" +
-                        "                             '"+transactionInfo.getTips()+"'\n" +
-                        "                         )";
-                Integer rowsInserted = statement.executeUpdate(insertTransactionStmt);
-                if(rowsInserted == 1) {
-                    for(OrderItemInfo orderItemInfo: orderItemInfoList) {
-                        transactionAddedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
-                    }
+        for(OrderItemInfo orderItemInfo: orderItemInfoList) {
+            if (!orderItemInfo.getXmlText().contains("Total")) {
+                Integer nextTransactionId = getNextTransactionId();
+                if (transactionInfo == null) {
+                    transactionInfo = new TransactionInfo();
                 }
-            } catch (SQLException sqlException) {
-                sqlException.printStackTrace();
+                transactionInfo.setId(nextTransactionId);
+                if (nextTransactionId != null) {
+                    try {
+                        Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+                        Statement statement = connection.createStatement();
+
+                        Double price = orderItemInfo.getPrice();
+                        if (orderItemInfo.getXmlText().contains("Tip")) {
+                            transactionInfo.setTips(price);
+                            price = null;
+                        }
+
+                        System.out.println("Total transaction price " + price);
+                        String insertTransactionStmt = "INSERT INTO transactions (\n" +
+                                "                             id,\n" +
+                                "                             total_amount,\n" +
+                                "                             payment_method,\n" +
+                                "                             tips\n" +
+                                "                         )\n" +
+                                "                         VALUES (\n" +
+                                "                             '" + transactionInfo.getId() + "',\n" +
+                                "                             '" + price + "',\n" +
+                                "                             '" + transactionInfo.getPaymentMethod() + "',\n" +
+                                "                             '" + transactionInfo.getTips() + "'\n" +
+                                "                         )";
+                        Integer rowsInserted = statement.executeUpdate(insertTransactionStmt);
+                        if (rowsInserted == 1) {
+                            if (transactionInfo.getTips() == null) { //Skip for transaction related to tip
+                                transactionAddedSuccessfully = updateOrderItemTransactionRef(orderItemInfo, transactionInfo);
+                            }
+                        }
+                    } catch (SQLException sqlException) {
+                        sqlException.printStackTrace();
+                    }
+                } else {
+                    System.out.println("Unable to add transaction");
+                }
             }
-        } else {
-            System.out.println("Unable to add transaction");
         }
 
         return transactionAddedSuccessfully;
@@ -155,7 +161,7 @@ public class DbUtil {
         try {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             Statement statement = connection.createStatement();
-            String resetPaymentForOrderItem = "UPDATE ORDERITEM SET PAYED=0"+
+            String resetPaymentForOrderItem = "UPDATE ORDERITEM SET PAYED=0, TRANSACTION_ID = null"+
                     " WHERE ORDER_ID='"+ orderItemInfo.getOrderId() +"'"+
                     " AND ITEM_ID='"+ orderItemInfo.getItemId()+"'"+
                     " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'";

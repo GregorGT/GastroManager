@@ -8,6 +8,7 @@ import com.gastromanager.print.PrintService;
 import com.gastromanager.print.PrintServiceImpl;
 import com.gastromanager.service.OrderService;
 import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.XmlUtil;
 
 import javax.xml.bind.JAXB;
 import java.io.StringWriter;
@@ -28,6 +29,7 @@ public class OrderServiceImpl implements OrderService {
         if(orderItems != null) {
             orderItemArrayList = new ArrayList<>();
             for(OrderItem orderItem: orderItems) {
+                orderItem.setXmlText(XmlUtil.formatOrderText(orderItem));
                 OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
                 orderItemArrayList.add(orderItemInfo);
             }
