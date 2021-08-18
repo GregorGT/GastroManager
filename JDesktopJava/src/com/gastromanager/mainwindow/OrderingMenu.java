@@ -1,10 +1,12 @@
+//TODO:
+// 1:  next order id
+
 package com.gastromanager.mainwindow;
 
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
+import java.awt.event.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.sql.Connection;
@@ -18,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -26,17 +29,19 @@ import javax.xml.transform.stream.StreamResult;
 
 import com.gastromanager.models.*;
 import com.gastromanager.service.impl.OrderServiceImpl;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import com.gastromanager.db.DbConnection;
 import com.gastromanager.service.impl.MenuServiceImpl;
 import com.gastromanager.util.Util;
+import org.xml.sax.SAXException;
 
 public class OrderingMenu extends JPanel {
 	private static final String SELECT_ORDER = "select * from orderitem join orders on orders.id = orderitem.order_id where orders.id=?";
 	private static final String SELECT_MAX_ID_ORDERS = "select max(id) id from orders";
+	private static final String SELECT_ORDER_FOR_DELETION = "select xml, id from orderitem where order_id=?";
+	private static final String DELETE_ITEM = "delete from orderitem where id=?";
 
 	private JTextField txtFieldTable;
 	private JTextField txtFieldFloor;
@@ -51,101 +56,108 @@ public class OrderingMenu extends JPanel {
 	private MenuDetail menuDetail;
 	private JScrollPane scrollPaneItems;
 	private JPanel subItemsPanel;
-	private JComboBox comboBox;
-	private List<JComboBox> itemOptions;
+	private ItemOptionComboBox comboBox;
+	private List<ItemOptionComboBox> itemOptions;
 	private List<ItemButton> itemButtons;
+	private HashMap<String, SelectedOrderItem> menuIdMap = new HashMap<>();
+	private Map<String, SelectedOrderItem> menuUuidMap = new HashMap<>();
+	private MainWindow mainWindow;
+	private SelectedOrderItem selectedOrderItem = new SelectedOrderItem();
 
-	public OrderingMenu() {
+	public OrderingMenu(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
+		recursiveFunctionReadingTheXml();
+
 		try {
 			connection = DbConnection.getDbConnection().gastroDbConnection;
 		} catch (Exception e) {
 			System.err.println("Failed to connect to database.\nClass: OrderingMenu.java");
-		}	
-		
+		}
+
 		JLabel lblTable = new JLabel("Table: ");
-	    lblTable.setBounds(20, 11, 56, 14);
-	    this.add(lblTable);
-	    
-	    txtFieldTable = new JTextField();
-	    txtFieldTable.setBounds(20, 24, 60, 20);
-	    this.add(txtFieldTable);
-	    txtFieldTable.setColumns(10);
-	    
-	    JLabel lblFloor= new JLabel("Floor: ");
-	    lblFloor.setBounds(90, 11, 46, 14);
-	    this.add(lblFloor);
-	    
-	    txtFieldFloor = new JTextField();
-	    txtFieldFloor.setBounds(90, 24, 60, 20);
-	    this.add(txtFieldFloor);
-	    txtFieldFloor.setColumns(10);
-	    
-	    list = new JList<Node>(listModel);
-	    list.setCellRenderer(new ListItemStyler());
-	    
-	    JScrollPane sPane = new JScrollPane(list);
-	    sPane.setBounds(10, 55, 236, 276);
-	    this.add(sPane);
-	    
-	    JLabel lblOrderID = new JLabel("Order ID");
-	    lblOrderID.setBounds(256, 56, 68, 14);
-	    this.add(lblOrderID);
-	    
-	    txtFieldOrderID = new JTextField();
-	    txtFieldOrderID.setBounds(256, 76, 109, 20);
+		lblTable.setBounds(20, 11, 56, 14);
+		this.add(lblTable);
 
-	    this.add(txtFieldOrderID);
-	    txtFieldOrderID.setColumns(10);
-	    
-	    JButton lblSelectOrderID = new JButton("Select Order ID");
-	    lblSelectOrderID.setBounds(256, 101, 109, 23);
-	    lblSelectOrderID.addActionListener(selectOrderActionListener());
-	    
-	    this.add(lblSelectOrderID);
-	    
-	    JButton btnPrevious = new JButton("<-");
-	    btnPrevious.setBounds(256, 135, 50, 23);
-	    btnPrevious.addActionListener(e -> {
-            String inputOrderId = (txtFieldOrderID.getText() != null) ?
-            		txtFieldOrderID.getText().toString() : null;
-            if ( Util.isNumeric(inputOrderId) ) {
-                Integer currOrderId = Integer.valueOf(inputOrderId);
-                currOrderId = (currOrderId - 1 < 0) ? 0 : currOrderId - 1;
-                txtFieldOrderID.setText(String.valueOf(currOrderId));
-                inputOrderId = (txtFieldOrderID.getText() != null) ?
-                		txtFieldOrderID.getText().toString() : null;
-            }
-            buildAndSendOrderQuery(inputOrderId);
-	    });
-	    this.add(btnPrevious);
-	    
-	    JButton btnNext = new JButton("->");
-	    btnNext.addActionListener(new ActionListener() {
-	    	//TODO: Next cannot go over the maximum order_id number
-	    	@Override
-	    	public void actionPerformed(ActionEvent event) {
-	    		 String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText() : null;
-                 if (Util.isNumeric(inputOrderId)) {
-                     Integer currOrderId = Integer.valueOf(inputOrderId);
-                     txtFieldOrderID.setText(String.valueOf(currOrderId + 1));
-                     inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText() : null;
-                 }
+		txtFieldTable = new JTextField();
+		txtFieldTable.setBounds(20, 24, 60, 20);
+		this.add(txtFieldTable);
+		txtFieldTable.setColumns(10);
 
-                buildAndSendOrderQuery(inputOrderId);
-	    	}
-	    });
-	    btnNext.setBounds(315, 135, 50, 23);
-	    this.add(btnNext);
-	    
-	    JButton btnNewOrderID = new JButton("New Order ID");
-	    btnNewOrderID.setBounds(256, 169, 111, 50);
-	    btnNewOrderID.addActionListener(e -> {
+		JLabel lblFloor= new JLabel("Floor: ");
+		lblFloor.setBounds(90, 11, 46, 14);
+		this.add(lblFloor);
+
+		txtFieldFloor = new JTextField();
+		txtFieldFloor.setBounds(90, 24, 60, 20);
+		this.add(txtFieldFloor);
+		txtFieldFloor.setColumns(10);
+
+		list = new JList<Node>(listModel);
+		list.setCellRenderer(new ListItemStyler());
+
+		JScrollPane sPane = new JScrollPane(list);
+		sPane.setBounds(10, 55, 236, 276);
+		this.add(sPane);
+
+		JLabel lblOrderID = new JLabel("Order ID");
+		lblOrderID.setBounds(256, 56, 68, 14);
+		this.add(lblOrderID);
+
+		txtFieldOrderID = new JTextField();
+		txtFieldOrderID.setBounds(256, 76, 109, 20);
+
+		this.add(txtFieldOrderID);
+		txtFieldOrderID.setColumns(10);
+
+		JButton lblSelectOrderID = new JButton("Select Order ID");
+		lblSelectOrderID.setBounds(256, 101, 109, 23);
+		lblSelectOrderID.addActionListener(selectOrderActionListener());
+
+		this.add(lblSelectOrderID);
+
+		JButton btnPrevious = new JButton("<-");
+		btnPrevious.setBounds(256, 135, 50, 23);
+		btnPrevious.addActionListener(e -> {
+			String inputOrderId = (txtFieldOrderID.getText() != null) ?
+					txtFieldOrderID.getText().toString() : null;
+			if ( Util.isNumeric(inputOrderId) ) {
+				Integer currOrderId = Integer.valueOf(inputOrderId);
+				currOrderId = (currOrderId - 1 < 0) ? 0 : currOrderId - 1;
+				txtFieldOrderID.setText(String.valueOf(currOrderId));
+				inputOrderId = (txtFieldOrderID.getText() != null) ?
+						txtFieldOrderID.getText().toString() : null;
+			}
+			buildAndSendOrderQuery(inputOrderId);
+		});
+		this.add(btnPrevious);
+
+		JButton btnNext = new JButton("->");
+		btnNext.addActionListener(new ActionListener() {
+			//TODO: Next cannot go over the maximum order_id number
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText() : null;
+				if (Util.isNumeric(inputOrderId)) {
+					Integer currOrderId = Integer.valueOf(inputOrderId);
+					txtFieldOrderID.setText(String.valueOf(currOrderId + 1));
+					inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText() : null;
+				}
+
+				buildAndSendOrderQuery(inputOrderId);
+			}
+		});
+		btnNext.setBounds(315, 135, 50, 23);
+		this.add(btnNext);
+
+		JButton btnNewOrderID = new JButton("New Order ID");
+		btnNewOrderID.setBounds(256, 169, 111, 50);
+		btnNewOrderID.addActionListener(e -> {
 			if (!listModel.isEmpty()) {
 				listModel.removeAllElements();
 			}
-	    	getAndSetNextOrderId();
-	    });
-	    this.add(btnNewOrderID);
+			getAndSetNextOrderId();
+		});
+		this.add(btnNewOrderID);
 
 		JButton addToOrder = new JButton("Add to order");
 		addToOrder.setBounds(256, 229, 111, 50);
@@ -153,44 +165,53 @@ public class OrderingMenu extends JPanel {
 			if (!readyForOrder())
 				return;
 			submitLastOrder();
+			showToList();
+			subItemsPanel.removeAll();
+			subItemsPanel.repaint();
+//			itemOptions = new ArrayList<>();
+//			BoxLayout boxLayout = new BoxLayout(subItemsPanel, BoxLayout.Y_AXIS);
+//			subItemsPanel.setLayout(boxLayout);
+			itemButtons.forEach(ItemButton::unselect);
 		});
 		this.add(addToOrder);
 
-	    JLabel lblDrillDownOpts = new JLabel("Drill Down Options: ");
-	    lblDrillDownOpts.setBounds(406, 27, 120, 14);
-	    this.add(lblDrillDownOpts);
+		JLabel lblDrillDownOpts = new JLabel("Drill Down Options: ");
+		lblDrillDownOpts.setBounds(406, 27, 120, 14);
+		this.add(lblDrillDownOpts);
 
 		menuService = new MenuServiceImpl();
 		menuDetail = menuService.loadMenu();
 
-	    ddChoice = new JComboBox<>();
-	    ddChoice.setBounds(406, 50, 120, 20);
+		ddChoice = new JComboBox<>();
+		ddChoice.setBounds(406, 50, 120, 20);
 		List<DrillDownMenuType> ddMenus = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
 		ddMenus.forEach(i -> ddChoice.addItem(i.getName()));
-	    this.add(ddChoice);
+		this.add(ddChoice);
 
-	    tfMenuID = new JTextField();
-	    tfMenuID.setBounds(406, 102, 120, 20);
-	    this.add(tfMenuID);
-	    tfMenuID.setColumns(10);
-	    
-	    JLabel lblMenuID = new JLabel("Menu ID:");
-	    lblMenuID.setBounds(406, 79, 70, 14);
-	    this.add(lblMenuID);
-	    
-	    JButton btnSelectMenuID = new JButton("Select Menu ID");
-	    btnSelectMenuID.addActionListener(event -> {
-			if (!readyForOrder())
+		tfMenuID = new JTextField();
+		tfMenuID.setBounds(406, 102, 120, 20);
+		this.add(tfMenuID);
+		tfMenuID.setColumns(10);
+
+		JLabel lblMenuID = new JLabel("Menu ID:");
+		lblMenuID.setBounds(406, 79, 70, 14);
+		this.add(lblMenuID);
+
+		JButton btnSelectMenuID = new JButton("Select Menu ID");
+		btnSelectMenuID.addActionListener(event -> {
+			if (!readyForOrder()) {
 				return;
-			makeOrderFromMenuId(lblMenuID.getText().trim());
+			}
+			makeOrderFromMenuId(tfMenuID.getText().trim());
+			showToList();
 		});
-	    btnSelectMenuID.setBounds(406, 135, 120, 23);
-	    this.add(btnSelectMenuID);
+		btnSelectMenuID.setBounds(406, 135, 120, 23);
+		this.add(btnSelectMenuID);
 
-	    scrollPaneItems = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		scrollPaneItems = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneItems.setBounds(10, 340, 300, 300);
 		this.add(scrollPaneItems);
-		
+
 		scrollPaneSubItems = new JScrollPane();
 		scrollPaneSubItems.setBounds(getWidth() / 2 + 20, 340, getWidth() / 2, 300);
 		this.add(scrollPaneSubItems);
@@ -249,6 +270,62 @@ public class OrderingMenu extends JPanel {
 				}
 			}
 		});
+
+		list.addMouseListener( new MouseAdapter() {
+			public void mousePressed(MouseEvent e) {
+				if ( SwingUtilities.isRightMouseButton(e) ) {
+					list.setSelectedIndex(list.locationToIndex(e.getPoint()));
+
+					JPopupMenu menu = new JPopupMenu();
+					JMenuItem itemRemove = new JMenuItem("Delete");
+					itemRemove.addActionListener( event -> {
+						//todo: implement the delete operation
+						System.out.println(list.getSelectedValue().getAttributes().getNamedItem("name").getFirstChild().getNodeValue());
+						deleteItem(list.getSelectedValue());
+						buildAndSendOrderQuery(txtFieldOrderID.getText());
+					});
+					menu.add(itemRemove);
+					menu.show(list, e.getPoint().x, e.getPoint().y);
+				}
+			}
+		});
+	}
+
+	private void deleteItem(Node item) {
+		if (txtFieldOrderID.getText().isEmpty() || txtFieldOrderID.getText().trim().isEmpty() || txtFieldOrderID.getText() == null) {
+			return;
+		}
+		try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ORDER_FOR_DELETION)) {
+			preparedStatement.setInt(1, Integer.parseInt(txtFieldOrderID.getText()));
+			Map<Integer, Node> xmls = new HashMap<>();
+			ResultSet rs = preparedStatement.executeQuery();
+			while (rs.next()) {
+				Element node = DocumentBuilderFactory
+						.newInstance()
+						.newDocumentBuilder()
+						.parse(new ByteArrayInputStream(rs.getString("xml").getBytes()))
+						.getDocumentElement();
+				xmls.put(rs.getInt("id"), node);
+			}
+
+			for (Map.Entry<Integer, Node> pair : xmls.entrySet()) {
+				if (item.isEqualNode(pair.getValue())) {
+					deleteItem(pair.getKey());
+					return;
+				}
+			}
+		} catch (SQLException | IOException | ParserConfigurationException | SAXException throwables) {
+			throwables.printStackTrace();
+		}
+	}
+
+	private void deleteItem(Integer id) {
+		try (PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ITEM)) {
+			preparedStatement.setInt(1, id);
+			preparedStatement.executeUpdate();
+		} catch (SQLException throwables) {
+			throwables.printStackTrace();
+		}
 	}
 
 	private void loadMenuItems(DrillDownMenuType menuType) {
@@ -294,15 +371,23 @@ public class OrderingMenu extends JPanel {
 			return;
 		}
 
-		comboBox = new JComboBox();
+		comboBox = new ItemOptionComboBox();
 		comboBox.addItem("-----(" + name + ")-----");
 		comboBox.setName(name);
 		optionsMap.forEach( (key, value) -> {
 			comboBox.addItem(value.getName());
+			comboBox.addPair(value.getName(), value.getUuid());
 		});
 		comboBox.setAlignmentX(0.5f);
 		comboBox.setMaximumSize(new Dimension(scrollPaneSubItems.getWidth() / 2, 30));
 		itemOptions.add(comboBox);
+		comboBox.addActionListener(l -> {
+			ItemOptionComboBox iocb = (ItemOptionComboBox) l.getSource();
+			if (iocb.getSelectedItem().equals("-----(" + name + ")-----")) {
+				return;
+			}
+			selectedOrderItem = menuUuidMap.get(iocb.getNameUuid().get(iocb.getSelectedItem()));
+		});
 		subItemsPanel.add(comboBox);
 		scrollPaneSubItems.setViewportView(subItemsPanel);
 	}
@@ -352,61 +437,22 @@ public class OrderingMenu extends JPanel {
 		return event -> {
 			ItemButton btn = (ItemButton) event.getSource();
 			btn.click();
-			SelectedOrderItem s = new SelectedOrderItem();
-			s.setItemName(btn.getName());
+//			s.setItemName(btn.getName());
 			if (btn.isPressedOnce()) {
 				return;
 			}
 			showMenu(btn.getName());
 			btn.setPressedOnce(true);
+			selectedOrderItem= menuUuidMap.get(btn.getTarget());
 		};
 	}
 
 	private void submitLastOrder() {
-		SelectedOrderItem selectedOrderItem = null;
-		for (ItemButton i : itemButtons) {
-			if (i.isMainItem() && i.isYellow()) {
-				selectedOrderItem = new SelectedOrderItem();
-				selectedOrderItem.setItemName(i.getName());
-				selectedOrderItem.setTarget(i.getTarget());
-				if (readyForOrder()) {
-					selectedOrderItem.setOrderId(txtFieldOrderID.getText().trim());
-					selectedOrderItem.setFloorId(txtFieldFloor.getText().trim());
-					selectedOrderItem.setTableId(txtFieldTable.getText().trim());
-				} else {
-					return;
-				}
-			}
-		}
-
-		if (selectedOrderItem == null) {
-			return;
-		}
-
-		List<SelectedOrderItem> subItems = new ArrayList<>();
-
-		for (ItemButton i : itemButtons) {
-			if (!i.isMainItem() && i.isYellow()) {
-				SelectedOrderItem s = new SelectedOrderItem();
-				s.setItemName(i.getName());
-				s.setTarget(i.getTarget());
-				subItems.add(s);
-
-				for (JComboBox combo : itemOptions) {
-					if (combo.getName().equals(i.getName())) {
-						if (!combo.getSelectedItem().toString().startsWith("-")) {
-							SelectedOrderItemOption option = new SelectedOrderItemOption();
-							option.setId(i.getOptionId());
-							option.setName(combo.getSelectedItem().toString());
-							s.setOption(option);
-						}
-					}
-				}
-			}
-		}
-		selectedOrderItem.setSubItems(subItems);
 		OrderServiceImpl orderService = new OrderServiceImpl();
 		orderService.setMenuDetail(menuDetail);
+		selectedOrderItem.setOrderId(txtFieldOrderID.getText().trim());
+		selectedOrderItem.setFloorId(txtFieldFloor.getText().trim());
+		selectedOrderItem.setTableId(txtFieldTable.getText().trim());
 		orderService.addOrderItem(selectedOrderItem);
 	}
 
@@ -417,55 +463,58 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private void makeOrderFromMenuId(String menuId) {
-		if (menuId == null || menuId.isEmpty()) {
+		if (menuId == null || menuId.isEmpty() || menuIdMap == null || menuIdMap.size() == 0) {
 			return;
 		}
-		menuService.loadQuickMenuMap(menuDetail);
-		Map<String, SelectedOrderItem> quickMenuIdRefMap = menuDetail.getMenu().getQuickMenuIdRefMap();
-		if (quickMenuIdRefMap == null) {
-			return;
-		}
-		for (Map.Entry<String, SelectedOrderItem> i : quickMenuIdRefMap.entrySet()) {
+
+		for (Map.Entry<String, SelectedOrderItem> i : menuIdMap.entrySet()) {
 			if (i.getKey().equals(menuId)) {
 				OrderServiceImpl orderService = new OrderServiceImpl();
 				orderService.setMenuDetail(menuDetail);
+				i.getValue().setOrderId(txtFieldOrderID.getText().trim());
+				i.getValue().setFloorId(txtFieldFloor.getText().trim());
+				i.getValue().setTableId(txtFieldTable.getText().trim());
 				orderService.addOrderItem(i.getValue());
 				return;
 			}
 		}
 	}
 
+	private void showToList() {
+		String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText().toString() : null;
+		buildAndSendOrderQuery(inputOrderId);
+	}
+
 	private ActionListener selectOrderActionListener() {
 		return e -> {
-                String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText().toString() : null;
-                buildAndSendOrderQuery(inputOrderId);
+			showToList();
 		};
 	}
 
 	private void buildAndSendOrderQuery(String inputOrderId) {
-        if(inputOrderId != null) {
-            System.out.println("get details for order id " + inputOrderId);
-            OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
-            orderDetailQuery.setHumanreadableId(inputOrderId);
-            if (txtFieldFloor.getText() != null) {
-                orderDetailQuery.setFloorId(txtFieldFloor.getText());
-            }
-            if (txtFieldTable.getText() != null) {
-                orderDetailQuery.setTableId(txtFieldTable.getText());
-            }
-            if (inputOrderId != null && !inputOrderId.isEmpty()) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(1000);
-                    makeQuery(inputOrderId);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    System.out.println("Order details could not be fetched");
-                }
-            }
-        } else {
-        	System.out.println("Order Id is required");
-        }
-    }
+		if(inputOrderId != null) {
+			System.out.println("get details for order id " + inputOrderId);
+			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+			orderDetailQuery.setHumanreadableId(inputOrderId);
+			if (txtFieldFloor.getText() != null) {
+				orderDetailQuery.setFloorId(txtFieldFloor.getText());
+			}
+			if (txtFieldTable.getText() != null) {
+				orderDetailQuery.setTableId(txtFieldTable.getText());
+			}
+			if (inputOrderId != null && !inputOrderId.isEmpty()) {
+				try {
+					TimeUnit.MILLISECONDS.sleep(1000);
+					makeQuery(inputOrderId);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					System.out.println("Order details could not be fetched");
+				}
+			}
+		} else {
+			System.out.println("Order Id is required");
+		}
+	}
 
 	private void getAndSetNextOrderId() {
 		try (PreparedStatement pr = connection.prepareStatement(SELECT_MAX_ID_ORDERS)) {
@@ -484,43 +533,52 @@ public class OrderingMenu extends JPanel {
 			txtFieldOrderID.setText(String.valueOf(maxId));
 		} catch (SQLException e) {
 			e.printStackTrace();
-		} 
+		}
 	}
-	
+
 	private void makeQuery(String text) {
 		if (text.length() == 0)
 			return;
 		if (!listModel.isEmpty()) {
 			listModel.removeAllElements();
-		} 
-		HashSet<String> xmlStrings = new HashSet<String>();
-		HashSet<Integer> itemQuantity = new HashSet<Integer>();
+		}
+		List<Map.Entry<String, Integer>> queryResults = new ArrayList<>();
 		try(PreparedStatement stmt = connection.prepareStatement(SELECT_ORDER)) {
 			stmt.setInt(1,Integer.parseInt(text));
-            ResultSet rs = stmt.executeQuery();
+			ResultSet rs = stmt.executeQuery();
 
-            int length = 0;
-            while (rs.next()) {
-            	xmlStrings.add(rs.getString("xml"));
-            	itemQuantity.add(rs.getInt("quantity"));
-            	++length;
-            }
-
-            parseXmlFromQuery(xmlStrings, itemQuantity);    
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
+			while (rs.next()) {
+				queryResults.add(new AbstractMap.SimpleEntry<String, Integer> (rs.getString("xml"), rs.getInt("quantity")));
+			}
+			parseXmlFromQuery(queryResults);
+		} catch (SQLException sqlException) {
+			sqlException.printStackTrace();
 		}
 	}
-	
-	private void parseXmlFromQuery(HashSet<String> xmlStrings, HashSet<Integer> quantity) {
-		HashMap<String, Integer> queryResults = new HashMap<String, Integer>();
-		//fuse both hashSets into the map
-		xmlStrings.forEach((item) -> {
-			Document doc = convertStringToDocument(item);
-			documentCons(doc.getFirstChild());
+
+	private void parseXmlFromQuery(List<Map.Entry<String, Integer>> queryResults) {
+		queryResults.forEach((item) -> {
+			Document doc = convertStringToDocument(item.getKey());
+			for (int i = 0; i < item.getValue(); ++i) {
+				documentCons(doc.getFirstChild());
+			}
 		});
 	}
-	
+
+	private static Document convertStringToDocument(String xmlStr) {
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder builder;
+		try
+		{
+			builder = factory.newDocumentBuilder();
+			Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
+			return doc;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
 	private void documentCons(Node node) {
 		if (node.getNodeName().contains("#"))
 			return;
@@ -531,77 +589,210 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private static String convertDocumentToString(Document doc) {
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer;
-        try {
-            transformer = tf.newTransformer();
-            StringWriter writer = new StringWriter();
-            transformer.transform(new DOMSource(doc), new StreamResult(writer));
-            String output = writer.getBuffer().toString();
-            return output;
-        } catch (TransformerException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-	
-	 private static Document convertStringToDocument(String xmlStr) {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();  
-        DocumentBuilder builder;  
-        try  
-        {  
-            builder = factory.newDocumentBuilder();  
-            Document doc = builder.parse(new InputSource(new StringReader(xmlStr))); 
-            return doc;
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        }
-        return null;
-    }
+		TransformerFactory tf = TransformerFactory.newInstance();
+		Transformer transformer;
+		try {
+			transformer = tf.newTransformer();
+			StringWriter writer = new StringWriter();
+			transformer.transform(new DOMSource(doc), new StreamResult(writer));
+			String output = writer.getBuffer().toString();
+			return output;
+		} catch (TransformerException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-		private class ListItemStyler extends DefaultListCellRenderer {
+	private void recursiveFunctionReadingTheXml() {
+		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+//		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/test.xml";
+		final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
+		final DocumentBuilder docBuilder;
+		final Document doc;
+		try {
+			docBuilder = dbfac.newDocumentBuilder();
+			doc = docBuilder.parse(file);
+			buildMenuIdMap(doc, doc.getDocumentElement());
+			buildMenuUuidMap(doc, doc.getDocumentElement());
+		} catch (ParserConfigurationException | IOException | SAXException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/*Builds the menu id items and stores them in a hashmap*/
+	private void buildMenuIdMap(final Document doc, final Element e) {
+		final NodeList children = e.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			final Node n = children.item(i);
+			if (n.getNodeType() == Node.ELEMENT_NODE) {
+				if (n.getAttributes().getNamedItem("menu_id") != null) {
+					SelectedOrderItem s = new SelectedOrderItem();
+
+					Node cur = n;
+					Stack<Node> stack = new Stack<>();
+					stack.push(cur);
+					while (!cur.getNodeName().equals("menues")) {
+						cur = cur.getParentNode();
+						stack.push(cur);
+					}
+
+					if (stack.size() == 0) {
+						continue;
+					}
+
+					stack.pop();
+					Node nodeItem = stack.pop();
+					s.setItemName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+
+					if (nodeItem.getAttributes().getNamedItem("uuid") != null) {
+						s.setTarget(nodeItem.getAttributes().getNamedItem("uuid").getNodeValue());
+					}
+
+					Map<String, SelectedOrderItemOption> allOptions;
+
+					SelectedOrderItem tempItem = s;
+					while (!stack.isEmpty()) {
+						SelectedOrderItem s2 = new SelectedOrderItem();
+						List<SelectedOrderItem> selectedOrderItemList = new ArrayList<>();
+						nodeItem = stack.pop();
+						s2.setItemName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+						if (nodeItem.getAttributes().getNamedItem("uuid") != null) {
+							s2.setTarget(nodeItem.getAttributes().getNamedItem("uuid").getNodeValue());
+						}
+						selectedOrderItemList.add(s2);
+						if (nodeItem.getNodeName().equals("option")) {
+							SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
+							selectedOrderItemOption.setId(nodeItem.getAttributes().getNamedItem("id").getNodeValue());
+							selectedOrderItemOption.setName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+							allOptions = new HashMap<>();
+							allOptions.put(nodeItem.getAttributes().getNamedItem("name").getNodeValue(), selectedOrderItemOption);
+							tempItem.setOption(selectedOrderItemOption);
+							tempItem.setAllOptions(allOptions);
+						} else {
+							tempItem.setSubItems(selectedOrderItemList);
+						}
+
+						tempItem = s2;
+					}
+
+					menuIdMap.put(n.getAttributes().getNamedItem("menu_id").getNodeValue(), s);
+				}
+
+				buildMenuIdMap(doc, (Element) n);
+			}
+		}
+	}
+
+	/*Builds the uuid items and stores them in a hashmap*/
+	private void buildMenuUuidMap(final Document doc, final Element e) {
+		final NodeList children = e.getChildNodes();
+		for (int i = 0; i < children.getLength(); i++) {
+			final Node n = children.item(i);
+			if (n.getNodeType() == Node.ELEMENT_NODE) {
+//				if (n.getNodeName().equals("menues")) {
+				if (n.getAttributes().getNamedItem("uuid") != null) {
+					SelectedOrderItem s = new SelectedOrderItem();
+
+					Node cur = n;
+					Stack<Node> stack = new Stack<>();
+					stack.push(cur);
+					while (!cur.getNodeName().equals("menues")) {
+						cur = cur.getParentNode();
+						stack.push(cur);
+					}
+
+					if (stack.size() == 0) {
+						continue;
+					}
+
+					stack.pop();
+					Node nodeItem = stack.pop();
+					s.setItemName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+
+					if (nodeItem.getAttributes().getNamedItem("uuid") != null) {
+						s.setTarget(nodeItem.getAttributes().getNamedItem("uuid").getNodeValue());
+					}
+
+					Map<String, SelectedOrderItemOption> allOptions;
+
+					SelectedOrderItem tempItem = s;
+					while (!stack.isEmpty()) {
+						SelectedOrderItem s2 = new SelectedOrderItem();
+						List<SelectedOrderItem> selectedOrderItemList = new ArrayList<>();
+						nodeItem = stack.pop();
+						s2.setItemName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+						if (nodeItem.getAttributes().getNamedItem("uuid") != null) {
+							s2.setTarget(nodeItem.getAttributes().getNamedItem("uuid").getNodeValue());
+						}
+						selectedOrderItemList.add(s2);
+						if (nodeItem.getNodeName().equals("option")) {
+							SelectedOrderItemOption selectedOrderItemOption = new SelectedOrderItemOption();
+							selectedOrderItemOption.setId(nodeItem.getAttributes().getNamedItem("id").getNodeValue());
+							selectedOrderItemOption.setName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
+							allOptions = new HashMap<>();
+							allOptions.put(nodeItem.getAttributes().getNamedItem("name").getNodeValue(), selectedOrderItemOption);
+							tempItem.setOption(selectedOrderItemOption);
+							tempItem.setAllOptions(allOptions);
+						} else {
+							tempItem.setSubItems(selectedOrderItemList);
+						}
+
+						tempItem = s2;
+					}
+
+					menuUuidMap.put(n.getAttributes().getNamedItem("uuid").getNodeValue(), s);
+				}
+				buildMenuUuidMap(doc, (Element) n);
+//				}
+			}
+		}
+	}
+
+
+
+	private class ListItemStyler extends DefaultListCellRenderer {
 //			HashSet<String> options = new HashSet<String>();
-			
+
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index,
 													  boolean isSelected, boolean cellHasFocus) {
-	            super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-	            Node source = (Node) value;
-	            
-	            String labelText = "<html>";
-	            
+			Node source = (Node) value;
+
+			String labelText = "<html>";
+
 //	            options.forEach((item) -> {
 //	            	System.out.println(item);
 //	            	finalLabel += item + newline;
 //	            });	
-	         
-	            String finalS = recursiveChildSearch(source);
-	            
-	            setText(labelText + finalS);
-	            return this;
-	        }
-	        
-	        private String recursiveChildSearch(Node parent) {
-	        	String labelText = "";
-	        	String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
-	            String newline = "<br/>";
-	            
-	            if (parent.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
-	            	labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
-	            }
-	            
-	            if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
-	             	
-//	            	System.out.println(parent.getParentNode().getNodeName());
-	            	labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
-	             }
 
-	            for (int j = 0; j < parent.getChildNodes().getLength(); j++) {	
-	            	labelText += recursiveChildSearch(parent.getChildNodes().item(j));
-	            }
-	            
-	            return labelText;
-	        }
-	 }
+			String finalS = recursiveChildSearch(source);
+
+			setText(labelText + finalS);
+			return this;
+		}
+
+		private String recursiveChildSearch(Node parent) {
+			String labelText = "";
+			String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
+			String newline = "<br/>";
+
+			if (parent.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+				labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
+			}
+
+			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
+
+//	            	System.out.println(parent.getParentNode().getNodeName());
+				labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
+			}
+
+			for (int j = 0; j < parent.getChildNodes().getLength(); j++) {
+				labelText += recursiveChildSearch(parent.getChildNodes().item(j));
+			}
+
+			return labelText;
+		}
+	}
 }

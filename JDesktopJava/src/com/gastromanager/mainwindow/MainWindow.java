@@ -49,7 +49,7 @@ public class MainWindow extends JFrame {
 	private DefaultTreeModel defaultModel;
 	private JScrollPane treeScroll;
 	private JTextField textField;
-	public MenuElement newMElement = new MenuElement(); 
+	public MenuElement newMElement = new MenuElement();
 	public HashSet<GMTreeItem> drillDownItems = new HashSet<GMTreeItem>();
 	public OrderingMenu tabOrdering;
 	public Connection connection;
@@ -57,7 +57,7 @@ public class MainWindow extends JFrame {
 	public XmlUtil xmlUtil;
 	private Document doc;
 	private String openedFile;
-	
+
 	/**
 	 * Launch the application.
 	 */
@@ -65,7 +65,7 @@ public class MainWindow extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					MainWindow frame = 
+					MainWindow frame =
 							new MainWindow();
 					frame.setVisible(true);
 				} catch (Exception e) {
@@ -89,7 +89,7 @@ public class MainWindow extends JFrame {
 		menuBar.add(mnFileMenu);
 
 
-		
+
 
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -104,7 +104,7 @@ public class MainWindow extends JFrame {
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		splitPane.setRightComponent(tabbedPane);
-		
+
 
 		JPanel tabView = new JPanel();
 		tabbedPane.addTab("View", null, tabView, null);
@@ -115,35 +115,35 @@ public class MainWindow extends JFrame {
 		tree.rootItem = root;
 		root.setTree(tree);
 
-		JScrollPane treeScroll = new JScrollPane(tree, 
-												 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-												 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+		JScrollPane treeScroll = new JScrollPane(tree,
+				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		treeScroll.setMinimumSize(new Dimension(200, MAXIMIZED_VERT));
 		splitPane.setLeftComponent(treeScroll);
 		tree.setEditable(true);
-		
-		treeScroll = new JScrollPane();
-		defaultModel = (DefaultTreeModel) tree.getModel(); 
 
-		
+		treeScroll = new JScrollPane();
+		defaultModel = (DefaultTreeModel) tree.getModel();
+
+
 		LayoutMenu tabLayout = new LayoutMenu(this);
 		tabbedPane.addTab("Layout", null, tabLayout, null);
 		tabLayout.setLayout(new FlowLayout());
 		tree.setLayoutMenu(tabLayout);
-		
-		
+
+
 		drillDownMenu = new DrillDownMenu(root, defaultModel, tree, newMElement);
-		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu, 
-										   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
-										   JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-		
+		JScrollPane drillDownScroll = new JScrollPane(drillDownMenu,
+				JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+				JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
 		tabbedPane.addTab("Drill Down Menu", null, drillDownScroll, null);
 		drillDownMenu.setLayout(null);
 
-		tabOrdering = new OrderingMenu();
+		tabOrdering = new OrderingMenu(this);
 		tabbedPane.addTab("Ordering", null, tabOrdering, null);
 		tabOrdering.setLayout(null);
-		
+
 		ReportsMenu tabReports = new ReportsMenu();
 //		reportsTab.setLayout(new BoxLayout());
 		tabbedPane.addTab("Reports", null, tabReports, null);
@@ -152,13 +152,13 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Payment", null,tabPayment, null);
 		tabPayment.setPreferredSize(new Dimension(750,650));
 		tabPayment.setLayout(null);
-		
+
 		BookingsMenu tabBookings = new BookingsMenu();
 		tabbedPane.addTab("Bookings", null,tabBookings, null);
 
 		ServerSocketMenu serverSocketMenu = new ServerSocketMenu();
 		tabbedPane.addTab("Server", null, serverSocketMenu, null);
-		
+
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
 
@@ -171,7 +171,7 @@ public class MainWindow extends JFrame {
 				int returnVal = fc.showDialog(null, "Open XML File...");
 //				String selected = fc.getSelectedFile().toString();
 				openedFile = fc.getSelectedFile().toString();
-				
+
 				try {
 					String fstr = xmlUtil.readFileToString(openedFile, Charset.defaultCharset());
 					doc = xmlUtil.loadXMLFromString(fstr);
@@ -195,21 +195,21 @@ public class MainWindow extends JFrame {
 //				System.out.println(root.getChildCount());
 
 				tabLayout.saveToXmlAndDb();
-				
+
 				root = (GMTreeItem) defaultModel.getRoot();
-				
-				
+
+
 				String newString = xmlUtil.writeTreeIntoString(root);
 
 				File saveFile = new File("C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml");
 //				File saveFile = new File(openedFile);
 				try {
-						FileWriter fileWriter = new FileWriter(saveFile);
-						fileWriter.write(newString);
-						fileWriter.flush();
-						fileWriter.close();
+					FileWriter fileWriter = new FileWriter(saveFile);
+					fileWriter.write(newString);
+					fileWriter.flush();
+					fileWriter.close();
 				} catch (IOException e1) {
-						e1.printStackTrace();
+					e1.printStackTrace();
 				}
 //				System.out.println(newString);
 			}
@@ -230,12 +230,12 @@ public class MainWindow extends JFrame {
 					e1.printStackTrace();
 				} catch (Exception e1) {
 					e1.printStackTrace();
-				}			
+				}
 			}
 		});
 		menuBar.add(btnDebugLoadFile);
 	}
-		
+
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -309,5 +309,5 @@ public class MainWindow extends JFrame {
 	public void setDrillDownMenu(DrillDownMenu drillDownMenu) {
 		this.drillDownMenu = drillDownMenu;
 	}
-	
+
 }

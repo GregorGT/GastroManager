@@ -184,6 +184,7 @@ public class XmlUtil {
 		try {
 			xmlContent = XmlUtil.readFileToString(
 					"C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+//					"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
 					Charset.defaultCharset());
 			SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
 			menuDetail = parser.parseXml(xmlContent);
