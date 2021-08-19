@@ -29,6 +29,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import com.gastromanager.models.*;
 import com.gastromanager.service.impl.OrderServiceImpl;
+import com.gastromanager.util.DbUtil;
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
@@ -109,6 +110,29 @@ public class OrderingMenu extends JPanel {
 		this.add(txtFieldOrderID);
 		txtFieldOrderID.setColumns(10);
 
+		txtFieldOrderID.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (txtFieldFloor.getText().trim().isEmpty() || txtFieldFloor.getText().trim() == null ||
+					txtFieldTable.getText().trim().isEmpty() || txtFieldTable.getText().trim() == null) {
+					JOptionPane.showMessageDialog(OrderingMenu.this, "Enter floor id and table id first.");
+					txtFieldOrderID.setFocusable(false);
+					txtFieldOrderID.setFocusable(true);
+				} else {
+					try {
+						txtFieldOrderID.setText(String.valueOf(DbUtil.getStartingHumanReadableOrderId(Integer.parseInt(txtFieldFloor.getText().trim()), Integer.parseInt(txtFieldTable.getText().trim()))));
+					} catch (NumberFormatException numberFormatException) {
+						JOptionPane.showMessageDialog(OrderingMenu.this, "Enter valid values for floor id and table id please.");
+					}
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				System.out.println("focus lost");
+			}
+		});
+
 		JButton lblSelectOrderID = new JButton("Select Order ID");
 		lblSelectOrderID.setBounds(256, 101, 109, 23);
 		lblSelectOrderID.addActionListener(selectOrderActionListener());
@@ -155,7 +179,8 @@ public class OrderingMenu extends JPanel {
 			if (!listModel.isEmpty()) {
 				listModel.removeAllElements();
 			}
-			getAndSetNextOrderId();
+			txtFieldOrderID.setText(String.valueOf(DbUtil.getNewHumanReadableOrderId()));
+//			getAndSetNextOrderId();
 		});
 		this.add(btnNewOrderID);
 
@@ -168,9 +193,6 @@ public class OrderingMenu extends JPanel {
 			showToList();
 			subItemsPanel.removeAll();
 			subItemsPanel.repaint();
-//			itemOptions = new ArrayList<>();
-//			BoxLayout boxLayout = new BoxLayout(subItemsPanel, BoxLayout.Y_AXIS);
-//			subItemsPanel.setLayout(boxLayout);
 			itemButtons.forEach(ItemButton::unselect);
 		});
 		this.add(addToOrder);
@@ -270,6 +292,7 @@ public class OrderingMenu extends JPanel {
 				}
 			}
 		});
+		loadMenuItems(ddMenus.get(0));
 
 		list.addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
@@ -469,15 +492,35 @@ public class OrderingMenu extends JPanel {
 
 		for (Map.Entry<String, SelectedOrderItem> i : menuIdMap.entrySet()) {
 			if (i.getKey().equals(menuId)) {
-				OrderServiceImpl orderService = new OrderServiceImpl();
-				orderService.setMenuDetail(menuDetail);
-				i.getValue().setOrderId(txtFieldOrderID.getText().trim());
-				i.getValue().setFloorId(txtFieldFloor.getText().trim());
-				i.getValue().setTableId(txtFieldTable.getText().trim());
-				orderService.addOrderItem(i.getValue());
-				return;
+
+				if (!checkIfItemIsReadyForSelection(i.getValue())) {
+					OrderServiceImpl orderService = new OrderServiceImpl();
+					orderService.setMenuDetail(menuDetail);
+					i.getValue().setOrderId(txtFieldOrderID.getText().trim());
+					i.getValue().setFloorId(txtFieldFloor.getText().trim());
+					i.getValue().setTableId(txtFieldTable.getText().trim());
+					orderService.addOrderItem(i.getValue());
+					return;
+				} else {
+					System.out.println("Not ready for selection");
+					subItemsPanel = new JPanel();
+					itemOptions = new ArrayList<>();
+					BoxLayout boxLayout = new BoxLayout(subItemsPanel, BoxLayout.Y_AXIS);
+					subItemsPanel.setLayout(boxLayout);
+					itemButtons.forEach(ItemButton::unselect);
+					itemButtons.forEach(b -> {
+						if (b.getName().equals(i.getValue().getItemName())) {
+							b.click();
+							showMenu(b.getName());
+						}
+					});
+				}
 			}
 		}
+	}
+
+	private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem s) {
+		return (s.getSubItems() != null && s.getSubItems().size() == 1 && s.getSubItems().get(0).getAllOptions() == null);
 	}
 
 	private void showToList() {
@@ -516,25 +559,25 @@ public class OrderingMenu extends JPanel {
 		}
 	}
 
-	private void getAndSetNextOrderId() {
-		try (PreparedStatement pr = connection.prepareStatement(SELECT_MAX_ID_ORDERS)) {
-			ResultSet rs = pr.executeQuery();
-			Integer maxId = null;
-
-			while (rs.next()) {
-				maxId = rs.getInt("id");
-			}
-
-			if (maxId == null) {
-				maxId = 1;
-			} else {
-				++maxId;
-			}
-			txtFieldOrderID.setText(String.valueOf(maxId));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
+//	private void getAndSetNextOrderId() {
+//		try (PreparedStatement pr = connection.prepareStatement(SELECT_MAX_ID_ORDERS)) {
+//			ResultSet rs = pr.executeQuery();
+//			Integer maxId = null;
+//
+//			while (rs.next()) {
+//				maxId = rs.getInt("id");
+//			}
+//
+//			if (maxId == null) {
+//				maxId = 1;
+//			} else {
+//				++maxId;
+//			}
+//			txtFieldOrderID.setText(String.valueOf(maxId));
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	private void makeQuery(String text) {
 		if (text.length() == 0)
