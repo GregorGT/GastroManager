@@ -256,14 +256,14 @@ public class FinancialReportTemplate {
     }
 	
 	private String parseXml(String xml) {
-		String itemName = null;
+		String itemName = "";
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = null;
 		Document document = null;
 		try {
 			builder = factory.newDocumentBuilder();
 			document = builder.parse(new InputSource(new StringReader(xml)));
-			itemName = parse(document, document.getDocumentElement());
+			itemName = parse(itemName, document, document.getDocumentElement());
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
 		} catch (SAXException e) {
@@ -271,28 +271,39 @@ public class FinancialReportTemplate {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//		System.out.println("Item name= "+itemName);
+		//System.out.println("Item name= "+itemName);
 		
 		return itemName;
 	}
 	
 
-    private String parse(Document doc, Element e) {
-        String itemName = "";
+    private String parse(String itemName, Document doc, Element e) {
+    	
+    	NamedNodeMap attributes = e.getAttributes();
+ 
+    	if (e.getNodeName().equals("item") || e.getNodeName().equals("option")) {
+    	 
+        		if (attributes.getNamedItem("name") != null) {
+        			
+        			if(itemName.length() > 0)
+        				itemName += ", " + attributes.getNamedItem("name").getNodeValue();
+        			else
+        				itemName += attributes.getNamedItem("name").getNodeValue();
+        				
+        			
+        		}
+      
+        
+    	}            	
+
+    	
+    	
     	NodeList children = e.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
         	Node n = children.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE) {
-            	NamedNodeMap attributes = n.getAttributes();
-            	if (n.getNodeName().equals("item")) {
-	            	if (attributes.getNamedItem("menu_id") != null) {
-	            		if (attributes.getNamedItem("name") != null) {
-	            			itemName = attributes.getNamedItem("name").getNodeValue();
-	            			return itemName;
-	            		}
-	            	}
-            	}            	
-            	itemName = parse(doc, (Element) n);
+            	
+            	itemName = parse(itemName, doc, (Element) n);
             }
         }
         return itemName;
