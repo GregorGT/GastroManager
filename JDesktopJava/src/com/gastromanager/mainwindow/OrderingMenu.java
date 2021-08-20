@@ -39,7 +39,8 @@ import com.gastromanager.util.Util;
 import org.xml.sax.SAXException;
 
 public class OrderingMenu extends JPanel {
-	private static final String SELECT_ORDER = "select * from orderitem join orders on orders.id = orderitem.order_id where orders.id=?";
+	private static final String SELECT_ORDER = "select * from orderitem join orders on orders.id = orderitem.order_id " +
+			"where orders.humanreadable_id=?  AND DATE(orders.datetime) = DATE('NOW', 'LOCALTIME') ORDER BY datetime ASC";
 	private static final String SELECT_MAX_ID_ORDERS = "select max(id) id from orders";
 	private static final String SELECT_ORDER_FOR_DELETION = "select xml, id from orderitem where order_id=?";
 	private static final String DELETE_ITEM = "delete from orderitem where id=?";
@@ -229,6 +230,31 @@ public class OrderingMenu extends JPanel {
 		});
 		btnSelectMenuID.setBounds(406, 135, 120, 23);
 		this.add(btnSelectMenuID);
+
+		JButton btnSignOff = new JButton("Sign off");
+		btnSignOff.setBounds(406, 165, 120, 23);
+		this.add(btnSignOff);
+		btnSignOff.addActionListener(e -> {
+			String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText().toString() : null;
+			if(inputOrderId != null) {
+				OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
+				orderDetailQuery.setHumanreadableId(inputOrderId);
+				if (txtFieldFloor.getText() != null) {
+					orderDetailQuery.setFloorId(txtFieldFloor.getText().toString());
+				}
+				if (txtFieldTable.getText() != null) {
+					orderDetailQuery.setTableId(txtFieldTable.getText().toString());
+				}
+				SignOffOrderInfo signOffOrderInfo = new SignOffOrderInfo();
+				signOffOrderInfo.setOrderDetailQuery(orderDetailQuery);
+//				new SignOffOrdertask().execute(signOffOrderInfo, this);
+				OrderServiceImpl orderService = new OrderServiceImpl();
+				boolean response = orderService.signOffOrder(signOffOrderInfo);
+				System.out.println("isOrderPrinted " + response);
+			} else {
+				JOptionPane.showMessageDialog(this, "Order Id not provided !!");
+			}
+		});
 
 		scrollPaneItems = new JScrollPane(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		scrollPaneItems.setBounds(10, 340, 300, 300);
@@ -559,26 +585,6 @@ public class OrderingMenu extends JPanel {
 		}
 	}
 
-//	private void getAndSetNextOrderId() {
-//		try (PreparedStatement pr = connection.prepareStatement(SELECT_MAX_ID_ORDERS)) {
-//			ResultSet rs = pr.executeQuery();
-//			Integer maxId = null;
-//
-//			while (rs.next()) {
-//				maxId = rs.getInt("id");
-//			}
-//
-//			if (maxId == null) {
-//				maxId = 1;
-//			} else {
-//				++maxId;
-//			}
-//			txtFieldOrderID.setText(String.valueOf(maxId));
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
 	private void makeQuery(String text) {
 		if (text.length() == 0)
 			return;
@@ -790,8 +796,6 @@ public class OrderingMenu extends JPanel {
 			}
 		}
 	}
-
-
 
 	private class ListItemStyler extends DefaultListCellRenderer {
 //			HashSet<String> options = new HashSet<String>();
