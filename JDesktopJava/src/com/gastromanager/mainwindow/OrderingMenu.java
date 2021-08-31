@@ -817,41 +817,29 @@ public class OrderingMenu extends JPanel {
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 			OrderItemInfo orderItemInfo = (OrderItemInfo) value;
-			setText(orderItemInfo.getXmlText());
+			setText(constructLabelText(orderItemInfo.getXmlText()));
 			if (isSelected) {
 				setBackground(Color.CYAN);
+			} else if (orderItemInfo.getPrintStatus() == 1) {
+				setBackground(Color.YELLOW);
 			} else {
 				setBackground(Color.WHITE);
-			}
-			if (orderItemInfo.getPrintStatus() == 1) {
-				setBackground(Color.YELLOW);
 			}
 			return this;
 		}
 
-		private String constructLabelText(Node parent) {
-			String labelText = "";
-			String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
-			String newline = "<br/>";
+		private String constructLabelText(String text) {
+			String labelText = "<html>";
+			String[] words = text.replaceAll("^[.,\\s]+", "").split("[.,\\s]+");
+			String spaces6 = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;";
+			String spaces1 = "&nbsp;";
 
-			if (parent.getParentNode().getNodeType() == Node.COMMENT_NODE) {
-				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
-//			if (parent.getNodeType() == Node.DOCUMENT_NODE) {
-				labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
+			labelText += words[0] + "<br/>" + "          ";
+			labelText += spaces6;
+			for (int i = 2; i < words.length; ++i) {
+				labelText += words[i] + spaces1;
 			}
-
-			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
-
-//			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeType() != Node.DOCUMENT_NODE) {
-
-				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
-				labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
-			}
-
-			for (int j = 0; j < parent.getChildNodes().getLength(); j++) {
-				labelText += constructLabelText(parent.getChildNodes().item(j));
-			}
-
+			labelText += "</html>";
 			return labelText;
 		}
 //			HashSet<String> options = new HashSet<String>();
