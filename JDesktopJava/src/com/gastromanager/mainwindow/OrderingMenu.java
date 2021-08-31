@@ -326,6 +326,10 @@ public class OrderingMenu extends JPanel {
 		if (txtFieldOrderID.getText().isEmpty() || txtFieldOrderID.getText().trim().isEmpty() || txtFieldOrderID.getText() == null) {
 			return;
 		}
+		if (item.getPrintStatus() == 1) {
+			JOptionPane.showMessageDialog(this, "Cannot delete a printed item");
+			return;
+		}
 		OrderServiceImpl orderService = new OrderServiceImpl();
 		orderService.removeOrderItem(item);
 	}
