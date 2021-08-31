@@ -2,14 +2,9 @@ package com.gastromanager.mainwindow;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -18,11 +13,6 @@ import javax.swing.*;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import com.gastromanager.models.*;
 import com.gastromanager.service.impl.OrderServiceImpl;
@@ -36,11 +26,6 @@ import com.gastromanager.util.Util;
 import org.xml.sax.SAXException;
 
 public class OrderingMenu extends JPanel {
-	private static final String SELECT_ORDER = "select * from orderitem join orders on orders.id = orderitem.order_id " +
-			"where orders.humanreadable_id=?  AND DATE(orders.datetime) = DATE('NOW', 'LOCALTIME') ORDER BY datetime ASC";
-	private static final String SELECT_MAX_ID_ORDERS = "select max(id) id from orders";
-	private static final String SELECT_ORDER_FOR_DELETION = "select xml, id from orderitem where order_id=?";
-	private static final String DELETE_ITEM = "delete from orderitem where id=?";
 
 	private JTextField txtFieldTable;
 	private JTextField txtFieldFloor;
@@ -243,7 +228,6 @@ public class OrderingMenu extends JPanel {
 				}
 				SignOffOrderInfo signOffOrderInfo = new SignOffOrderInfo();
 				signOffOrderInfo.setOrderDetailQuery(orderDetailQuery);
-//				new SignOffOrdertask().execute(signOffOrderInfo, this);
 				OrderServiceImpl orderService = new OrderServiceImpl();
 				boolean response = orderService.signOffOrder(signOffOrderInfo);
 				System.out.println("isOrderPrinted " + response);
@@ -318,7 +302,7 @@ public class OrderingMenu extends JPanel {
 
 		list.addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
-				if ( SwingUtilities.isRightMouseButton(e) ) {
+				if ( SwingUtilities.isLeftMouseButton(e) ) {
 					list.setSelectedIndex(list.locationToIndex(e.getPoint()));
 
 
@@ -343,38 +327,6 @@ public class OrderingMenu extends JPanel {
 		}
 		OrderServiceImpl orderService = new OrderServiceImpl();
 		orderService.removeOrderItem(item);
-
-//		try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ORDER_FOR_DELETION)) {
-//			preparedStatement.setInt(1, Integer.parseInt(txtFieldOrderID.getText()));
-//			Map<Integer, Node> xmls = new HashMap<>();
-//			ResultSet rs = preparedStatement.executeQuery();
-//			while (rs.next()) {
-//				Element node = DocumentBuilderFactory
-//						.newInstance()
-//						.newDocumentBuilder()
-//						.parse(new ByteArrayInputStream(rs.getString("xml").getBytes()))
-//						.getDocumentElement();
-//				xmls.put(rs.getInt("id"), node);
-//			}
-//
-//			for (Map.Entry<Integer, Node> pair : xmls.entrySet()) {
-//				if (item.isEqualNode(pair.getValue())) {
-//					deleteItem(pair.getKey());
-//					return;
-//				}
-//			}
-//		} catch (SQLException | IOException | ParserConfigurationException | SAXException throwables) {
-//			throwables.printStackTrace();
-//		}
-	}
-
-	private void deleteItem(Integer id) {
-		try (PreparedStatement preparedStatement = connection.prepareStatement(DELETE_ITEM)) {
-			preparedStatement.setInt(1, id);
-			preparedStatement.executeUpdate();
-		} catch (SQLException throwables) {
-			throwables.printStackTrace();
-		}
 	}
 
 	private void loadMenuItems(DrillDownMenuType menuType) {
@@ -596,27 +548,6 @@ public class OrderingMenu extends JPanel {
 		}
 	}
 
-	private void makeQuery(String text) {
-		if (text.length() == 0)
-			return;
-		if (!listModel.isEmpty()) {
-			listModel.removeAllElements();
-		}
-		List<Map.Entry<String, Integer>> queryResults = new ArrayList<>();
-		try(PreparedStatement stmt = connection.prepareStatement(SELECT_ORDER)) {
-			stmt.setInt(1,Integer.parseInt(text));
-			ResultSet rs = stmt.executeQuery();
-
-			while (rs.next()) {
-				queryResults.add(new AbstractMap.SimpleEntry<String, Integer> (rs.getString("xml"), rs.getInt("quantity")));
-				System.out.println(queryResults.get(queryResults.size()-1).getKey());
-			}
-			parseXmlFromQuery(queryResults);
-		} catch (SQLException sqlException) {
-			sqlException.printStackTrace();
-		}
-	}
-
 	private void parseXmlFromQuery(List<Map.Entry<String, Integer>> queryResults) {
 		queryResults.forEach((item) -> {
 			Document doc = convertStringToDocument(item.getKey());
@@ -647,21 +578,6 @@ public class OrderingMenu extends JPanel {
 		while (node.getNextSibling() != null) {
 			documentCons(node.getNextSibling());
 		}
-	}
-
-	private static String convertDocumentToString(Document doc) {
-		TransformerFactory tf = TransformerFactory.newInstance();
-		Transformer transformer;
-		try {
-			transformer = tf.newTransformer();
-			StringWriter writer = new StringWriter();
-			transformer.transform(new DOMSource(doc), new StreamResult(writer));
-			String output = writer.getBuffer().toString();
-			return output;
-		} catch (TransformerException e) {
-			e.printStackTrace();
-		}
-		return null;
 	}
 
 	private void recursiveFunctionReadingTheXml() {
@@ -839,52 +755,5 @@ public class OrderingMenu extends JPanel {
 			labelText += "</html>";
 			return labelText;
 		}
-//			HashSet<String> options = new HashSet<String>();
-//
-//		@Override
-//		public Component getListCellRendererComponent(JList list, Object value, int index,
-//													  boolean isSelected, boolean cellHasFocus) {
-//			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-//
-//			Node source = (Node) value;
-//
-//			String labelText = "<html>";
-//
-////	            options.forEach((item) -> {
-////	            	System.out.println(item);
-////	            	finalLabel += item + newline;
-////	            });
-//
-//			String finalS = recursiveChildSearch(source);
-//
-//			setText(labelText + finalS);
-//			return this;
-//		}
-//
-//		private String recursiveChildSearch(Node parent) {
-//			String labelText = "";
-//			String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
-//			String newline = "<br/>";
-//
-//			if (parent.getParentNode().getNodeType() == Node.COMMENT_NODE) {
-//				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
-////			if (parent.getNodeType() == Node.DOCUMENT_NODE) {
-//				labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
-//			}
-//
-//			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
-//
-////			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeType() != Node.DOCUMENT_NODE) {
-//
-//				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
-//				labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
-//			}
-//
-//			for (int j = 0; j < parent.getChildNodes().getLength(); j++) {
-//				labelText += recursiveChildSearch(parent.getChildNodes().item(j));
-//			}
-//
-//			return labelText;
-//		}
 	}
 }
