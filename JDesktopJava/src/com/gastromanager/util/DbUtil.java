@@ -602,7 +602,8 @@ public class DbUtil {
                     " WHERE ORDER_ID='"+orderItemInfo.getOrderId()+"'"+
                     " AND ITEM_ID ='"+orderItemInfo.getItemId()+"'" +
                     " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'"+
-                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')";
+                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')"+
+                    " AND PRINT_STATUS = 0";
             System.out.println(query);
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
