@@ -49,9 +49,9 @@ public class OrderingMenu extends JPanel {
 	private JTextField txtFieldFloor;
 	private JTextField txtFieldOrderID;
 	private JTextField tfMenuID;
-	private JList<Node> list;
+	private JList<OrderItemInfo> list;
 	private JComboBox<String> ddChoice;
-	private DefaultListModel<Node> listModel = new DefaultListModel<Node>();
+	private DefaultListModel<OrderItemInfo> listModel = new DefaultListModel<>();
 	private Connection connection;
 	private JScrollPane scrollPaneSubItems;
 	private MenuServiceImpl menuService;
@@ -94,7 +94,7 @@ public class OrderingMenu extends JPanel {
 		this.add(txtFieldFloor);
 		txtFieldFloor.setColumns(10);
 
-		list = new JList<Node>(listModel);
+		list = new JList<>(listModel);
 		list.setCellRenderer(new ListItemStyler());
 
 		JScrollPane sPane = new JScrollPane(list);
@@ -158,7 +158,6 @@ public class OrderingMenu extends JPanel {
 
 		JButton btnNext = new JButton("->");
 		btnNext.addActionListener(new ActionListener() {
-			//TODO: Next cannot go over the maximum order_id number
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				String inputOrderId = (txtFieldOrderID.getText() != null) ? txtFieldOrderID.getText() : null;
@@ -325,11 +324,12 @@ public class OrderingMenu extends JPanel {
 				if ( SwingUtilities.isRightMouseButton(e) ) {
 					list.setSelectedIndex(list.locationToIndex(e.getPoint()));
 
+
 					JPopupMenu menu = new JPopupMenu();
 					JMenuItem itemRemove = new JMenuItem("Delete");
 					itemRemove.addActionListener( event -> {
 						//todo: implement the delete operation
-						System.out.println(list.getSelectedValue().getAttributes().getNamedItem("name").getFirstChild().getNodeValue());
+//						System.out.println(list.getSelectedValue().getAttributes().getNamedItem("name").getFirstChild().getNodeValue());
 						deleteItem(list.getSelectedValue());
 						buildAndSendOrderQuery(txtFieldOrderID.getText());
 					});
@@ -340,32 +340,35 @@ public class OrderingMenu extends JPanel {
 		});
 	}
 
-	private void deleteItem(Node item) {
+	private void deleteItem(OrderItemInfo item) {
 		if (txtFieldOrderID.getText().isEmpty() || txtFieldOrderID.getText().trim().isEmpty() || txtFieldOrderID.getText() == null) {
 			return;
 		}
-		try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ORDER_FOR_DELETION)) {
-			preparedStatement.setInt(1, Integer.parseInt(txtFieldOrderID.getText()));
-			Map<Integer, Node> xmls = new HashMap<>();
-			ResultSet rs = preparedStatement.executeQuery();
-			while (rs.next()) {
-				Element node = DocumentBuilderFactory
-						.newInstance()
-						.newDocumentBuilder()
-						.parse(new ByteArrayInputStream(rs.getString("xml").getBytes()))
-						.getDocumentElement();
-				xmls.put(rs.getInt("id"), node);
-			}
+		OrderServiceImpl orderService = new OrderServiceImpl();
+		orderService.removeOrderItem(item);
 
-			for (Map.Entry<Integer, Node> pair : xmls.entrySet()) {
-				if (item.isEqualNode(pair.getValue())) {
-					deleteItem(pair.getKey());
-					return;
-				}
-			}
-		} catch (SQLException | IOException | ParserConfigurationException | SAXException throwables) {
-			throwables.printStackTrace();
-		}
+//		try (PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ORDER_FOR_DELETION)) {
+//			preparedStatement.setInt(1, Integer.parseInt(txtFieldOrderID.getText()));
+//			Map<Integer, Node> xmls = new HashMap<>();
+//			ResultSet rs = preparedStatement.executeQuery();
+//			while (rs.next()) {
+//				Element node = DocumentBuilderFactory
+//						.newInstance()
+//						.newDocumentBuilder()
+//						.parse(new ByteArrayInputStream(rs.getString("xml").getBytes()))
+//						.getDocumentElement();
+//				xmls.put(rs.getInt("id"), node);
+//			}
+//
+//			for (Map.Entry<Integer, Node> pair : xmls.entrySet()) {
+//				if (item.isEqualNode(pair.getValue())) {
+//					deleteItem(pair.getKey());
+//					return;
+//				}
+//			}
+//		} catch (SQLException | IOException | ParserConfigurationException | SAXException throwables) {
+//			throwables.printStackTrace();
+//		}
 	}
 
 	private void deleteItem(Integer id) {
@@ -515,7 +518,6 @@ public class OrderingMenu extends JPanel {
 		if (menuId == null || menuId.isEmpty() || menuIdMap == null || menuIdMap.size() == 0) {
 			return;
 		}
-
 		for (Map.Entry<String, SelectedOrderItem> i : menuIdMap.entrySet()) {
 			if (i.getKey().equals(menuId)) {
 
@@ -561,6 +563,7 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private void buildAndSendOrderQuery(String inputOrderId) {
+		listModel.removeAllElements();
 		if(inputOrderId != null) {
 			System.out.println("get details for order id " + inputOrderId);
 			OrderDetailQuery orderDetailQuery = new OrderDetailQuery();
@@ -574,7 +577,18 @@ public class OrderingMenu extends JPanel {
 			if (inputOrderId != null && !inputOrderId.isEmpty()) {
 				try {
 					TimeUnit.MILLISECONDS.sleep(1000);
-					makeQuery(inputOrderId);
+					orderDetailQuery.setHumanreadableId(inputOrderId);
+
+					OrderServiceImpl orderService = new OrderServiceImpl();
+					List<OrderItemInfo> fetchedItems = orderService.retrieveOrderItems(orderDetailQuery);
+					if (fetchedItems != null) {
+						fetchedItems.forEach(i -> {
+							System.out.println(i.getQuantity());
+							System.out.println((i.getXmlText()));
+							listModel.addElement(i);
+						});
+					}
+//					makeQuery(inputOrderId);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					System.out.println("Order details could not be fetched");
@@ -598,6 +612,7 @@ public class OrderingMenu extends JPanel {
 
 			while (rs.next()) {
 				queryResults.add(new AbstractMap.SimpleEntry<String, Integer> (rs.getString("xml"), rs.getInt("quantity")));
+				System.out.println(queryResults.get(queryResults.size()-1).getKey());
 			}
 			parseXmlFromQuery(queryResults);
 		} catch (SQLException sqlException) {
@@ -631,7 +646,7 @@ public class OrderingMenu extends JPanel {
 	private void documentCons(Node node) {
 		if (node.getNodeName().contains("#"))
 			return;
-		listModel.addElement(node);
+//		listModel.addElement(node);
 		while (node.getNextSibling() != null) {
 			documentCons(node.getNextSibling());
 		}
@@ -798,48 +813,90 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private class ListItemStyler extends DefaultListCellRenderer {
-//			HashSet<String> options = new HashSet<String>();
 
 		@Override
-		public Component getListCellRendererComponent(JList list, Object value, int index,
-													  boolean isSelected, boolean cellHasFocus) {
-			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-			Node source = (Node) value;
-
-			String labelText = "<html>";
-
-//	            options.forEach((item) -> {
-//	            	System.out.println(item);
-//	            	finalLabel += item + newline;
-//	            });	
-
-			String finalS = recursiveChildSearch(source);
-
-			setText(labelText + finalS);
+		public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+			OrderItemInfo orderItemInfo = (OrderItemInfo) value;
+			setText(orderItemInfo.getXmlText());
+			if (isSelected) {
+				setBackground(Color.CYAN);
+			} else {
+				setBackground(Color.WHITE);
+			}
 			return this;
 		}
 
-		private String recursiveChildSearch(Node parent) {
+		private String constructLabelText(Node parent) {
 			String labelText = "";
 			String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
 			String newline = "<br/>";
 
-			if (parent.getParentNode().getNodeType() == Node.DOCUMENT_NODE) {
+			if (parent.getParentNode().getNodeType() == Node.COMMENT_NODE) {
+				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
+//			if (parent.getNodeType() == Node.DOCUMENT_NODE) {
 				labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
 			}
 
 			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
 
-//	            	System.out.println(parent.getParentNode().getNodeName());
+//			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeType() != Node.DOCUMENT_NODE) {
+
+				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
 				labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
 			}
 
 			for (int j = 0; j < parent.getChildNodes().getLength(); j++) {
-				labelText += recursiveChildSearch(parent.getChildNodes().item(j));
+				labelText += constructLabelText(parent.getChildNodes().item(j));
 			}
 
 			return labelText;
 		}
+//			HashSet<String> options = new HashSet<String>();
+//
+//		@Override
+//		public Component getListCellRendererComponent(JList list, Object value, int index,
+//													  boolean isSelected, boolean cellHasFocus) {
+//			super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+//
+//			Node source = (Node) value;
+//
+//			String labelText = "<html>";
+//
+////	            options.forEach((item) -> {
+////	            	System.out.println(item);
+////	            	finalLabel += item + newline;
+////	            });
+//
+//			String finalS = recursiveChildSearch(source);
+//
+//			setText(labelText + finalS);
+//			return this;
+//		}
+//
+//		private String recursiveChildSearch(Node parent) {
+//			String labelText = "";
+//			String spacer = "&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ";
+//			String newline = "<br/>";
+//
+//			if (parent.getParentNode().getNodeType() == Node.COMMENT_NODE) {
+//				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
+////			if (parent.getNodeType() == Node.DOCUMENT_NODE) {
+//				labelText += parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
+//			}
+//
+//			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getParentNode().getNodeType() != Node.DOCUMENT_NODE) {
+//
+////			if (parent.getNodeType() == Node.ELEMENT_NODE && parent.getNodeType() != Node.DOCUMENT_NODE) {
+//
+//				System.out.println(parent.getAttributes().getNamedItem("name").getNodeValue());
+//				labelText += spacer + parent.getAttributes().getNamedItem("name").getNodeValue() + newline;
+//			}
+//
+//			for (int j = 0; j < parent.getChildNodes().getLength(); j++) {
+//				labelText += recursiveChildSearch(parent.getChildNodes().item(j));
+//			}
+//
+//			return labelText;
+//		}
 	}
 }
