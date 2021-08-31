@@ -25,11 +25,14 @@ public class DbUtil {
                 if(orderId != null) {
                     StringBuilder queryBuilder = new StringBuilder();
                     queryBuilder.append("SELECT * from ORDERITEM WHERE" +
-                                " ORDER_ID = '"+ orderId +"'" +
-                                 " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME') ORDER BY datetime ASC");
+                                " order_id = '"+ orderId +"'" +
+                                 " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
                     if(queryForPrint) {
                         queryBuilder.append(" AND PRINT_STATUS = 0");
                     }
+                    
+                    queryBuilder.append(" ORDER BY datetime ASC");
+                    
                     Statement stmt=connection.createStatement();
 
                     ResultSet result = stmt.executeQuery(queryBuilder.toString());
