@@ -1,6 +1,3 @@
-//TODO:
-// 1:  next order id
-
 package com.gastromanager.mainwindow;
 
 import java.awt.*;
