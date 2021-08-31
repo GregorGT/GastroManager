@@ -231,6 +231,7 @@ public class OrderingMenu extends JPanel {
 				OrderServiceImpl orderService = new OrderServiceImpl();
 				boolean response = orderService.signOffOrder(signOffOrderInfo);
 				System.out.println("isOrderPrinted " + response);
+				buildAndSendOrderQuery(txtFieldOrderID.getText());
 			} else {
 				JOptionPane.showMessageDialog(this, "Order Id not provided !!");
 			}
