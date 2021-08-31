@@ -823,6 +823,9 @@ public class OrderingMenu extends JPanel {
 			} else {
 				setBackground(Color.WHITE);
 			}
+			if (orderItemInfo.getPrintStatus() == 1) {
+				setBackground(Color.YELLOW);
+			}
 			return this;
 		}
 
