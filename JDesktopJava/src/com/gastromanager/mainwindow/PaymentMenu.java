@@ -11,10 +11,17 @@ import com.gastromanager.ui.OrderItemListTableModel;
 import com.gastromanager.util.Util;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,24 +34,33 @@ public class PaymentMenu  extends Panel{
 	private JTextField txtFieldTableID;
 	private JTextField txtFieldOrderID;
 	private JTextField txtFieldTipAmount;
+	private JLabel totalAmountField;
 	private PaymentService paymentService;
 	private List<Order> orderList;
 	private List<OrderItemInfo> orderItemInfoList;
 	private List<OrderItemInfo> selectedOrderItemInfoList;
 	private JTable orderItemsListTable;
 	private JTable selectedOrderItemsListTable;
+	private JLabel floorId;
+	private JLabel tableId;
+	private JLabel orderId;
+	List<BigDecimal> totals = new ArrayList<>();
+	private boolean isSelectionFlow;
 
 	public PaymentMenu() {
 		paymentService = new PaymentServiceImpl();
-
+		isSelectionFlow = false;
 		leftItemListPanel = new JPanel();
 		leftItemListPanel.setLayout(new BorderLayout());
 		leftItemListPanel.setBounds(50, 220, 250, 300);
 		orderItemsListTable = new JTable(new OrderItemListTableModel(orderItemInfoList)) {
 			@Override
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int col) {
+				//orderItemsListTable.addRowSelectionInterval(row, row);
+				System.out.println("Row : "+row + " Col: "+ col);
 				Component c = super.prepareRenderer(renderer, row, col);
 				Integer payed = (Integer) getValueAt(row, 3);
+				Color color = UIManager.getColor("Table.selectionBackground");
 				System.out.println("Row "+row + " value "+payed);
 				if(payed == 1) {
 					c.setBackground(Color.GREEN);
@@ -54,8 +70,10 @@ public class PaymentMenu  extends Panel{
 				return c;
 			}
 		};
+		//orderItemsListTable.setRowSelectionAllowed(true);
+		//orderItemsListTable.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 
-		orderItemsListTable.setRowHeight(65);
+		orderItemsListTable.setRowHeight(15);
 		if(orderItemsListTable.getColumnModel().getColumnCount() > 0) {
 			orderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 			//hide the item id column
@@ -82,7 +100,7 @@ public class PaymentMenu  extends Panel{
 
 		};
 
-		selectedOrderItemsListTable.setRowHeight(65);
+		selectedOrderItemsListTable.setRowHeight(20);
 		selectedOrderItemsListTable.getColumnModel().getColumn(0).setPreferredWidth(100);
 		//hide the item id column
 		selectedOrderItemsListTable.getColumnModel().getColumn(2).setWidth(0);
@@ -98,22 +116,44 @@ public class PaymentMenu  extends Panel{
 		selectedItemsListPanel.setVisible(true);
 		this.add(selectedItemsListPanel);
 
-	    txtFieldFloor = new JTextField("Floor");
+		floorId = new JLabel("Floor No");
+		floorId.setBounds(50, 5, 150, 30);
+	    txtFieldFloor = new JTextField("Floor No");
 		txtFieldFloor.setBounds(50, 30, 150, 30);
+		this.add(floorId);
 		this.add(txtFieldFloor);
+		txtFieldFloor.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtFieldFloor.setText("");
+			}
+		});
 
-	    txtFieldTableID = new JTextField("Table ID");
-		txtFieldTableID.setBounds(50, 100, 150, 30);
+		tableId = new JLabel("Table No");
+		tableId.setBounds(420, 5, 150, 30);
+	    txtFieldTableID = new JTextField("Table No");
+		txtFieldTableID.setBounds(420, 30, 150, 30);
+		this.add(tableId);
 		this.add(txtFieldTableID);
+		txtFieldTableID.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtFieldTableID.setText("");
+			}
+		});
 
-		txtFieldOrderID = new JTextField("Display(Order)ID");
+		orderId = new JLabel("Order ID");
+		orderId.setBounds(220, 5, 150, 30);
+		txtFieldOrderID = new JTextField("Order ID");
 		txtFieldOrderID.setBounds(220, 30, 150, 30);
+		this.add(orderId);
 		this.add(txtFieldOrderID);
-
-		//Edit Buttons for the floor
-		JButton selectButton1 = new JButton("Select");
-		selectButton1.setBounds(50, 135, 150, 30);
-		this.add(selectButton1);
+		txtFieldOrderID.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				txtFieldOrderID.setText("");
+			}
+		});
 
 		JButton selectButton2 = new JButton("Select");
 		selectButton2.setBounds(220, 65, 150, 30);
@@ -188,13 +228,13 @@ public class PaymentMenu  extends Panel{
 			public void actionPerformed(ActionEvent e) {
 				System.out.println("table rows selected "+selectedOrderItemsListTable.getSelectedRows());
 				processOperation(true);
-				/*int[] selectedRows = selectedOrderItemsListTable.getSelectedRows();
+				int[] selectedRows = selectedOrderItemsListTable.getSelectedRows();
 				for(int i=0; i<selectedRows.length ; i++) {
 					Long selectedOrderItemId = Long.parseLong(selectedOrderItemsListTable.getValueAt(i, 2).toString());
 					System.out.println("selected item id "+selectedOrderItemsListTable.getValueAt(i, 2));
 					//loadSelectedOrderItemTable(selectedOrderItemId);
 					processOperation(true);
-				}*/
+				}
 			}
 		});
 		this.add(removeButton);
@@ -215,10 +255,16 @@ public class PaymentMenu  extends Panel{
 				((OrderItemListTableModel) orderItemsListTable.getModel()).fireTableDataChanged();
 			}
 		});
-		this.add(undoButton);
-
+		//this.add(undoButton);
+		JLabel totalLabel = new JLabel("Total: ");
+		totalAmountField = new JLabel("0");
+		totalAmountField.setBounds(460, 520, 50, 30);
+		totalAmountField.setForeground(Color.RED);
+		totalAmountField.setFont(new Font("", Font.HANGING_BASELINE, 20));
+		totalLabel.setBounds(390, 520, 80, 30);
+		totalLabel.setFont(new Font("", Font.HANGING_BASELINE, 20));
 		JButton payedButton = new JButton("Payed");
-		payedButton.setBounds(480, 530, 80, 30);
+		payedButton.setBounds(560, 520, 80, 30);
 		payedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -234,35 +280,39 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 		this.add(payedButton);
-
-
-		txtFieldTipAmount = new JTextField("Tip Amount");
-		txtFieldTipAmount.setBounds(420, 30, 150, 30);
+		this.add(totalLabel);
+		this.add(totalAmountField);
 		this.add(txtFieldOrderID);
-		JButton addTipButton = new JButton("Add Tip");
-		addTipButton.setBounds(420, 60, 150, 30);
-		addTipButton.addActionListener(new ActionListener() {
+
+		orderItemsListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(Util.isNumeric(txtFieldTipAmount.getText())) {
-					((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).addTip(Double.parseDouble(txtFieldTipAmount.getText()));
-					((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
-				}
+			public void valueChanged(ListSelectionEvent e) {
 			}
 		});
 
-		JButton calcTotalButton = new JButton("Calculate Total");
-		calcTotalButton.setBounds(420, 90, 150, 30);
+		JButton calcTotalButton = new JButton("Select All");
+		calcTotalButton.setBounds(170, 520, 130, 30);
 		calcTotalButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).addTotal();
-				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+				TableModel leftTableModel = orderItemsListTable.getModel();
+				int counter=0;
+				for(int i=leftTableModel.getRowCount(); i> 0; i--) {
+					Long selectedOrderItemId = Long.parseLong(leftTableModel.getValueAt(leftTableModel.getRowCount() - i, 2).toString());
+					BigDecimal price = BigDecimal.valueOf((Double) leftTableModel.getValueAt(leftTableModel.getRowCount() - i, 1));
+					Integer paid = (Integer) leftTableModel.getValueAt(leftTableModel.getRowCount() - i, 3);
+					if(paid != 1) {
+						totals.add(price);
+						OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, false);
+						addItemToTable(orderItemInfo, selectedOrderItemsListTable);
+						removeItemFromTable(orderItemInfo, orderItemsListTable);
+						counter++;
+					}
+				}
+				BigDecimal total = totals.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+				totalAmountField.setText(total.toString());
 			}
 		});
-
-		this.add(txtFieldTipAmount);
-		this.add(addTipButton);
 		this.add(calcTotalButton);
 
 	}
@@ -289,21 +339,33 @@ public class PaymentMenu  extends Panel{
 
 		if(!isRemove) { //add
 			int[] selectedRowIndexes = leftTable.getSelectedRows();
+			TableModel tm = leftTable.getModel();
+			int counter = 0;
 			for(int i=0 ; i<selectedRowIndexes.length; i++) {
-				Long selectedOrderItemId = Long.parseLong(leftTable.getValueAt(selectedRowIndexes[i], 2).toString());
-				OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, isRemove);
-				addItemToTable(orderItemInfo, rightTable);
-				removeItemFromTable(orderItemInfo, leftTable);
+				Long selectedOrderItemId = Long.parseLong(leftTable.getValueAt(selectedRowIndexes[i]-counter, 2).toString());
+				BigDecimal price = BigDecimal.valueOf((Double) tm.getValueAt(selectedRowIndexes[i]-counter, 1));
+				Integer paid = (Integer) leftTable.getValueAt(selectedRowIndexes[i]-counter, 3);
+				if(paid != 1) {
+					totals.add(price);
+					OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, false);
+					addItemToTable(orderItemInfo, selectedOrderItemsListTable);
+					removeItemFromTable(orderItemInfo, orderItemsListTable);
+					counter++;
+				}
 			}
+
 		} else {
 			int[] selectedRowIndexes = rightTable.getSelectedRows();
 			for(int i=0 ; i<selectedRowIndexes.length; i++) {
-				Long selectedOrderItemId = Long.parseLong(rightTable.getValueAt(selectedRowIndexes[i], 2).toString());
+				Long selectedOrderItemId = Long.parseLong(rightTable.getValueAt(selectedRowIndexes[i]-i, 2).toString());
+				totals.remove(selectedRowIndexes[i]-i);
 				OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, isRemove);
 				addItemToTable(orderItemInfo, leftTable);
 				removeItemFromTable(orderItemInfo, rightTable);
 			}
 		}
+		BigDecimal total = totals.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+		totalAmountField.setText(total.toString());
 
 	}
 
@@ -347,6 +409,17 @@ public class PaymentMenu  extends Panel{
 			//orderItemsListTable.setModel(new OrderItemListTableModel(orderItemInfoList)); ** WORKS
 			((OrderItemListTableModel) orderItemsListTable.getModel()).setOrderItemInfoList(orderItemInfoList);
 			((OrderItemListTableModel) orderItemsListTable.getModel()).fireTableDataChanged();
+			int numberOfRows = selectedOrderItemsListTable.getRowCount();
+			if(numberOfRows > 0) {
+				for(int i=numberOfRows; i> 0; i--) {
+					Long selectedOrderItemId = Long.parseLong(selectedOrderItemsListTable.getValueAt(numberOfRows-i, 2).toString());
+					OrderItemInfo orderItemInfo = getSelectedOrderItem(selectedOrderItemId, true);
+					removeItemFromTable(orderItemInfo, selectedOrderItemsListTable);
+				}
+				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+			}
+			totalAmountField.setText("0");
+			totals = new ArrayList<>();
 		}
 	}
 
