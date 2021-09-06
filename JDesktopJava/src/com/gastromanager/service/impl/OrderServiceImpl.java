@@ -29,7 +29,7 @@ public class OrderServiceImpl implements OrderService {
         if(orderItems != null) {
             orderItemArrayList = new ArrayList<>();
             for(OrderItem orderItem: orderItems) {
-                orderItem.setXmlText(XmlUtil.formatOrderText(orderItem));
+                orderItem.setXmlText(XmlUtil.formatOrderTextRecursive(orderItem));
                 OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
                 orderItemArrayList.add(orderItemInfo);
             }
