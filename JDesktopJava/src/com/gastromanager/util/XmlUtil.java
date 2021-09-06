@@ -213,6 +213,26 @@ public class XmlUtil {
 		System.out.println(orderDetailsBuilder.toString());
 		return orderDetailsBuilder.toString().trim();
 	}
+	
+	public static String formatOrderTextRecursive(OrderItem orderItem)
+	{
+		StringBuilder orderDetailsBuilder = new StringBuilder();
+
+		//Main Item
+		Node item = orderItem.getXml().getDocumentElement();
+		if (item.getNodeName() == "item") {
+			orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + "\n");
+			//addOptionOrderInfo(item, orderDetailsBuilder);
+			//Linked items
+			addChildItemInfoRecursive(item.getChildNodes(), orderDetailsBuilder);
+			//addChildItems(item, orderDetailsBuilder);
+			orderDetailsBuilder.append("\n");
+		}
+
+		System.out.println(orderDetailsBuilder.toString());
+		return orderDetailsBuilder.toString().trim();
+		
+	}
 
 	public static String getMainOrderItem(OrderItem orderItem) {
     	String orderItemInfo = formatOrderText(orderItem);
@@ -228,6 +248,21 @@ public class XmlUtil {
 			String childItemName  = child.getNodeName();
 			if(childItemName == "item") {
 				orderDetailsBuilder.append(GastroManagerConstants.FOUR_SPACES + child.getAttributes().getNamedItem("name").getNodeValue());
+				addOptionOrderInfo(child, orderDetailsBuilder);
+				//orderDetailsBuilder.append("\n");
+				if(child.hasChildNodes()) {
+					addChildItemInfo(child.getChildNodes(), orderDetailsBuilder);
+				}
+			}
+		}
+	}
+
+	private static void addChildItemInfoRecursive(NodeList children, StringBuilder orderDetailsBuilder) {
+		for (int childId = 0; childId < children.getLength(); childId++) {
+			Node child = children.item(childId);
+			String childItemName  = child.getNodeName();
+			if(childItemName == "item" || childItemName == "option") {
+				orderDetailsBuilder.append(" " + child.getAttributes().getNamedItem("name").getNodeValue());
 				addOptionOrderInfo(child, orderDetailsBuilder);
 				//orderDetailsBuilder.append("\n");
 				if(child.hasChildNodes()) {
