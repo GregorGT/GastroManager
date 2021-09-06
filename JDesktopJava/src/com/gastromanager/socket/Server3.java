@@ -180,13 +180,13 @@ public class Server3 extends Thread{
                     //send result to client
                     OrderListQuery orderListQuery = (OrderListQuery) clientMessage;
                     oos.writeObject(paymentService.retrieveOrders(orderListQuery));
-                    paymentService = null;
+                  //  paymentService = null;
 
                 } else if(clientMessage instanceof OrderItemTransactionInfo) {
                     //send result to client
                     OrderItemTransactionInfo orderItemTransactionInfo = (OrderItemTransactionInfo) clientMessage;
                     oos.writeObject(paymentService.processTransactionInfo(orderItemTransactionInfo));
-                    paymentService = null;
+                  //  paymentService = null;
 
                 } else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;
