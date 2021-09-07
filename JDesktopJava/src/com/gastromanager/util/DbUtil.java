@@ -204,8 +204,8 @@ public class DbUtil {
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT * from ORDERITEM WHERE" +
-                    " ORDER_ID = '"+ orderId +"'" +
-                    " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
+                    " ORDER_ID = '"+ orderId + "'" + " ORDER BY DATETIME ASC" );
+               //     " AND DATE(DATETIME) = DATE('NOW', 'LOCALTIME')");
             if(queryForPrint) {
                 queryBuilder.append(" AND PRINT_STATUS = 0");
             }
