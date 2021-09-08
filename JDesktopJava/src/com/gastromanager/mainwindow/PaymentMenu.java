@@ -130,9 +130,9 @@ public class PaymentMenu  extends Panel{
 		});
 
 		tableId = new JLabel("Table No");
-		tableId.setBounds(420, 5, 150, 30);
+		tableId.setBounds(220, 5, 150, 30);
 	    txtFieldTableID = new JTextField("Table No");
-		txtFieldTableID.setBounds(420, 30, 150, 30);
+		txtFieldTableID.setBounds(220, 30, 150, 30);
 		this.add(tableId);
 		this.add(txtFieldTableID);
 		txtFieldTableID.addMouseListener(new MouseAdapter() {
@@ -143,9 +143,9 @@ public class PaymentMenu  extends Panel{
 		});
 
 		orderId = new JLabel("Order ID");
-		orderId.setBounds(220, 5, 150, 30);
+		orderId.setBounds(390, 5, 150, 30);
 		txtFieldOrderID = new JTextField("Order ID");
-		txtFieldOrderID.setBounds(220, 30, 150, 30);
+		txtFieldOrderID.setBounds(390, 30, 150, 30);
 		this.add(orderId);
 		this.add(txtFieldOrderID);
 		txtFieldOrderID.addMouseListener(new MouseAdapter() {
@@ -156,7 +156,7 @@ public class PaymentMenu  extends Panel{
 		});
 
 		JButton selectButton2 = new JButton("Select");
-		selectButton2.setBounds(220, 65, 150, 30);
+		selectButton2.setBounds(390, 65, 150, 30);
 		selectButton2.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -165,43 +165,6 @@ public class PaymentMenu  extends Panel{
 		});
 		this.add(selectButton2);
 
-
-		JButton prevButton = new JButton("<<");
-		prevButton.setBounds(50, 60, 70, 30);
-		this.add(prevButton);
-
-		JButton nextButton = new JButton(">>");
-		nextButton.setBounds(130, 60, 70, 30);
-		this.add(nextButton);
-
-		//edit buttons table ID
-		JButton prevButton2 = new JButton("<<");
-		prevButton2.setBounds(50, 165, 70, 30);
-		this.add(prevButton2);
-
-		JButton nextButton2 = new JButton(">>");
-		nextButton2.setBounds(130, 165, 70, 30);
-
-		//Display(order)ID edit buttons
-		JButton prevButton3 = new JButton("<<");
-		prevButton3.setBounds(220, 95, 70, 30);
-		prevButton3.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				loadOrderItems(true, false);
-			}
-		});
-		this.add(prevButton3);
-
-		JButton nextButton3 = new JButton(">>");
-		nextButton3.setBounds(300, 95, 70, 30);
-		nextButton3.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				loadOrderItems(false, true);
-			}
-		});
-		this.add(nextButton3);
 		//main buttons
 		JButton addButton = new JButton("Add");
 		addButton.setBounds(305, 295, 80, 30);
@@ -220,6 +183,9 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 		this.add(addButton);
+
+		JButton calcTotalButton = new JButton("Add All");
+		calcTotalButton.setBounds(305, 400, 80, 30);
 
 		JButton removeButton = new JButton("Remove");
 		removeButton.setBounds(305, 345, 80, 30);
@@ -290,8 +256,7 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 
-		JButton calcTotalButton = new JButton("Select All");
-		calcTotalButton.setBounds(170, 520, 130, 30);
+
 		calcTotalButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
