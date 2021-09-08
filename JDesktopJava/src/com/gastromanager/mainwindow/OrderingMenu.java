@@ -587,7 +587,8 @@ public class OrderingMenu extends JPanel {
 
 	private void recursiveFunctionReadingTheXml() {
 		String file = "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
-//		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/test.xml";
+//		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+
 		final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder;
 		final Document doc;
@@ -754,7 +755,7 @@ public class OrderingMenu extends JPanel {
 
 			labelText += words[0] + "<br/>" + "          ";
 			labelText += spaces6;
-			for (int i = 2; i < words.length; ++i) {
+			for (int i = 1; i < words.length; ++i) {
 				labelText += words[i] + spaces1;
 			}
 			labelText += "</html>";
