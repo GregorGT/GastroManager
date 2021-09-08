@@ -21,7 +21,7 @@ public class PaymentServiceImpl implements PaymentService {
         if(orderItems != null) {
             orderItemInfoList = new ArrayList<>();
             for(OrderItem orderItem: orderItems) {
-                orderItem.setXmlText(XmlUtil.getMainOrderItem(orderItem));
+                orderItem.setXmlText(XmlUtil.formatOrderTextRecursive(orderItem));
                 OrderItemInfo orderItemInfo = new OrderItemInfo(orderItem);
                 orderItemInfoList.add(orderItemInfo);
             }
