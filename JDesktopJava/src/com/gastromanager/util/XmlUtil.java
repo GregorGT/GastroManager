@@ -184,7 +184,8 @@ public class XmlUtil {
 		try {
 			xmlContent = XmlUtil.readFileToString(
 //					"C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-					"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
+//					"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
+            		"C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
 					Charset.defaultCharset());
 			SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
 			menuDetail = parser.parseXml(xmlContent);
@@ -263,10 +264,10 @@ public class XmlUtil {
 			String childItemName  = child.getNodeName();
 			if(childItemName == "item" || childItemName == "option") {
 				orderDetailsBuilder.append(" " + child.getAttributes().getNamedItem("name").getNodeValue());
-				addOptionOrderInfo(child, orderDetailsBuilder);
+				//addOptionOrderInfo(child, orderDetailsBuilder);
 				//orderDetailsBuilder.append("\n");
 				if(child.hasChildNodes()) {
-					addChildItemInfo(child.getChildNodes(), orderDetailsBuilder);
+					addChildItemInfoRecursive(child.getChildNodes(), orderDetailsBuilder);
 				}
 			}
 		}
