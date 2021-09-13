@@ -10,6 +10,9 @@ public interface PaymentService {
 
     List<OrderItemInfo> retrieveOrderItems(OrderDetailQuery orderDetailQuery);
 
+   // List<OrderItemInfo> retrieveOrderItemsRecursiveText(OrderDetailQuery orderDetailQuery);
+    
+    
     List<OrderItemInfo> processTransactionInfo(OrderItemTransactionInfo orderItemTransactionInfo);
 
     void undoPayment(OrderItemInfo orderItemInfo);
