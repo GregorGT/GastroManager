@@ -5,6 +5,8 @@ import com.gastromanager.util.PropertiesUtil;
 import com.gastromanager.util.Util;
 
 import javax.swing.*;
+
+import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.InetAddress;
@@ -25,12 +27,20 @@ public class ServerSocketMenu extends JPanel {
     private JLabel port;
     private JTextField ipAddressTextField;
     private JTextField portTextField;
+    
+    
+    public  static JTextField serverTextField;
+    private JLabel 	   serverLabel;
 
 
 
     public ServerSocketMenu() {
         isServerAlive = false;
+        
+       this.setLayout(new BorderLayout() );
+        
        serverStartStopButton = new JButton("Start Server");
+       serverStartStopButton.setBounds(320, 80, 150, 50);
         serverStartStopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -39,9 +49,10 @@ public class ServerSocketMenu extends JPanel {
         });
 
         serverStatusLabel = new JLabel("Status: ");
+        serverStatusLabel.setBounds(50, 20, 100, 50);
         serverStatusInfoLabel = new JLabel(" Offline ");
+        serverStatusInfoLabel.setBounds(100, 20, 100, 50);
 
-        JButton checkServerStatusButton = new JButton("Check Server Status");
 
         /*checkServerStatusButton.addActionListener(new ActionListener() {
             @Override
@@ -50,8 +61,10 @@ public class ServerSocketMenu extends JPanel {
             }
         });
 */
-        ipAddress = new JLabel("IP:");
+        ipAddress = new JLabel("IP:Port");
+        ipAddress.setBounds(50,80, 100, 50);
         ipAddressTextField = new JTextField();
+        ipAddressTextField.setBounds(100, 80, 100, 50);
         ipAddressTextField.setEditable(false);
         try {
             InetAddress ip = InetAddress.getLocalHost();
@@ -62,9 +75,17 @@ public class ServerSocketMenu extends JPanel {
             e.printStackTrace();
         }
         port = new JLabel("Port:");
+        port.setBounds(150, 80, 100, 50);
         portTextField = new JTextField();
         portTextField.setText(serverSocketPort.toString());
-
+        portTextField.setBounds(200, 80, 100, 50);
+        
+        serverLabel = new JLabel("Server name:");
+        serverTextField	= new JTextField();
+        
+        serverLabel.setBounds(50, 250, 100, 50);
+        serverTextField.setText("Server name");
+        serverTextField.setBounds(150, 250, 100, 50);
 
         this.add(serverStartStopButton);
         //this.add(checkServerStatusButton);
@@ -76,6 +97,11 @@ public class ServerSocketMenu extends JPanel {
 
         this.add(port);
         this.add(portTextField);
+        
+        
+        
+        this.add(serverLabel);
+        this.add(serverTextField);
 
 
     }
