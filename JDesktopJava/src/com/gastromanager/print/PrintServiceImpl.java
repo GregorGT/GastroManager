@@ -1,5 +1,6 @@
 package com.gastromanager.print;
 
+import com.gastromanager.mainwindow.ServerSocketMenu;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
@@ -64,8 +65,9 @@ public class PrintServiceImpl implements PrintService {
             orderDetailsBuilder.append("Floor: " + orderInfo.getFloorId() + "(" + orderInfo.getFloorName()
                     + ")" + "\n");
             orderDetailsBuilder.append("Table: " + orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" + "\n");
-            orderDetailsBuilder.append("Waitress: " + orderInfo.getStaffId() + "("
-                    + orderInfo.getStaffName() + ")" + "\n");
+          //  orderDetailsBuilder.append("Waitress: " + orderInfo.getStaffId() + "("
+          //          + orderInfo.getStaffName() + ")" + "\n");
+            orderDetailsBuilder.append("Server: " + ServerSocketMenu.serverTextField.getText() + "\n");
             orderDetailsBuilder.append("Ordered At: " + orderInfo.getTimestamp() + "\n");
             orderDetailsBuilder.append("*************************\n");
             orderItems.forEach(orderItem -> {
