@@ -6,6 +6,7 @@ public class OrderDetailQuery implements Serializable {
     private String floorId;
     private String tableId;
     private String humanreadableId;
+    private String servername;
 
     public String getFloorId() {
         return floorId;
@@ -30,4 +31,16 @@ public class OrderDetailQuery implements Serializable {
     public void setHumanreadableId(String humanreadableId) {
         this.humanreadableId = humanreadableId;
     }
+    
+    public void setServerName(String servername)
+    {
+    	this.servername = servername;
+    }
+    
+    public String getServerName()
+    {
+    	return this.servername;
+    }
+    
+    
 }
