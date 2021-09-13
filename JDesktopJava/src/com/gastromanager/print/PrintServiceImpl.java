@@ -32,7 +32,7 @@ public class PrintServiceImpl implements PrintService {
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        return executePrint(formatOrderText(orderItems, orderInfo));
+        return executePrint(formatOrderText(orderItems, orderInfo, ""));
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
@@ -41,7 +41,7 @@ public class PrintServiceImpl implements PrintService {
         Boolean isOrderPrinted = false;
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderDetailQuery.getHumanreadableId());
-        isOrderPrinted = executePrint(formatOrderText(orderItems, orderInfo));
+        isOrderPrinted = executePrint(formatOrderText(orderItems, orderInfo, orderDetailQuery.getServerName()));
         if(isOrderPrinted) {
             isOrderPrinted = DbUtil.updatePrintedOrderItems(orderDetailQuery, true);
         }
@@ -49,14 +49,14 @@ public class PrintServiceImpl implements PrintService {
     }
 
     @Override
-    public String getPrintInfo(String orderId) {
+    public String getPrintInfo(String orderId, String servername) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        return formatOrderText(orderItems, orderInfo);
+        return formatOrderText(orderItems, orderInfo, servername);
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
-    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo) {
+    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo, String servername) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
         if(orderInfo != null){
             AtomicReference<Double> total = new AtomicReference<>(new Double(0));
@@ -67,7 +67,11 @@ public class PrintServiceImpl implements PrintService {
             orderDetailsBuilder.append("Table: " + orderInfo.getTableId() + "(" + orderInfo.getTableName() + ")" + "\n");
           //  orderDetailsBuilder.append("Waitress: " + orderInfo.getStaffId() + "("
           //          + orderInfo.getStaffName() + ")" + "\n");
-            orderDetailsBuilder.append("Server: " + ServerSocketMenu.serverTextField.getText() + "\n");
+            if(servername == null || servername.length() == 0)
+            	orderDetailsBuilder.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");
+            else
+            	orderDetailsBuilder.append("Server(app): " + servername + "\n");
+            	
             orderDetailsBuilder.append("Ordered At: " + orderInfo.getTimestamp() + "\n");
             orderDetailsBuilder.append("*************************\n");
             orderItems.forEach(orderItem -> {
