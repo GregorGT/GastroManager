@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.util.Enumeration;
 import java.util.HashSet;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -157,7 +158,8 @@ public class MainWindow extends JFrame {
 		tabbedPane.addTab("Bookings", null,tabBookings, null);
 
 		ServerSocketMenu serverSocketMenu = new ServerSocketMenu();
-		tabbedPane.addTab("Server", null, serverSocketMenu, null);
+		
+		tabbedPane.addTab("Server/Settings", null, serverSocketMenu, null);
 
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		mntmLoad.addActionListener(new ActionListener() {
