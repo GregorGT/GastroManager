@@ -42,7 +42,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -292,9 +295,27 @@ public class PaymentMenu  extends Panel{
 					PrintService printService = new PrintServiceImpl();
 					
 					fileWriter.append("\n");
-					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
+					fileWriter.append("Floor: "+ txtFieldFloor.getText() +"\n");
+					fileWriter.append("Table: "+ txtFieldTableID.getText() +"\n");
+					fileWriter.append("Order: "+ txtFieldOrderID.getText() +"\n");
+					
+					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+					Date date = new Date();
+					//System.out.println();
+					
+					fileWriter.append("Time: " + dateFormat.format(date) + "\n");
+					fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
 					fileWriter.append("\n");
 					fileWriter.append("\n");
+					
+					for(OrderItemInfo orderItemInfo: orderItemInfoList) {
+						
+							String price   = orderItemInfo.getPrice().toString();
+							String xmltext = orderItemInfo.getXmlText();
+							
+							
+					}
+					
 					Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
 					Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
 					Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));

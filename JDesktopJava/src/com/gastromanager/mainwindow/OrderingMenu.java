@@ -586,8 +586,9 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private void recursiveFunctionReadingTheXml() {
-//		String file = "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
-		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+	//	String file = "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
+		String file = "C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
+//		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
 
 		final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder;

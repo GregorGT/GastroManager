@@ -234,6 +234,11 @@ public class XmlUtil {
 		return orderDetailsBuilder.toString().trim();
 		
 	}
+	
+	//public static String formatXMLTextRecursiveIntoName(String xml)
+	//{
+		//Document xmldoc = new Document();
+	//}
 
 	public static String getMainOrderItem(OrderItem orderItem) {
     	String orderItemInfo = formatOrderText(orderItem);
