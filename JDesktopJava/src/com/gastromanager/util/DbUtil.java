@@ -331,7 +331,7 @@ public class DbUtil {
                 orderInfo.setHumanReadableId(result.getString("HUMANREADABLE_ID"));
                 orderInfo.setStaffId(result.getString("STAFF_ID"));
 
-                org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern("YYYY-MM-DD HH:mm:ss");
+                org.joda.time.format.DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd HH:mm:ss");
                 DateTime dt = formatter.parseDateTime(result.getString("DATETIME"));
                 orderInfo.setTimestamp(dt.toString(formatter));
                 orderInfo.setFloorId(result.getString("FLOOR_ID"));
