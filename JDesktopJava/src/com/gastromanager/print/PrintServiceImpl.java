@@ -34,7 +34,7 @@ public class PrintServiceImpl implements PrintService {
     public boolean print(String orderId) {
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        return executePrint(formatOrderText(orderItems, orderInfo, ""));
+        return executePrint(formatOrderText(orderItems, orderInfo, "", 0));
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
@@ -43,7 +43,7 @@ public class PrintServiceImpl implements PrintService {
         Boolean isOrderPrinted = false;
         List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderDetailQuery.getHumanreadableId());
-        isOrderPrinted = executePrint(formatOrderText(orderItems, orderInfo, orderDetailQuery.getServerName()));
+        isOrderPrinted = executePrint(formatOrderText(orderItems, orderInfo, orderDetailQuery.getServerName(), 0));
         if(isOrderPrinted) {
             isOrderPrinted = DbUtil.updatePrintedOrderItems(orderDetailQuery, true);
         }
@@ -51,14 +51,14 @@ public class PrintServiceImpl implements PrintService {
     }
 
     @Override
-    public String getPrintInfo(String orderId, String servername) {
+    public String getPrintInfo(String orderId, String servername, int constant) {
         List<OrderItem> orderItems = DbUtil.getOrderItems(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        return formatOrderText(orderItems, orderInfo, servername);
+        return formatOrderText(orderItems, orderInfo, servername, constant);
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
-    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo, String servername) {
+    private String formatOrderText(List<OrderItem> orderItems, OrderInfo orderInfo, String servername, int constant) {
         StringBuilder orderDetailsBuilder = new StringBuilder();
         if(orderInfo != null){
             AtomicReference<Double> total = new AtomicReference<>(new Double(0));
@@ -82,9 +82,12 @@ public class PrintServiceImpl implements PrintService {
                 //Main Item
                 Node item = xml.getDocumentElement();
                 if (item.getNodeName() == "item") {
-                	orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.FOUR_SPACES + orderItem.getQuantity() + GastroManagerConstants.FOUR_SPACES + orderItem.getPrice()*orderItem.getQuantity() + PropertiesUtil.getPropertyValue("currency") + "\n");
-//                    orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + orderItem.getPrice()*orderItem.getQuantity() + PropertiesUtil.getPropertyValue("currency") + "\n");
-                    //addOptionOrderInfo(item, orderDetailsBuilder);
+                	if (constant == GastroManagerConstants.PRINT_RECEIPT) {
+                		orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getPrice() + PropertiesUtil.getPropertyValue("currency") + "\n");	
+                	} else {
+                		orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
+                	}
+                	//addOptionOrderInfo(item, orderDetailsBuilder);
                     //Linked items
                     addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
                     //addChildItems(item, orderDetailsBuilder);
@@ -92,7 +95,7 @@ public class PrintServiceImpl implements PrintService {
 
                 }
             });
-            //addTotal(total.get(), orderDetailsBuilder);
+//            addTotal(total.get(), orderDetailsBuilder);
         }
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString().trim();

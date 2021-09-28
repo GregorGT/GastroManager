@@ -292,15 +292,17 @@ public class PaymentMenu  extends Panel{
 					PrintService printService = new PrintServiceImpl();
 					
 					fileWriter.append("\n");
-					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "Server name"));
+					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
 					fileWriter.append("\n");
 					fileWriter.append("\n");
-					fileWriter.append("Taxes: " + GastroManagerConstants.FOUR_SPACES+ PropertiesUtil.getPropertyValue("salsetax") + "%\n");
 					Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
 					Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
-					Double finalPrice = totalPrice + (totalPrice * salsetax);
+					Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
+					fileWriter.append("--------------------------------\n");
+					fileWriter.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
+					fileWriter.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
 					fileWriter.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
-					
+					fileWriter.append("--------------------------------\n");
 					
 					BufferedReader bre = new BufferedReader(new FileReader("resources/billingfooter.txt"));
 					try {
