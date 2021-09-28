@@ -223,6 +223,56 @@ public class DbUtil {
 
         return orderItems;
     }
+    
+    public static List<OrderItem> getOrderItems(String orderId, Boolean queryForPrint) {
+        List<OrderItem> orderItems = null;
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT * from ORDERITEM o JOIN ORDERS ord WHERE" +
+                    " ord.humanreadable_id = '"+ orderId + "' AND o.order_id=ord.id" +
+                    " AND DATE(ord.DATETIME) = DATE('NOW', 'LOCALTIME')");
+            if(queryForPrint) {
+                queryBuilder.append(" AND o.PRINT_STATUS = 0");
+            }
+            
+            queryBuilder.append(" ORDER BY o.DATETIME ASC");
+
+            PreparedStatement stmt=connection.prepareStatement(queryBuilder.toString());
+            ResultSet result = stmt.executeQuery();
+            orderItems = loadOrderItems(result);
+            stmt.close();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            orderItems = null;
+        }
+
+        return orderItems;
+    }
+    
+    public static Double getTotalPrice(String id) {
+    	Double price = null;
+        try {
+            Connection connection = DbConnection.getDbConnection().gastroDbConnection;
+            StringBuilder queryBuilder = new StringBuilder();
+            queryBuilder.append("SELECT SUM(o.price) from ORDERITEM o JOIN ORDERS ord WHERE" +
+                    " ord.humanreadable_id = '"+ id + "' AND o.order_id=ord.id" +
+                    " AND DATE(ord.DATETIME) = DATE('NOW', 'LOCALTIME')");
+            queryBuilder.append(" AND o.PRINT_STATUS = 0");
+            
+            queryBuilder.append(" ORDER BY o.DATETIME ASC");
+
+            PreparedStatement stmt=connection.prepareStatement(queryBuilder.toString());
+            ResultSet result = stmt.executeQuery();
+            price = result.getDouble(1);
+            stmt.close();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+            price = null;
+        }
+
+        return price;
+    }
 
     public static Boolean updatePrintedOrderItems(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
         Boolean printStatusUpdated = false;
@@ -438,7 +488,7 @@ public class DbUtil {
         return orderId;
     }
 
-    private static Integer getOrderId(String humanReadableId, String floorId, String tableId) {
+    public static Integer getOrderId(String humanReadableId, String floorId, String tableId) {
         Integer orderId  = null;
         Integer locationId = getLocationId(floorId, tableId);
         if(locationId != null && humanReadableId != null) {

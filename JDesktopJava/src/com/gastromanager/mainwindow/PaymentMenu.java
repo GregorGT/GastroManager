@@ -3,12 +3,20 @@ package com.gastromanager.mainwindow;
 import com.gastromanager.comparator.OrderItemComparator;
 import com.gastromanager.models.Order;
 import com.gastromanager.models.OrderDetailQuery;
+import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItemInfo;
 import com.gastromanager.models.OrderItemTransactionInfo;
+import com.gastromanager.models.TransactionInfo;
+import com.gastromanager.print.PrintService;
+import com.gastromanager.print.PrintServiceImpl;
 import com.gastromanager.service.PaymentService;
 import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.ui.OrderItemListTableModel;
+import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.GastroManagerConstants;
+import com.gastromanager.util.PropertiesUtil;
 import com.gastromanager.util.Util;
+
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -21,9 +29,22 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class PaymentMenu  extends Panel{
 
@@ -46,6 +67,7 @@ public class PaymentMenu  extends Panel{
 	private JLabel orderId;
 	List<BigDecimal> totals = new ArrayList<>();
 	private boolean isSelectionFlow;
+	private DbUtil db;
 
 	public PaymentMenu() {
 		paymentService = new PaymentServiceImpl();
@@ -234,15 +256,71 @@ public class PaymentMenu  extends Panel{
 		payedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println(PropertiesUtil.getPropertyValue("salsetax"));
+
+				
 				OrderItemTransactionInfo orderItemTransactionInfo = null;
 				List<OrderItemInfo> orderItemInfoList = null;
 				orderItemInfoList = ((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList();
 				orderItemTransactionInfo = new OrderItemTransactionInfo();
 				orderItemTransactionInfo.setOrderItemInfo(orderItemInfoList);
 				orderItemTransactionInfo.setAddTransaction(true);
-				paymentService.processTransactionInfo(orderItemTransactionInfo);
+				List<OrderItemInfo> itemList = paymentService.processTransactionInfo(orderItemTransactionInfo);
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList().removeAll(orderItemInfoList);
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
+				
+				
+				File receipt = new File("receipt.txt");
+				try (FileWriter fileWriter = new FileWriter("receipt.txt")) {
+					
+					BufferedReader br = new BufferedReader(new FileReader("resources/billinghead.txt"));
+					try {
+					    StringBuilder sb = new StringBuilder();
+					    String line = br.readLine();
+
+					    while (line != null) {
+					        sb.append(line);
+					        sb.append(System.lineSeparator());
+					        line = br.readLine();
+					    }
+					    String everything = sb.toString();
+					    fileWriter.write(everything);
+					} finally {
+					    br.close();
+					}
+					
+					PrintService printService = new PrintServiceImpl();
+					
+					fileWriter.append("\n");
+					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "Server name"));
+					fileWriter.append("\n");
+					fileWriter.append("\n");
+					fileWriter.append("Taxes: " + GastroManagerConstants.FOUR_SPACES+ PropertiesUtil.getPropertyValue("salsetax") + "%\n");
+					Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
+					Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+					Double finalPrice = totalPrice + (totalPrice * salsetax);
+					fileWriter.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
+					
+					
+					BufferedReader bre = new BufferedReader(new FileReader("resources/billingfooter.txt"));
+					try {
+					    StringBuilder sb = new StringBuilder();
+					    String line = bre.readLine();
+
+					    while (line != null) {
+					        sb.append(line);
+					        sb.append(System.lineSeparator());
+					        line = bre.readLine();
+					    }
+					    String everything = sb.toString();
+					    fileWriter.append(everything);
+					} finally {
+					    bre.close();
+					}
+					
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 			}
 		});
 		this.add(payedButton);

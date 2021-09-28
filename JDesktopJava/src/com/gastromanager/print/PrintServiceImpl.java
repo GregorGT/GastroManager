@@ -6,6 +6,8 @@ import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
+import com.gastromanager.util.PropertiesUtil;
+
 import io.github.escposjava.PrinterService;
 import io.github.escposjava.print.NetworkPrinter;
 import io.github.escposjava.print.Printer;
@@ -50,7 +52,7 @@ public class PrintServiceImpl implements PrintService {
 
     @Override
     public String getPrintInfo(String orderId, String servername) {
-        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderId, true);
+        List<OrderItem> orderItems = DbUtil.getOrderItems(orderId, true);
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
         return formatOrderText(orderItems, orderInfo, servername);
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
@@ -80,7 +82,8 @@ public class PrintServiceImpl implements PrintService {
                 //Main Item
                 Node item = xml.getDocumentElement();
                 if (item.getNodeName() == "item") {
-                    orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + "\n");
+                	orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.FOUR_SPACES + orderItem.getQuantity() + GastroManagerConstants.FOUR_SPACES + orderItem.getPrice()*orderItem.getQuantity() + PropertiesUtil.getPropertyValue("currency") + "\n");
+//                    orderDetailsBuilder.append(item.getAttributes().getNamedItem("name").getNodeValue() + GastroManagerConstants.PRICE_SPACING + orderItem.getQuantity() + orderItem.getPrice()*orderItem.getQuantity() + PropertiesUtil.getPropertyValue("currency") + "\n");
                     //addOptionOrderInfo(item, orderDetailsBuilder);
                     //Linked items
                     addChildItemInfo(item.getChildNodes(), orderDetailsBuilder);
