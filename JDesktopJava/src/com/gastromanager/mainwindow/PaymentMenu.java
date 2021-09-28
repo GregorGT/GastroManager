@@ -295,26 +295,23 @@ public class PaymentMenu  extends Panel{
 					PrintService printService = new PrintServiceImpl();
 					
 					fileWriter.append("\n");
-					fileWriter.append("Floor: "+ txtFieldFloor.getText() +"\n");
-					fileWriter.append("Table: "+ txtFieldTableID.getText() +"\n");
-					fileWriter.append("Order: "+ txtFieldOrderID.getText() +"\n");
+					//fileWriter.append("Floor: "+ txtFieldFloor.getText() +"\n");
+					//fileWriter.append("Table: "+ txtFieldTableID.getText() +"\n");
+					//fileWriter.append("Order: "+ txtFieldOrderID.getText() +"\n");
 					
 					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 					Date date = new Date();
 					//System.out.println();
+					//formatOrderText
+					
 					
 					fileWriter.append("Time: " + dateFormat.format(date) + "\n");
-					fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
+					//fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
 					fileWriter.append("\n");
 					fileWriter.append("\n");
 					
-					for(OrderItemInfo orderItemInfo: orderItemInfoList) {
-						
-							String price   = orderItemInfo.getPrice().toString();
-							String xmltext = orderItemInfo.getXmlText();
-							
-							
-					}
+					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "", GastroManagerConstants.PRINT_RECEIPT));
+					fileWriter.append("\n");
 					
 					Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
 					Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
