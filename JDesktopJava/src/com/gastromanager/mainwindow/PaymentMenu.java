@@ -31,6 +31,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -273,74 +274,40 @@ public class PaymentMenu  extends Panel{
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
 				
 				
-				File receipt = new File("receipt.txt");
-				try (FileWriter fileWriter = new FileWriter("receipt.txt")) {
-					
-					BufferedReader br = new BufferedReader(new FileReader("resources/billinghead.txt"));
-					try {
-					    StringBuilder sb = new StringBuilder();
-					    String line = br.readLine();
-
-					    while (line != null) {
-					        sb.append(line);
-					        sb.append(System.lineSeparator());
-					        line = br.readLine();
-					    }
-					    String everything = sb.toString();
-					    fileWriter.write(everything);
-					} finally {
-					    br.close();
-					}
-					
-					PrintService printService = new PrintServiceImpl();
-					
-					fileWriter.append("\n");
-					//fileWriter.append("Floor: "+ txtFieldFloor.getText() +"\n");
-					//fileWriter.append("Table: "+ txtFieldTableID.getText() +"\n");
-					//fileWriter.append("Order: "+ txtFieldOrderID.getText() +"\n");
-					
-					DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-					Date date = new Date();
-					//System.out.println();
-					//formatOrderText
-					
-					
-					fileWriter.append("Time: " + dateFormat.format(date) + "\n");
-					//fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
-					fileWriter.append("\n");
-					fileWriter.append("\n");
-					
-					fileWriter.append(printService.getPrintInfo(txtFieldOrderID.getText(), "", GastroManagerConstants.PRINT_RECEIPT));
-					fileWriter.append("\n");
-					
-					Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
-					Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
-					Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
-					fileWriter.append("--------------------------------\n");
-					fileWriter.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
-					fileWriter.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
-					fileWriter.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
-					fileWriter.append("--------------------------------\n");
-					
-					BufferedReader bre = new BufferedReader(new FileReader("resources/billingfooter.txt"));
-					try {
-					    StringBuilder sb = new StringBuilder();
-					    String line = bre.readLine();
-
-					    while (line != null) {
-					        sb.append(line);
-					        sb.append(System.lineSeparator());
-					        line = bre.readLine();
-					    }
-					    String everything = sb.toString();
-					    fileWriter.append(everything);
-					} finally {
-					    bre.close();
-					}
-					
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+				StringBuilder bill = new StringBuilder();
+				
+				writeFileToBill("resources/billinghead.txt", bill);
+				
+				PrintServiceImpl printService = new PrintServiceImpl();
+				
+				bill.append("\n");
+				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				Date date = new Date();
+				
+				bill.append("Time: " + dateFormat.format(date) + "\n");
+				//fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
+				bill.append("\n");
+				bill.append("\n");
+				
+				bill.append(printService.getPrintInfo(txtFieldOrderID.getText(), "", GastroManagerConstants.PRINT_RECEIPT));
+				bill.append("\n");
+				
+				Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
+				Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+				Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
+			
+				bill.append("--------------------------------\n");
+				bill.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
+				bill.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
+				bill.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
+				bill.append("--------------------------------\n");
+				
+				writeFileToBill("resources/billingfooter.txt", bill);
+								
+				System.out.println("This is the final bill\n\n\n\n");
+				System.out.println(bill);
+				printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
+				
 			}
 		});
 		this.add(payedButton);
@@ -380,6 +347,24 @@ public class PaymentMenu  extends Panel{
 
 	}
 
+	private void writeFileToBill(String path, StringBuilder bill) {
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(path));
+		    StringBuilder sb = new StringBuilder();
+		    String line = br.readLine();
+
+		    while (line != null) {
+		        sb.append(line);
+		        sb.append(System.lineSeparator());
+		        line = br.readLine();
+		    }
+		    String everything = sb.toString();
+		    bill.append(everything);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	private void addItemToTable(OrderItemInfo orderItemInfo, JTable table) {
 		List<OrderItemInfo> tableItems = ((OrderItemListTableModel) table.getModel()).getOrderItemInfoList();
 		if(tableItems == null) {

@@ -233,10 +233,10 @@ public class PrintServiceImpl implements PrintService {
         return isPrintSuccessful;
     }
 
-    private Boolean executePrintOverNetwork(String text) {
+    public Boolean executePrintOverNetwork(String text, String ip, int port) {
         Boolean isPrintSuccessful = false;
         try {
-            Printer printer = new NetworkPrinter("127.0.0.1", 9100);
+            Printer printer = new NetworkPrinter(ip, port);
             PrinterService printerService = new PrinterService(printer);
 
             printerService.print(text);
