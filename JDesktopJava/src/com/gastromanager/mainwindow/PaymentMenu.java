@@ -7,6 +7,7 @@ import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItemInfo;
 import com.gastromanager.models.OrderItemTransactionInfo;
 import com.gastromanager.models.TransactionInfo;
+import com.gastromanager.print.MainPrintService;
 import com.gastromanager.print.PrintService;
 import com.gastromanager.print.PrintServiceImpl;
 import com.gastromanager.service.PaymentService;
@@ -307,7 +308,8 @@ public class PaymentMenu  extends Panel{
 				System.out.println("This is the final bill\n\n\n\n");
 				System.out.println(bill);
 				printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
-				
+				MainPrintService mainPrintService = new MainPrintService();
+				mainPrintService.printString(PropertiesUtil.getPropertyValue("printer.billing"), bill.toString());
 			}
 		});
 		this.add(payedButton);
