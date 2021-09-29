@@ -307,9 +307,19 @@ public class PaymentMenu  extends Panel{
 								
 				System.out.println("This is the final bill\n\n\n\n");
 				System.out.println(bill);
-				printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
+				try {
+					printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
+				} catch( Exception ex)
+				{
+					System.out.print(ex.toString());
+				}
 				MainPrintService mainPrintService = new MainPrintService();
-				mainPrintService.printString(PropertiesUtil.getPropertyValue("printer.billing"), bill.toString());
+				try {
+					mainPrintService.printString(PropertiesUtil.getPropertyValue("printer.billing"), bill.toString());
+				}catch(Exception ex)
+				{
+					System.out.print(ex.toString());
+				}
 			}
 		});
 		this.add(payedButton);
