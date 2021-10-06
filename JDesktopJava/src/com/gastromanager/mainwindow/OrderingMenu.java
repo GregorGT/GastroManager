@@ -26,7 +26,12 @@ import com.gastromanager.util.Util;
 import org.xml.sax.SAXException;
 
 public class OrderingMenu extends JPanel {
-
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	
 	private JTextField txtFieldTable;
 	private JTextField txtFieldFloor;
 	private JTextField txtFieldOrderID;
@@ -48,8 +53,11 @@ public class OrderingMenu extends JPanel {
 	private MainWindow mainWindow;
 	private SelectedOrderItem selectedOrderItem = new SelectedOrderItem();
 
+	
 	public OrderingMenu(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
+		menuService = new MenuServiceImpl();
+		menuDetail = menuService.loadMenu();
 		recursiveFunctionReadingTheXml();
 
 		try {
@@ -183,8 +191,8 @@ public class OrderingMenu extends JPanel {
 		lblDrillDownOpts.setBounds(406, 27, 120, 14);
 		this.add(lblDrillDownOpts);
 
-		menuService = new MenuServiceImpl();
-		menuDetail = menuService.loadMenu();
+//		menuService = new MenuServiceImpl();
+//		menuDetail = menuService.loadMenu();
 
 		ddChoice = new JComboBox<>();
 		ddChoice.setBounds(406, 50, 120, 20);
@@ -550,38 +558,6 @@ public class OrderingMenu extends JPanel {
 			}
 		} else {
 			System.out.println("Order Id is required");
-		}
-	}
-
-	private void parseXmlFromQuery(List<Map.Entry<String, Integer>> queryResults) {
-		queryResults.forEach((item) -> {
-			Document doc = convertStringToDocument(item.getKey());
-			for (int i = 0; i < item.getValue(); ++i) {
-				documentCons(doc.getFirstChild());
-			}
-		});
-	}
-
-	private static Document convertStringToDocument(String xmlStr) {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder builder;
-		try
-		{
-			builder = factory.newDocumentBuilder();
-			Document doc = builder.parse(new InputSource(new StringReader(xmlStr)));
-			return doc;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	private void documentCons(Node node) {
-		if (node.getNodeName().contains("#"))
-			return;
-//		listModel.addElement(node);
-		while (node.getNextSibling() != null) {
-			documentCons(node.getNextSibling());
 		}
 	}
 

@@ -22,14 +22,14 @@ public class MenuServiceImpl implements MenuService {
             SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
             menuDetail = parser.parseXml(xmlContent);
             System.out.println("Drill down menu types available count " +menuDetail.getDrillDownMenus().getDrillDownMenuTypes().size());
-
+            
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return menuDetail;
     }
-
+    
     public void loadQuickMenuMap(MenuDetail menuDetail) {
         Menu menu = menuDetail.getMenu();
         Stack<DrillDownMenuItemDetail> drillDownMenuItemDetailStack = null;

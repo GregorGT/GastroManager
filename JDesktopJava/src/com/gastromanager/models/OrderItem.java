@@ -18,8 +18,9 @@ public class OrderItem implements Serializable {
     private LocalDateTime dateTime;
     private Integer status;
     private Order order;
+    private String printer;
 
-    public Integer getOrderId() {
+	public Integer getOrderId() {
         return orderId;
     }
 
@@ -115,4 +116,11 @@ public class OrderItem implements Serializable {
         this.order = order;
     }
 
+    public String getPrinter() {
+		return printer;
+	}
+
+	public void setPrinter(String printer) {
+		this.printer = printer;
+	}
 }

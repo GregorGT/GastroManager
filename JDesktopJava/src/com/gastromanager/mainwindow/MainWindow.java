@@ -68,6 +68,7 @@ public class MainWindow extends JFrame {
 				try {
 					MainWindow frame =
 							new MainWindow();
+					frame.setTitle("Main Window");
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

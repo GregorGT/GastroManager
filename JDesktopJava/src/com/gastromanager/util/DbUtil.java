@@ -4,7 +4,13 @@ import com.gastromanager.db.DbConnection;
 import com.gastromanager.models.*;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -12,8 +18,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+
 public class DbUtil {
 
+   private static String printer = "";
+
+	
     public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
     	List<OrderItem> orderItems = null;
@@ -632,6 +646,11 @@ public class DbUtil {
 
                     orderItem.setDateTime(LocalDateTime.parse(result.getString("datetime"),
                             DATE_TME_FORMATTER));
+                    printer = "";
+                    findPrinterOfItem(orderItem.getItemId());
+                    orderItem.setPrinter(printer);
+                    printer = "";
+                    
                     orderItems.add(orderItem);
                 }
                 if (orderItems == null) {
@@ -646,7 +665,50 @@ public class DbUtil {
 
         return orderItems;
     }
+    
+ 
+    private static void findPrinterOfItem(Long id) {
+    
+    	String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+    	
+    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+    	DocumentBuilder db;
+		try {
+			db = dbf.newDocumentBuilder();
+			Document doc = db.parse(file);
+			findPrinter(doc, doc.getDocumentElement(), id);
+		} catch (ParserConfigurationException | SAXException | IOException e) {
+			e.printStackTrace();
+		}
 
+    }
+    
+    private static void findPrinter(Document doc, Element el, Long id) {
+    	NodeList nl = el.getChildNodes();
+    	
+    	for (int i = 0; i < nl.getLength(); ++i) {
+    		Node node = (Node) nl.item(i);
+    		if (node.getNodeType() == Node.ELEMENT_NODE) {
+    			
+				if (node.getAttributes().getNamedItem("uuid") != null) {
+					if (node.getAttributes().getNamedItem("uuid").getNodeValue().equals(String.valueOf(id))) {
+	    				Node parent = (Node) node.getParentNode();
+	    				while (parent.getAttributes().getNamedItem("printer") == null) {
+	    					parent = (Node) parent.getParentNode();
+	    				}
+	    				if (parent.getAttributes().getNamedItem("printer") != null) {
+	    					printer = parent.getAttributes().getNamedItem("printer").getNodeValue();
+	    					return;
+	    				}
+    				}
+    			}
+    		
+				findPrinter(doc, (Element) node, id);
+    		}
+    	}    	
+    
+    }
+    
     public static Boolean removeOrderItem(OrderItemInfo orderItemInfo) {
         Boolean isItemRemoved = false;
         try {

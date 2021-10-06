@@ -63,7 +63,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public Boolean signOffOrder(SignOffOrderInfo signOffOrderInfo) {
         PrintService printService = new PrintServiceImpl();
-        return printService.print(signOffOrderInfo.getOrderDetailQuery());
+        return printService.printToSelectedPrinter(signOffOrderInfo.getOrderDetailQuery());
     }
 
     @Override
@@ -124,7 +124,6 @@ public class OrderServiceImpl implements OrderService {
         String xmlString = sw.toString();
         System.out.println("xml "+xmlString);
         return xmlString;
-
     }
 
     private Item createItem(SelectedOrderItem item, DrillDownMenuItemDetail itemDetail,  OrderPrice orderPrice,

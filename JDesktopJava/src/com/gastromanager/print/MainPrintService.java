@@ -34,7 +34,7 @@ public class MainPrintService implements Printable {
         return PAGE_EXISTS;
     }
 
-    public void printString(String printerName, String text) {
+    public boolean printString(String printerName, String text) {
 
         // find the printService of name printerName
         DocFlavor flavor = DocFlavor.BYTE_ARRAY.AUTOSENSE;
@@ -59,11 +59,11 @@ public class MainPrintService implements Printable {
 
 
             job.print(doc, null);
-
+            return true;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
-
     }
 
     public void printBytes(String printerName, byte[] bytes) {

@@ -26,7 +26,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class PrintServiceImpl implements PrintService {
@@ -38,6 +41,54 @@ public class PrintServiceImpl implements PrintService {
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
+    public Boolean printToSelectedPrinter(OrderDetailQuery orderDetailQuery) {
+        Boolean isFullOrderPrinted = false;
+        List<OrderItem> orderItems = DbUtil.getOrderDetails(orderDetailQuery, true);
+        OrderInfo orderInfo = DbUtil.getOrderInfo(orderDetailQuery.getHumanreadableId());
+        
+
+        Map<String, List<OrderItem>> groupedOrderItems = groupOrderItemsByPrinter(orderItems);
+        
+        MainPrintService mainPrintService = new MainPrintService();
+        int allItems = 0;
+        for (Map.Entry<String, List<OrderItem>> kv : groupedOrderItems.entrySet()) {
+        	if (mainPrintService.printString(kv.getKey(), formatOrderText(kv.getValue(), orderInfo, orderDetailQuery.getServerName(), 0))) {
+        		allItems++;
+        	}
+        	
+        }
+        
+        if (allItems == groupedOrderItems.size()) {
+        	isFullOrderPrinted = true;
+        }
+        
+        if(isFullOrderPrinted) {
+            isFullOrderPrinted = DbUtil.updatePrintedOrderItems(orderDetailQuery, true);
+        }
+        return isFullOrderPrinted;    	
+    }
+    
+    private Map<String, List<OrderItem>> groupOrderItemsByPrinter(List<OrderItem> orderItems) {
+    	Map<String, List<OrderItem>> items = new HashMap<>();
+    			
+    	for (OrderItem i : orderItems) {
+    		boolean inserted = false;
+    		for (Map.Entry<String, List<OrderItem>> kv : items.entrySet()) {
+    			if (kv.getKey().equals(i.getPrinter())) {
+    				kv.getValue().add(i);
+    				inserted = true;
+    			}
+    		}
+    		if (!inserted) {
+    			ArrayList<OrderItem> a = new ArrayList<>();
+    			a.add(i);
+    			items.put(i.getPrinter(), a);
+    		}
+    	}
+    	
+    	return items;
+    }
+    
     @Override
     public Boolean print(OrderDetailQuery orderDetailQuery) {
         Boolean isOrderPrinted = false;
