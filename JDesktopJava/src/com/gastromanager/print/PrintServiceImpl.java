@@ -52,10 +52,13 @@ public class PrintServiceImpl implements PrintService {
         MainPrintService mainPrintService = new MainPrintService();
         int allItems = 0;
         for (Map.Entry<String, List<OrderItem>> kv : groupedOrderItems.entrySet()) {
-        	if (mainPrintService.printString(kv.getKey(), formatOrderText(kv.getValue(), orderInfo, orderDetailQuery.getServerName(), 0))) {
+        	try {
+				executePrintOverNetwork(formatOrderText(kv.getValue(), orderInfo, orderDetailQuery.getServerName(), 0), PropertiesUtil.getPropertyValue("printer.ip." + kv.getKey()), Integer.parseInt(PropertiesUtil.getPropertyValue("printer.port."+kv.getKey())));
+				mainPrintService.printString(PropertiesUtil.getPropertyValue("printer."+kv.getKey()), formatOrderText(kv.getValue(), orderInfo, orderDetailQuery.getServerName(), 0));
         		allItems++;
-        	}
-        	
+			} catch (Exception ex) {
+				System.out.print(ex.toString());
+			}
         }
         
         if (allItems == groupedOrderItems.size()) {
