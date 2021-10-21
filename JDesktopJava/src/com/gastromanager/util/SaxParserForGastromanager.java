@@ -48,16 +48,16 @@ public class SaxParserForGastromanager {
     }
 
     public static void main(String[] args) {
-        try {
-            SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
-            MenuDetail menuDetailInfo = null;
-
-            menuDetailInfo = parser.parseXml(XmlUtil.readFileToString("C:\\Users\\Admin\\AndroidStudioProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-                    Charset.defaultCharset()));
-            System.out.println(menuDetailInfo);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
+//            MenuDetail menuDetailInfo = null;
+//
+//            menuDetailInfo = parser.parseXml(XmlUtil.readFileToString("C:\\Users\\Admin\\AndroidStudioProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+//                    Charset.defaultCharset()));
+//            System.out.println(menuDetailInfo);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         /*try {
             SAXParserFactory factory = SAXParserFactory.newInstance();

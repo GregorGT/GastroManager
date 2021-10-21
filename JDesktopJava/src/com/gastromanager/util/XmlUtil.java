@@ -129,11 +129,6 @@ public class XmlUtil {
     }
 
     public static String writeTreeIntoString(GMTreeItem treeItem) {
-    	
-    	if (treeItem.getXmlName().equals("layout")) {
-    		int c=0;
-    	}
-    	
         String result = "";  
         List<GMTreeItem> children = treeItem.children;
 
@@ -181,17 +176,21 @@ public class XmlUtil {
     public MenuDetail getMenuDetail() {
 		String xmlContent = null;
 		MenuDetail menuDetail = null;
-		try {
-			xmlContent = XmlUtil.readFileToString(
-//					"C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-//					"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
-            		"C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-					Charset.defaultCharset());
+//		try {
+			 PublicVariables publicVariables = PublicVariables.getInstance();
+		        
+		       xmlContent = XmlUtil.writeTreeIntoString(publicVariables.getTree());
+		        
+//			xmlContent = XmlUtil.readFileToString(
+////					"C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+////					"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
+//            		"C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
+//					Charset.defaultCharset());
 			SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
 			menuDetail = parser.parseXml(xmlContent);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 
 		return menuDetail;
 	}

@@ -270,56 +270,57 @@ public class PaymentMenu  extends Panel{
 				orderItemTransactionInfo = new OrderItemTransactionInfo();
 				orderItemTransactionInfo.setOrderItemInfo(orderItemInfoList);
 				orderItemTransactionInfo.setAddTransaction(true);
+				orderItemTransactionInfo.setOrderId(txtFieldOrderID.getText());
 				List<OrderItemInfo> itemList = paymentService.processTransactionInfo(orderItemTransactionInfo);
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).getOrderItemInfoList().removeAll(orderItemInfoList);
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
 				
 				
-				StringBuilder bill = new StringBuilder();
-				
-				writeFileToBill("resources/billinghead.txt", bill);
-				
-				PrintServiceImpl printService = new PrintServiceImpl();
-				
-				bill.append("\n");
-				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-				Date date = new Date();
-				
-				bill.append("Time: " + dateFormat.format(date) + "\n");
-				//fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
-				bill.append("\n");
-				bill.append("\n");
-				
-				bill.append(printService.getPrintInfo(txtFieldOrderID.getText(), "", GastroManagerConstants.PRINT_RECEIPT));
-				bill.append("\n");
-				
-				Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
-				Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
-				Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
-			
-				bill.append("--------------------------------\n");
-				bill.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
-				bill.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
-				bill.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
-				bill.append("--------------------------------\n");
-				
-				writeFileToBill("resources/billingfooter.txt", bill);
-								
-				System.out.println("This is the final bill\n\n\n\n");
-				System.out.println(bill);
-				try {
-					printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
-				} catch( Exception ex)
-				{
-					System.out.print(ex.toString());
-				}
-				MainPrintService mainPrintService = new MainPrintService();
-				try {
-					mainPrintService.printString(PropertiesUtil.getPropertyValue("printer.billing"), bill.toString());
-				}catch(Exception ex)
-				{
-					System.out.print(ex.toString());
-				}
+//				StringBuilder bill = new StringBuilder();
+//				
+//				writeFileToBill("resources/billinghead.txt", bill);
+//				
+//				PrintServiceImpl printService = new PrintServiceImpl();
+//				
+//				bill.append("\n");
+//				DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//				Date date = new Date();
+//				
+//				bill.append("Time: " + dateFormat.format(date) + "\n");
+//				//fileWriter.append("Server(terminal): " + ServerSocketMenu.serverTextField.getText() + "\n");//printService.getPrintInfo(txtFieldOrderID.getText(), "Server name", GastroManagerConstants.PRINT_RECEIPT));
+//				bill.append("\n");
+//				bill.append("\n");
+//				
+//				bill.append(printService.getPrintInfo(txtFieldOrderID.getText(), "", GastroManagerConstants.PRINT_RECEIPT));
+//				bill.append("\n");
+//				
+//				Double totalPrice = db.getTotalPrice(txtFieldOrderID.getText());
+//				Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+//				Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
+//			
+//				bill.append("--------------------------------\n");
+//				bill.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
+//				bill.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
+//				bill.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
+//				bill.append("--------------------------------\n");
+//				
+//				writeFileToBill("resources/billingfooter.txt", bill);
+//								
+//				System.out.println("This is the final bill\n\n\n\n");
+//				System.out.println(bill);
+//				try {
+//					printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
+//				} catch( Exception ex)
+//				{
+//					System.out.print(ex.toString());
+//				}
+//				MainPrintService mainPrintService = new MainPrintService();
+//				try {
+//					mainPrintService.printString(PropertiesUtil.getPropertyValue("printer.billing"), bill.toString());
+//				}catch(Exception ex)
+//				{
+//					System.out.print(ex.toString());
+//				}
 			}
 		});
 		this.add(payedButton);

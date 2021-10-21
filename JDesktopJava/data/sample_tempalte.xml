@@ -1,99 +1,84 @@
 <root>
-
-	<!-- menues node-->
-	<menues>
-		<item name="Pizza" uuid="1976266538" printer="kitchen">
-			<item name="topping" name_en="topping">	
-				<option id="toppingammount" name="few" price="0.5" />
-				<option id="toppingammount" name="more" price="0.8" />
-				<option id="toppingammount" name="lots" price="1.2" />
-				<item name="margarita" menu_id="100" uuid="35652837">
-					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="100a" />
-					<option id="size" name="medium" overwrite_price="5.8" menu_id="100b" uuid="1284887162" />
-					<option id="size" name="large" 	price="1.2" menu_id="100c" uuid="12841245" />
-				</item>
-
-				<item name="pepperoni" menu_id="101" uuid="356152837">
-					<option id="size"  name="small" overwrite_price="5.5" uuid="3462565" menu_id="101a" />
-					<option id="size" name="medium" overwrite_price="5.8" menu_id="101b" uuid="1284887162" />
-					<option id="size" name="large" 	price="1.2" menu_id="101c" uuid="29383823" />
-				</item>
-				 
-			</item>
-		</item>
-		<item name="Pasta" uuid="19762674635" printer="kitchen">
-			<item name="Capellini" menu_id="110" uuid="39198183113">
-				<option id="size"  name="small" overwrite_price="5.5" uuid="3462565213" menu_id="110a" />
-				<option id="size" name="medium" overwrite_price="5.8" menu_id="110b" uuid="3462562144"/>
-				<option id="size" name="large" 	price="1.2" menu_id="110c" uuid="346256785" />
-			</item>
-			<item name="Mostaccioli" menu_id="120" uuid="39198183423">
-				<option id="size"  name="small" overwrite_price="5.5" uuid="3412515213" menu_id="120a" />
-				<option id="size" name="medium" overwrite_price="5.8" menu_id="120b" uuid="346123244" />
-				<option id="size" name="large" 	price="1.2" menu_id="120c" uuid="3412512344"/>
-			</item>
-		</item>	
-		<item name="sushi" printer="kitchen" uuid="1231414234">
-			<item name="maki" uuid="21231232">
-				<item name="2 rolls" price="4" uuid="1294231241" menu_id="130a" ></item>
-				<item name="4 rolls" price="6" uuid="12942311" menu_id="130b"></item>
-				<item name="6 rolls" price="8" uuid="12942" menu_id="130c"></item>
-			</item>
-			<item name="nigiri" uuid="2123123322">
-				<option name="2 rolls" id="rollcount"  price="4" uuid="12943231"  menu_id="131a"></option>
-				<option name="4 rolls" id="rollcount"  price="6" uuid="129489971" menu_id="131b"></option>
-				<option name="6 rolls" id="rollcount"  price="8" uuid="12123211" menu_id="131c"></option>
-			</item>
-		</item>
-		<item name="Salad" printer="kitchen" uuid="1244225331">
-			<item name="Chicken breast salad" price="6" uuid="129122941" menu_id="140" ></item>
-			<item name="Chicken breast salad - extra chicken" price="2" uuid="129122949" menu_id="140a" ></item>
-			<item name="Turkey breast salad" price="6" uuid="423424" menu_id="141" ></item>
-			<item name="Turkey breast salad - extra chicken" price="2" uuid="54532343" menu_id="141a" ></item>
-		</item>
-		<item name="Drink" name_en="drink" printer="bar" uuid="381123886124">
-				<ingridients name="sugar,water"/>
-				<item name="Coca Cola" name_en="Coce" menu_id="10" uuid="124453434">
-					<option id="size" name="small" name_de="klein" overwrite_price="2.0" menu_id="10a" uuid="124451231" />
-					<option id="size" name="medium" name_de="mittel" overwrite_price="2.25" menu_id="10b" uuid="12444224"/>
-					<option id="size" name="large" name_de="gross" overwrite_price="2.5" menu_id="10c" uuid="4983776" />
-				</item>
-				<item name="Fanta" displayname_en="Fanta" price="0.5" menu_id="11" uuid="391283113"/>
-				
-		</item>
-	</menues>
-	<layout>
-	</layout>
-	<drilldownmenus>
-		<drilldownmenu name="Main screens" width="700" height="600">
-			<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" y-position="304" height="100" target="1976266538"> 
-			</button>
-			<button name="Drink" width="200" x-position="9" id="5357360846491103059" y-position="196" height="100" target="381123886124">
-			</button>
-			<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" y-position="89" height="100" target="19762674635">
-			</button>
-		</drilldownmenu>
-		
-		<drilldownmenu name="Tablets" width="900" height="700">
-			<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" y-position="20" height="100" target="19762674635"/>
-			<button name="Drink" width="200" x-position="332" id="7998995850391924247" y-position="20" height="100" target="381123886124"/>
-			<button name="Pizza" width="200" x-position="688" id="7860246180633986788" y-position="20" height="100" target="1976266538"/>
-		</drilldownmenu>
-		
-		<drilldownmenu name="Android Tablet" height="800" width="400">
-				<button name="Pizza" target="1976266538" x-position="50" y-position="50" height="50" width="100"/>
-				<button name="Pasta" target="19762674635" x-position="50" y-position="150" height="50" width="100"/>
-				<button name="Drink" target="381123886124" x-position="50" y-position="250" height="50" width="100"/>
-				<button name="Sushi" target="1231414234" x-position="50" y-position="350" height="50" width="100"/>
-				<button name="Salad" target="1244225331" x-position="50" y-position="450" height="50" width="100"/>
-				<button name="Fanta" target="391283113" x-position="150" y-position="450" height="50" width="100"/>
-				
-		</drilldownmenu>
-	</drilldownmenus>
-	
-	<settings>
-		<language>en</language>
-	</settings>
-	
-
-</root>
+<menues>
+<item printer="kitchen" name="Pizza" uuid="1976266538">
+<item name="topping" uuid="-6877985942040561727" name_en="topping">
+<option price="0.5" name="few" id="toppingammount" uuid="-6050374134752635303"/>
+<option price="0.8" name="more" id="toppingammount" uuid="3550299839834473965"/>
+<option price="1.2" name="lots" id="toppingammount" uuid="-445934611107198810"/>
+<item name="margarita" uuid="35652837" menu_id="100">
+<option name="small" id="size" overwrite_price="5.5" uuid="3462565" menu_id="100a"/>
+<option name="medium" id="size" overwrite_price="5.8" uuid="1284887162" menu_id="100b"/>
+<option price="1.2" name="large" id="size" uuid="12841245" menu_id="100c"/>
+</item> 
+<item name="pepperoni" uuid="356152837" menu_id="101">
+<option name="small" id="size" overwrite_price="5.5" uuid="3462565" menu_id="101a"/>
+<option name="medium" id="size" overwrite_price="5.8" uuid="1284887162" menu_id="101b"/>
+<option price="1.2" name="large" id="size" uuid="29383823" menu_id="101c"/>
+</item> 
+</item> 
+</item> 
+<item printer="kitchen" name="Pasta" uuid="19762674635">
+<item name="Capellini" uuid="39198183113" menu_id="110">
+<option name="small" id="size" overwrite_price="5.5" uuid="3462565213" menu_id="110a"/>
+<option name="medium" id="size" overwrite_price="5.8" uuid="3462562144" menu_id="110b"/>
+<option price="1.2" name="large" id="size" uuid="346256785" menu_id="110c"/>
+</item> 
+<item name="Mostaccioli" uuid="39198183423" menu_id="120">
+<option name="small" id="size" overwrite_price="5.5" uuid="3412515213" menu_id="120a"/>
+<option name="medium" id="size" overwrite_price="5.8" uuid="346123244" menu_id="120b"/>
+<option price="1.2" name="large" id="size" uuid="3412512344" menu_id="120c"/>
+</item> 
+</item> 
+<item printer="kitchen" name="sushi" uuid="1231414234">
+<item name="maki" uuid="21231232">
+<item price="4" name="2 rolls" uuid="1294231241" menu_id="130a"/>
+<item price="6" name="4 rolls" uuid="12942311" menu_id="130b"/>
+<item price="8" name="6 rolls" uuid="12942" menu_id="130c"/>
+</item> 
+<item name="nigiri" uuid="2123123322">
+<option price="4" name="2 rolls" id="rollcount" uuid="12943231" menu_id="131a"/>
+<option price="6" name="4 rolls" id="rollcount" uuid="129489971" menu_id="131b"/>
+<option price="8" name="6 rolls" id="rollcount" uuid="12123211" menu_id="131c"/>
+</item> 
+</item> 
+<item printer="kitchen" name="Salad" uuid="1244225331">
+<item price="6" name="Chicken breast salad" uuid="129122941" menu_id="140"/>
+<item price="2" name="Chicken breast salad - extra chicken" uuid="129122949" menu_id="140a"/>
+<item price="6" name="Turkey breast salad" uuid="423424" menu_id="141"/>
+<item price="2" name="Turkey breast salad - extra chicken" uuid="54532343" menu_id="141a"/>
+</item> 
+<item printer="bar" name="Drink" uuid="381123886124" name_en="drink">
+<ingridients name="sugar,water" uuid="-1295479558564967691"/>
+<item name="Coca Cola" uuid="124453434" menu_id="10" name_en="Coce">
+<option name_de="klein" name="small" id="size" overwrite_price="2.0" uuid="124451231" menu_id="10a"/>
+<option name_de="mittel" name="medium" id="size" overwrite_price="2.25" uuid="12444224" menu_id="10b"/>
+<option name_de="gross" name="large" id="size" overwrite_price="2.5" uuid="4983776" menu_id="10c"/>
+</item> 
+<item price="0.5" name="Fanta" displayname_en="Fanta" uuid="391283113" menu_id="11"/>
+</item> 
+</menues> 
+<layout/>
+<drilldownmenus>
+<drilldownmenu name="Main screens" width="700" uuid="-4829199423986838146" height="600">
+<button name="Pizza" width="200" x-position="14" id="-5505883469043557828" uuid="-9187495955763240109" y-position="304" height="100" target="1976266538"/> 
+<button name="Drink" width="200" x-position="9" id="5357360846491103059" uuid="-5385036452360080196" y-position="196" height="100" target="381123886124"/> 
+<button name="Pasta" width="200" x-position="11" id="-2588972898365060236" uuid="2649042489231467020" y-position="89" height="100" target="19762674635"/> 
+</drilldownmenu> 
+<drilldownmenu name="Tablets" width="900" uuid="-7455405253332854858" height="700">
+<button name="Pasta" width="200" x-position="10" id="-7141392327822557486" uuid="8717750432045154467" y-position="20" height="100" target="19762674635"/> 
+<button name="Drink" width="200" x-position="332" id="7998995850391924247" uuid="8762023762682923000" y-position="20" height="100" target="381123886124"/> 
+<button name="Pizza" width="200" x-position="688" id="7860246180633986788" uuid="-2211429254650880083" y-position="20" height="100" target="1976266538"/> 
+</drilldownmenu> 
+<drilldownmenu name="Android Tablet" width="400" uuid="-5265225099582883913" height="800">
+<button name="Pizza" width="100" x-position="50" uuid="6020224281649201013" y-position="50" height="50" target="1976266538"/> 
+<button name="Pasta" width="100" x-position="50" uuid="653965612576798292" y-position="150" height="50" target="19762674635"/> 
+<button name="Drink" width="100" x-position="50" uuid="959927107321752512" y-position="250" height="50" target="381123886124"/> 
+<button name="Sushi" width="100" x-position="50" uuid="-1735617499366841670" y-position="350" height="50" target="1231414234"/> 
+<button name="Salad" width="100" x-position="50" uuid="7635049292839888252" y-position="450" height="50" target="1244225331"/> 
+<button name="Fanta" width="100" x-position="150" uuid="1370702789105573655" y-position="450" height="50" target="391283113"/> 
+</drilldownmenu> 
+</drilldownmenus> 
+<settings>
+<language/>
+</settings> 
+</root> 

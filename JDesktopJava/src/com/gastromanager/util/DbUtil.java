@@ -8,9 +8,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -669,13 +671,18 @@ public class DbUtil {
  
     private static void findPrinterOfItem(Long id) {
     
-    	String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+//    	String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
+    	PublicVariables publicVariables = PublicVariables.getInstance();
+      
+    	String file = XmlUtil.writeTreeIntoString(publicVariables.getTree());
+      
     	
     	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     	DocumentBuilder db;
 		try {
 			db = dbf.newDocumentBuilder();
-			Document doc = db.parse(file);
+			InputSource is = new InputSource(new StringReader(file));
+			Document doc = db.parse(is);
 			findPrinter(doc, doc.getDocumentElement(), id);
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			e.printStackTrace();

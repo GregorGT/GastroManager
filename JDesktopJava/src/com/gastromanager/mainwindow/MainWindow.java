@@ -38,6 +38,8 @@ import javax.swing.tree.DefaultTreeModel;
 
 import org.w3c.dom.Document;
 
+import com.gastromanager.util.PropertiesUtil;
+import com.gastromanager.util.PublicVariables;
 import com.gastromanager.util.XmlUtil;
 import com.sun.star.xforms.Model;
 
@@ -58,7 +60,9 @@ public class MainWindow extends JFrame {
 	public XmlUtil xmlUtil;
 	private Document doc;
 	private String openedFile;
-
+	private LayoutMenu tabLayout;
+	
+	
 	/**
 	 * Launch the application.
 	 */
@@ -128,7 +132,7 @@ public class MainWindow extends JFrame {
 		defaultModel = (DefaultTreeModel) tree.getModel();
 
 
-		LayoutMenu tabLayout = new LayoutMenu(this);
+		tabLayout = new LayoutMenu(this);
 		tabbedPane.addTab("Layout", null, tabLayout, null);
 		tabLayout.setLayout(new FlowLayout());
 		tree.setLayoutMenu(tabLayout);
@@ -181,14 +185,20 @@ public class MainWindow extends JFrame {
 					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
 					tree.init(tree, drillDownMenu, root);
 					tree.loaded = true;
+					PublicVariables publicVariables = PublicVariables.getInstance();
+					publicVariables.setTree(root);
+					PropertiesUtil.setAndSavePropertyValue("xml_file", openedFile);
 					tabLayout.setIsFileLoaded(true);
-
+					tabOrdering.fileHasChanged();
+					
 				} catch (Exception e1) {
 					e1.printStackTrace();
 				}
 			}
 		});
 		mnFileMenu.add(mntmLoad);
+		
+		autoLoadPreviousFile();
 
 		JMenuItem mntmNewMenuItem = new JMenuItem("Save");
 		mntmNewMenuItem.addActionListener(new ActionListener() {
@@ -204,8 +214,25 @@ public class MainWindow extends JFrame {
 
 				String newString = xmlUtil.writeTreeIntoString(root);
 
-				File saveFile = new File("C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml");
-//				File saveFile = new File(openedFile);
+				String autoFile = PropertiesUtil.getPropertyValue("xml_file");
+				File saveFile = null;
+				
+				if (!autoFile.isEmpty() && autoFile != null) {
+					saveFile = new File(autoFile);
+				} else if (!openedFile.isEmpty() && openedFile != null) {
+					saveFile = new File(openedFile);
+				} else {
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setDialogTitle("Specify a file to save");   
+					 
+					int userSelection = fileChooser.showSaveDialog(contentPane);
+					 
+					if (userSelection == JFileChooser.APPROVE_OPTION) {
+					    saveFile = fileChooser.getSelectedFile();
+					    System.out.println("Save as file: " + saveFile.getAbsolutePath());
+					}
+				}
+				
 				try {
 					FileWriter fileWriter = new FileWriter(saveFile);
 					fileWriter.write(newString);
@@ -219,26 +246,49 @@ public class MainWindow extends JFrame {
 		});
 		mnFileMenu.add(mntmNewMenuItem);
 
-		JButton btnDebugLoadFile = new JButton("Load File (Debug)");
-		btnDebugLoadFile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				Document doc;
-				String fstr;
-				try {
-					fstr = xmlUtil.readFileToString("C:\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
-					doc = xmlUtil.loadXMLFromString(fstr);
-					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
-					tree.init(tree, drillDownMenu, root);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (Exception e1) {
-					e1.printStackTrace();
-				}
-			}
-		});
-		menuBar.add(btnDebugLoadFile);
+//		JButton btnDebugLoadFile = new JButton("Load File (Debug)");
+//		btnDebugLoadFile.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				Document doc;
+//				String fstr;
+//				try {
+//					fstr = xmlUtil.readFileToString("C:\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
+//					doc = xmlUtil.loadXMLFromString(fstr);
+//					xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
+//					tree.init(tree, drillDownMenu, root);
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				} catch (Exception e1) {
+//					e1.printStackTrace();
+//				}
+//			}
+//		});
+//		menuBar.add(btnDebugLoadFile);
 	}
 
+	private void autoLoadPreviousFile() {
+		openedFile = PropertiesUtil.getPropertyValue("xml_file");
+		
+		if (openedFile.isEmpty() || openedFile == null) {
+			return;
+		}
+		
+		
+		try {
+			String fstr = xmlUtil.readFileToString(openedFile, Charset.defaultCharset());
+			doc = xmlUtil.loadXMLFromString(fstr);
+			xmlUtil.parseXmlDocument(doc, root, newMElement);//, tabOrdering);
+			tree.init(tree, drillDownMenu, root);
+			tree.loaded = true;
+			PublicVariables publicVariables = PublicVariables.getInstance();
+			publicVariables.setTree(root);
+			tabLayout.setIsFileLoaded(true);
+			tabOrdering.fileHasChanged();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+	}
+	
 	private static void addPopup(Component component, final JPopupMenu popup) {
 		component.addMouseListener(new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {

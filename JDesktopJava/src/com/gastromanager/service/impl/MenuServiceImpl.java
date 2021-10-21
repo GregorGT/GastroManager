@@ -1,7 +1,9 @@
 package com.gastromanager.service.impl;
 
+import com.gastromanager.mainwindow.MainWindow;
 import com.gastromanager.models.*;
 import com.gastromanager.service.MenuService;
+import com.gastromanager.util.PublicVariables;
 import com.gastromanager.util.SaxParserForGastromanager;
 import com.gastromanager.util.XmlUtil;
 
@@ -11,21 +13,20 @@ import java.util.*;
 
 public class MenuServiceImpl implements MenuService {
 
+	private MainWindow mainWindow;
+	
     public MenuDetail loadMenu() {
         MenuDetail menuDetail = null;
-        try {
-            String xmlContent = XmlUtil.readFileToString(
-//                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-//            		"C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml",
-            		"/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml",
-                    Charset.defaultCharset());
-            SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
-            menuDetail = parser.parseXml(xmlContent);
-            System.out.println("Drill down menu types available count " +menuDetail.getDrillDownMenus().getDrillDownMenuTypes().size());
+
+        PublicVariables publicVariables = PublicVariables.getInstance();
+        
+        String xmlContent = XmlUtil.writeTreeIntoString(publicVariables.getTree());
+        
+        SaxParserForGastromanager parser = SaxParserForGastromanager.getInstance();
+        menuDetail = parser.parseXml(xmlContent);
+        System.out.println("Drill down menu types available count " +menuDetail.getDrillDownMenus().getDrillDownMenuTypes().size());
             
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+       
 
         return menuDetail;
     }

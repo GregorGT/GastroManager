@@ -1,5 +1,6 @@
 package com.gastromanager.socket;
 
+import com.gastromanager.util.PublicVariables;
 import com.gastromanager.util.XmlUtil;
 
 import java.io.BufferedInputStream;
@@ -40,8 +41,11 @@ public class Client {
 
     public void sendXMLData(String xmlContent, DataOutputStream out) {
         try {
-            xmlContent = XmlUtil.readFileToString(
-                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
+        	
+        	PublicVariables publicVariables = PublicVariables.getInstance();
+        	xmlContent = XmlUtil.writeTreeIntoString(publicVariables.getTree());
+//            xmlContent = XmlUtil.readFileToString(
+//                    "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\DesktopJava\\data\\sample_tempalte.xml", Charset.defaultCharset());
             //System.out.println(xmlContent);
             out.writeUTF(xmlContent);
         } catch (IOException e) {

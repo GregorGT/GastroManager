@@ -1,6 +1,8 @@
 package com.gastromanager.util;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -53,6 +55,16 @@ public class PropertiesUtil {
             e.printStackTrace();
         }
     }
+    
+    public static void setAndSavePropertyValue(String propertyKey, String newPropertyValue) {
+    	setPropertyValue(propertyKey, newPropertyValue);
+    	try {
+			properties.store(new FileOutputStream("resources/gastromanager.properties"), null);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} 
+    }
+    
     
     
     public static String getOsName()

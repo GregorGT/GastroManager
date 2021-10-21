@@ -17,12 +17,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import com.gastromanager.models.*;
 import com.gastromanager.service.impl.OrderServiceImpl;
 import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.PublicVariables;
+
 import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 import com.gastromanager.db.DbConnection;
 import com.gastromanager.service.impl.MenuServiceImpl;
 import com.gastromanager.util.Util;
+import com.gastromanager.util.XmlUtil;
+
 import org.xml.sax.SAXException;
 
 public class OrderingMenu extends JPanel {
@@ -52,14 +56,13 @@ public class OrderingMenu extends JPanel {
 	private Map<String, SelectedOrderItem> menuUuidMap = new HashMap<>();
 	private MainWindow mainWindow;
 	private SelectedOrderItem selectedOrderItem = new SelectedOrderItem();
-
+	private List<DrillDownMenuType> ddMenus = null;
 	
 	public OrderingMenu(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		menuService = new MenuServiceImpl();
-		menuDetail = menuService.loadMenu();
-		recursiveFunctionReadingTheXml();
 
+	
 		try {
 			connection = DbConnection.getDbConnection().gastroDbConnection;
 		} catch (Exception e) {
@@ -196,9 +199,14 @@ public class OrderingMenu extends JPanel {
 
 		ddChoice = new JComboBox<>();
 		ddChoice.setBounds(406, 50, 120, 20);
-		List<DrillDownMenuType> ddMenus = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
-		ddMenus.forEach(i -> ddChoice.addItem(i.getName()));
+
+		if (menuDetail != null) {
+			ddMenus = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
+			ddMenus.forEach(i -> ddChoice.addItem(i.getName()));	
+		}
 		this.add(ddChoice);
+		
+		
 
 		tfMenuID = new JTextField();
 		tfMenuID.setBounds(406, 102, 120, 20);
@@ -298,6 +306,7 @@ public class OrderingMenu extends JPanel {
 			}
 		});
 
+		
 		ddChoice.addActionListener( e -> {
 			List<DrillDownMenuType> menuTypeList = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
 			for (DrillDownMenuType menuType : menuTypeList) {
@@ -307,8 +316,11 @@ public class OrderingMenu extends JPanel {
 				}
 			}
 		});
-		loadMenuItems(ddMenus.get(0));
-
+		
+		if (ddMenus != null) {
+			loadMenuItems(ddMenus.get(0));
+		}
+		
 		list.addMouseListener( new MouseAdapter() {
 			public void mousePressed(MouseEvent e) {
 				if ( SwingUtilities.isLeftMouseButton(e) ) {
@@ -483,7 +495,7 @@ public class OrderingMenu extends JPanel {
 		for (Map.Entry<String, SelectedOrderItem> i : menuIdMap.entrySet()) {
 			if (i.getKey().equals(menuId)) {
 
-				if (!checkIfItemIsReadyForSelection(i.getValue())) {
+				if (checkIfItemIsReadyForSelection(i.getValue())) {
 					OrderServiceImpl orderService = new OrderServiceImpl();
 					orderService.setMenuDetail(menuDetail);
 					i.getValue().setOrderId(txtFieldOrderID.getText().trim());
@@ -510,7 +522,10 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private Boolean checkIfItemIsReadyForSelection(SelectedOrderItem s) {
-		return (s.getSubItems() != null && s.getSubItems().size() == 1 && s.getSubItems().get(0).getAllOptions() == null);
+		return (s.getSubItems() != null && s.getSubItems().size() == 1 
+				&& 
+			   (s.getSubItems().get(0).getAllOptions() != null || s.getSubItems().get(0).getSubItems() != null)
+		);
 	}
 
 	private void showToList() {
@@ -562,16 +577,17 @@ public class OrderingMenu extends JPanel {
 	}
 
 	private void recursiveFunctionReadingTheXml() {
-	//	String file = "C:\\Users\\Admin\\IdeaProjects\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
-//		String file = "C:\\workspace\\RestaurantePoint\\GastroManager\\JDesktopJava\\data\\sample_tempalte.xml";
-		String file = "/home/panagiotis/repos/GastroManager/JDesktopJava/data/sample_tempalte.xml";
-
+		
+		PublicVariables publicVariables = PublicVariables.getInstance();
+		String file = XmlUtil.writeTreeIntoString(publicVariables.getTree());
+		
 		final DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
 		final DocumentBuilder docBuilder;
 		final Document doc;
 		try {
 			docBuilder = dbfac.newDocumentBuilder();
-			doc = docBuilder.parse(file);
+			InputSource is = new InputSource(new StringReader(file));
+			doc = docBuilder.parse(is);
 			buildMenuIdMap(doc, doc.getDocumentElement());
 			buildMenuUuidMap(doc, doc.getDocumentElement());
 		} catch (ParserConfigurationException | IOException | SAXException e) {
@@ -656,9 +672,15 @@ public class OrderingMenu extends JPanel {
 					Node cur = n;
 					Stack<Node> stack = new Stack<>();
 					stack.push(cur);
+			
 					while (!cur.getNodeName().equals("menues")) {
+						if (cur.getParentNode() == null ) {
+							break;
+						}
 						cur = cur.getParentNode();
-						stack.push(cur);
+						stack.push(cur);	
+//						System.out.println(cur);
+//						System.out.println(cur.getNodeName());
 					}
 
 					if (stack.size() == 0) {
@@ -667,6 +689,9 @@ public class OrderingMenu extends JPanel {
 
 					stack.pop();
 					Node nodeItem = stack.pop();
+					if (nodeItem.getAttributes().getNamedItem("name") == null) {
+						break;
+					}
 					s.setItemName(nodeItem.getAttributes().getNamedItem("name").getNodeValue());
 
 					if (nodeItem.getAttributes().getNamedItem("uuid") != null) {
@@ -707,7 +732,19 @@ public class OrderingMenu extends JPanel {
 			}
 		}
 	}
-
+	
+	public void fileHasChanged() {
+		menuDetail = menuService.loadMenu();
+		recursiveFunctionReadingTheXml();	
+		if (menuDetail != null) {
+			ddMenus = menuDetail.getDrillDownMenus().getDrillDownMenuTypes();
+			ddMenus.forEach(i -> ddChoice.addItem(i.getName()));	
+		}
+		if (ddMenus != null) {
+			loadMenuItems(ddMenus.get(0));
+		}
+	}
+	
 	private class ListItemStyler extends DefaultListCellRenderer {
 
 		@Override
@@ -738,5 +775,18 @@ public class OrderingMenu extends JPanel {
 			labelText += "</html>";
 			return labelText;
 		}
+	}
+	
+	private class BackgroundCheckFileChanges implements Runnable {
+
+		PublicVariables publicVariables = PublicVariables.getInstance();
+		
+		@Override
+		public void run() {
+			while (true) {
+				
+			}
+		}
+		
 	}
 }
