@@ -1,6 +1,7 @@
 package com.gastromanager.mainwindow;
 
 import com.gastromanager.socket.Server3;
+import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.PropertiesUtil;
 import com.gastromanager.util.Util;
 
@@ -31,6 +32,9 @@ public class ServerSocketMenu extends JPanel {
     
     public  static JTextField serverTextField;
     private JLabel 	   serverLabel;
+    
+    private JButton resetHumanReadableId;
+    private JLabel resetHumanReadableIdLabel;
 
 
 
@@ -87,6 +91,18 @@ public class ServerSocketMenu extends JPanel {
         serverTextField.setText("Server name");
         serverTextField.setBounds(150, 250, 100, 50);
 
+        resetHumanReadableIdLabel = new JLabel("Reset human readable ID");
+        resetHumanReadableIdLabel.setBounds(400, 250, 200, 50);
+        
+        resetHumanReadableId = new JButton("Reset");
+        resetHumanReadableId.setBounds(440, 300, 100, 50);
+        resetHumanReadableId.addActionListener(l -> {
+        	DbUtil.setReset(true);
+        });
+
+        this.add(resetHumanReadableId);        
+        this.add(resetHumanReadableIdLabel);        
+
         this.add(serverStartStopButton);
         //this.add(checkServerStatusButton);
         this.add(serverStatusLabel);
@@ -102,7 +118,6 @@ public class ServerSocketMenu extends JPanel {
         
         this.add(serverLabel);
         this.add(serverTextField);
-
 
     }
 

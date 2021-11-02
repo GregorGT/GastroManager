@@ -49,12 +49,12 @@ public class PaymentServiceImpl implements PaymentService {
         } else { //remove transaction
             DbUtil.removeTransactionInfo(orderItemInfo, transactionInfo);
         }
-        printBill(orderItemTransactionInfo.getOrderId());
+        printBill(orderItemTransactionInfo);
         return translateToOrderItemInfo(DbUtil.getOrderDetails(orderItemInfo.get(0).getOrderId().toString(), false));
     }
 
-    public void printBill(String orderId) {
-    	StringBuilder bill = constructBill(orderId);
+    public void printBill(OrderItemTransactionInfo orderItemTransactionInfo) {
+    	StringBuilder bill = constructBill(orderItemTransactionInfo.getOrderId(), orderItemTransactionInfo.getServerName());
     	PrintServiceImpl printService = new PrintServiceImpl();
 		try {
 			printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
@@ -72,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
     
     
-    private StringBuilder constructBill(String orderId) {
+    private StringBuilder constructBill(String orderId, String serverName) {
     	StringBuilder bill = new StringBuilder();
 		
 		writeFileToBill("resources/billinghead.txt", bill);
@@ -88,7 +88,7 @@ public class PaymentServiceImpl implements PaymentService {
 		bill.append("\n");
 		bill.append("\n");
 		
-		bill.append(printService.getPrintInfo(orderId, "", GastroManagerConstants.PRINT_RECEIPT));
+		bill.append(printService.getPrintInfo(orderId, serverName, GastroManagerConstants.PRINT_RECEIPT));
 		bill.append("\n");
 		
 		Double totalPrice = DbUtil.getTotalPrice(orderId);

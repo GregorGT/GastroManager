@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 public class DbUtil {
 
    private static String printer = "";
-
+   private static boolean resetHumanReadableId = false;
 	
     public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
@@ -741,11 +741,17 @@ public class DbUtil {
     }
 
     public static Integer getNewHumanReadableOrderId() {
+    	if (resetHumanReadableId) {
+    		resetHumanReadableId = false;
+    		return 1;
+    	}
+    	
         Integer nextOrderId = null;
         try {
-            String query = "SELECT HUMANREADABLE_ID AS MAX_ID, MAX(DATETIME) FROM ORDERS "
-                    + "WHERE  DATE(DATETIME)  = DATE('NOW', 'LOCALTIME') "
-                    +"ORDER BY DATETIME DESC";
+            String query = "SELECT HUMANREADABLE_ID AS MAX_ID "
+            		+ "FROM ORDERS "
+            		+ "ORDER BY DATETIME DESC "
+            		+ "LIMIT 1";
 
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -848,6 +854,10 @@ public class DbUtil {
         }
 
         return nextOrderItemId;
+    }
+    
+    public static void setReset(boolean value) {
+    	resetHumanReadableId = value;
     }
 
     public static void main(String[] args) {
