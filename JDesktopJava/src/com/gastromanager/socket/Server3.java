@@ -9,6 +9,7 @@ import com.gastromanager.service.impl.MenuServiceImpl;
 import com.gastromanager.service.impl.OrderServiceImpl;
 import com.gastromanager.service.impl.PaymentServiceImpl;
 import com.gastromanager.util.DbUtil;
+import com.gastromanager.util.PropertiesUtil;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -188,7 +189,17 @@ public class Server3 extends Thread{
                     oos.writeObject(paymentService.processTransactionInfo(orderItemTransactionInfo));
                   //  paymentService = null;
 
-                } else if(clientMessage instanceof String) {
+                } else if(clientMessage instanceof PaymentInformationQuery)
+                {
+                    PaymentInformationQuery piq = (PaymentInformationQuery) clientMessage;
+                    
+                    piq.setCurrency( PropertiesUtil.getPropertyValue("currency") );
+                    piq.setTaxes( Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax")) );
+                    
+                    oos.writeObject(piq);
+                	
+                }
+                else if(clientMessage instanceof String) {
                     String request = (String) clientMessage;
                     System.out.println("Received request for " + request);
 
