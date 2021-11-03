@@ -7,12 +7,15 @@ import com.gastromanager.service.PaymentService;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
 import com.gastromanager.util.PropertiesUtil;
+import com.gastromanager.util.Util;
 import com.gastromanager.util.XmlUtil;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.RoundingMode;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -90,14 +93,21 @@ public class PaymentServiceImpl implements PaymentService {
 		
 		bill.append(printService.getPrintInfo(orderId, serverName, GastroManagerConstants.PRINT_RECEIPT));
 		bill.append("\n");
+	
 		
 		Double totalPrice = DbUtil.getTotalPrice(orderId);
 		Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
-		Double finalPrice = totalPrice + (totalPrice * (salsetax / 100));
+		
+		double tmpvalue = (totalPrice * (salsetax / 100));
+		tmpvalue = Util.roundDouble(tmpvalue, 2);
+		double taxes = tmpvalue;
+				
+		Double finalPrice = totalPrice + taxes;
+		
 	
 		bill.append("--------------------------------\n");
 		bill.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
-		bill.append("Taxes: " + GastroManagerConstants.FOUR_SPACES + PropertiesUtil.getPropertyValue("salsetax") + "%\n");
+		bill.append("Taxes("+ PropertiesUtil.getPropertyValue("salsetax") +"%):" + GastroManagerConstants.FOUR_SPACES + taxes + PropertiesUtil.getPropertyValue("currency") + "\n");
 		bill.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
 		bill.append("--------------------------------\n");
 		
