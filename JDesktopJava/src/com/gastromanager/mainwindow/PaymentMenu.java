@@ -60,7 +60,10 @@ public class PaymentMenu  extends Panel{
 	private JTextField txtFieldTableID;
 	private JTextField txtFieldOrderID;
 	private JTextField txtFieldTipAmount;
-	private JLabel totalAmountField;
+	private JLabel subtotalAmountField;
+	private JLabel taxesAmountField;
+	private JLabel ltotalAmountField;
+	
 	private PaymentService paymentService;
 	private List<Order> orderList;
 	private List<OrderItemInfo> orderItemInfoList;
@@ -249,13 +252,32 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 		//this.add(undoButton);
+		JLabel subtotalLabel = new JLabel("SubTotal: ");
+		JLabel taxesLabel = new JLabel("Taxes("+PropertiesUtil.getPropertyValue("salsetax")+"%): ");
 		JLabel totalLabel = new JLabel("Total: ");
-		totalAmountField = new JLabel("0");
-		totalAmountField.setBounds(460, 520, 50, 30);
-		totalAmountField.setForeground(Color.RED);
-		totalAmountField.setFont(new Font("", Font.HANGING_BASELINE, 20));
-		totalLabel.setBounds(390, 520, 80, 30);
-		totalLabel.setFont(new Font("", Font.HANGING_BASELINE, 20));
+		subtotalAmountField = new JLabel("0");
+		subtotalAmountField.setBounds(480, 520, 50, 30);
+		subtotalAmountField.setForeground(Color.RED);
+		subtotalAmountField.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		taxesAmountField = new JLabel("0");
+		taxesAmountField.setBounds(480, 540, 50, 30);
+		taxesAmountField.setForeground(Color.RED);
+		taxesAmountField.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		ltotalAmountField = new JLabel("0");
+		ltotalAmountField.setBounds(480, 560, 50, 30);
+		ltotalAmountField.setForeground(Color.RED);
+		ltotalAmountField.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		
+		
+		subtotalLabel.setBounds(390, 520, 80, 30);
+		subtotalLabel.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		taxesLabel.setBounds(390, 540, 80, 30);
+		taxesLabel.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		totalLabel.setBounds(390, 560, 80, 30);
+		totalLabel.setFont(new Font("", Font.HANGING_BASELINE, 12));
+		
+		
+		
 		JButton payedButton = new JButton("Payed");
 		payedButton.setBounds(560, 520, 80, 30);
 		payedButton.addActionListener(new ActionListener() {
@@ -324,8 +346,13 @@ public class PaymentMenu  extends Panel{
 			}
 		});
 		this.add(payedButton);
+		this.add(subtotalLabel);
+		this.add(taxesLabel);
 		this.add(totalLabel);
-		this.add(totalAmountField);
+		this.add(subtotalAmountField);
+		this.add(taxesAmountField);
+		this.add(ltotalAmountField);
+		
 		this.add(txtFieldOrderID);
 
 		orderItemsListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -353,11 +380,34 @@ public class PaymentMenu  extends Panel{
 					}
 				}
 				BigDecimal total = totals.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-				totalAmountField.setText(total.toString());
+				subtotalAmountField.setText(total.toString());
+				updateTaxesAndTotalAmount();
+				
+				
+				/// here comes the code
 			}
 		});
 		this.add(calcTotalButton);
 
+	}
+	
+	private void updateTaxesAndTotalAmount()
+	{
+		double total = Double.parseDouble(subtotalAmountField.getText());
+		
+		Double totalPrice = total;
+		Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+		
+		double tmpvalue = (totalPrice * (salsetax / 100));
+		tmpvalue = Util.roundDouble(tmpvalue, 2);
+		double taxes = tmpvalue;
+				
+		Double finalPrice = totalPrice + taxes;
+		finalPrice = Util.roundDouble(finalPrice, 2);
+		
+		taxesAmountField.setText(String.valueOf(taxes));
+		ltotalAmountField.setText(String.valueOf(finalPrice));
+		
 	}
 
 	private void writeFileToBill(String path, StringBuilder bill) {
@@ -426,8 +476,8 @@ public class PaymentMenu  extends Panel{
 			}
 		}
 		BigDecimal total = totals.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
-		totalAmountField.setText(total.toString());
-
+		subtotalAmountField.setText(total.toString());
+		updateTaxesAndTotalAmount();
 	}
 
 	private OrderItemInfo getSelectedOrderItem(Long itemId, Boolean isRemove) {
@@ -479,7 +529,7 @@ public class PaymentMenu  extends Panel{
 				}
 				((OrderItemListTableModel) selectedOrderItemsListTable.getModel()).fireTableDataChanged();
 			}
-			totalAmountField.setText("0");
+			subtotalAmountField.setText("0");
 			totals = new ArrayList<>();
 		}
 	}
