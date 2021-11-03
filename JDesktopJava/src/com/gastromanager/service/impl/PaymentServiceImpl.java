@@ -103,12 +103,13 @@ public class PaymentServiceImpl implements PaymentService {
 		double taxes = tmpvalue;
 				
 		Double finalPrice = totalPrice + taxes;
+		finalPrice = Util.roundDouble(finalPrice, 2);
 		
 	
 		bill.append("--------------------------------\n");
-		bill.append("SubTotal: " + GastroManagerConstants.FOUR_SPACES + totalPrice +"\n");
+		bill.append("SubTotal:  " + GastroManagerConstants.FOUR_SPACES + totalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
 		bill.append("Taxes("+ PropertiesUtil.getPropertyValue("salsetax") +"%):" + GastroManagerConstants.FOUR_SPACES + taxes + PropertiesUtil.getPropertyValue("currency") + "\n");
-		bill.append("Total: " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
+		bill.append("Total:     " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
 		bill.append("--------------------------------\n");
 		
 		writeFileToBill("resources/billingfooter.txt", bill);
