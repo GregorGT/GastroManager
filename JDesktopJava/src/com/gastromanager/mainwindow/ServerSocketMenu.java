@@ -35,6 +35,7 @@ public class ServerSocketMenu extends JPanel {
     
     private JButton resetHumanReadableId;
     private JLabel resetHumanReadableIdLabel;
+    private JLabel lastResetTime;
 
 
 
@@ -96,10 +97,21 @@ public class ServerSocketMenu extends JPanel {
         
         resetHumanReadableId = new JButton("Reset");
         resetHumanReadableId.setBounds(440, 300, 100, 50);
+        
+        
+        lastResetTime = new JLabel("Last modified time");
+        lastResetTime.setBounds(350, 350, 400, 50);
+        lastResetTime.setText("Last modified time: " + PropertiesUtil.getPropertyValue("lastReset"));
+        
         resetHumanReadableId.addActionListener(l -> {
         	DbUtil.resetHumanReadableId();
+        	lastResetTime.setText("Last modified time: " + PropertiesUtil.getPropertyValue("lastReset"));	
         });
-
+        
+        
+        
+        
+        this.add(lastResetTime);
         this.add(resetHumanReadableId);        
         this.add(resetHumanReadableIdLabel);        
 
