@@ -85,7 +85,7 @@ public class Server {
 
                 if (isNumeric(request)) {
                     //send result to client
-                    String response = new PrintServiceImpl().getPrintInfo(request, "", 0);
+                    String response = new PrintServiceImpl().getPrintInfo(request, "", null, 0);
                     dos.writeUTF(response);
                 } else {
                     if (request.equals("menu")) {

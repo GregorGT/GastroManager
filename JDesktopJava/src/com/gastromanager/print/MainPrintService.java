@@ -112,7 +112,7 @@ public class MainPrintService implements Printable {
         System.out.println(printerService.getPrinters());
 
         //print some stuff
-        printerService.printString("POS-58-Series", printService.getPrintInfo("1", "", 0));
+        printerService.printString("POS-58-Series", printService.getPrintInfo("1", "", null, 0));
 
         // cut that paper!
         byte[] cutP = new byte[] { 0x1d, 'V', 1 };

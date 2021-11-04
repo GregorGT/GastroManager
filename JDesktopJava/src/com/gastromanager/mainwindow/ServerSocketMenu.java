@@ -97,7 +97,7 @@ public class ServerSocketMenu extends JPanel {
         resetHumanReadableId = new JButton("Reset");
         resetHumanReadableId.setBounds(440, 300, 100, 50);
         resetHumanReadableId.addActionListener(l -> {
-        	DbUtil.setReset(true);
+        	DbUtil.resetHumanReadableId();
         });
 
         this.add(resetHumanReadableId);        

@@ -4,9 +4,11 @@ import com.gastromanager.mainwindow.ServerSocketMenu;
 import com.gastromanager.models.OrderDetailQuery;
 import com.gastromanager.models.OrderInfo;
 import com.gastromanager.models.OrderItem;
+import com.gastromanager.models.OrderItemInfo;
 import com.gastromanager.util.DbUtil;
 import com.gastromanager.util.GastroManagerConstants;
 import com.gastromanager.util.PropertiesUtil;
+import com.gastromanager.util.Util;
 
 import io.github.escposjava.PrinterService;
 import io.github.escposjava.print.NetworkPrinter;
@@ -105,10 +107,27 @@ public class PrintServiceImpl implements PrintService {
     }
 
     @Override
-    public String getPrintInfo(String orderId, String servername, int constant) {
+    public String getPrintInfo(String orderId, String servername, List<OrderItemInfo> selectedOrderItems, int constant) {
         List<OrderItem> orderItems = DbUtil.getOrderItems(orderId, true);
+        
+        List<OrderItem> finalItems = new ArrayList<>();
+        
+        if (selectedOrderItems != null) {
+	        
+	        for (OrderItemInfo o : selectedOrderItems) {
+		        for (OrderItem or : orderItems) {
+		    		if (or.getItemId().equals(o.getItemId())) {
+		    			finalItems.add(or);
+		    			break;
+		    		}
+		    	}
+	        }
+        } else {
+        	finalItems = orderItems;
+        }
+        
         OrderInfo orderInfo = DbUtil.getOrderInfo(orderId);
-        return formatOrderText(orderItems, orderInfo, servername, constant);
+        return formatOrderText(finalItems, orderInfo, servername, constant);
         //return executePrintOverNetwork(formatOrderText(orderItems, orderInfo));
     }
 
@@ -149,16 +168,28 @@ public class PrintServiceImpl implements PrintService {
 
                 }
             });
-//            addTotal(total.get(), orderDetailsBuilder);
+            addTotal(total.get(), orderDetailsBuilder);
         }
         System.out.println(orderDetailsBuilder.toString());
         return orderDetailsBuilder.toString().trim();
     }
 
     private void addTotal(double total, StringBuilder orderDetailsBuilder) {
-        orderDetailsBuilder.append("------------------------------------\n");
-        orderDetailsBuilder.append("Total:"+GastroManagerConstants.PRICE_SPACING + total  +"\n");
-        orderDetailsBuilder.append("------------------------------------");
+    	Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+		
+    	double tmpvalue = (total * (salsetax / 100));
+		tmpvalue = Util.roundDouble(tmpvalue, 2);
+		double taxes = tmpvalue;
+				
+		Double finalPrice = total + taxes;
+		finalPrice = Util.roundDouble(finalPrice, 2);
+		
+	
+		orderDetailsBuilder.append("--------------------------------\n");
+		orderDetailsBuilder.append("SubTotal:  " + GastroManagerConstants.FOUR_SPACES + total+ PropertiesUtil.getPropertyValue("currency") + "\n");
+		orderDetailsBuilder.append("Taxes("+ PropertiesUtil.getPropertyValue("salsetax") +"%):" + GastroManagerConstants.FOUR_SPACES + taxes + PropertiesUtil.getPropertyValue("currency") + "\n");
+		orderDetailsBuilder.append("Total:     " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
+		orderDetailsBuilder.append("--------------------------------\n");
     }
 
     private void addChildItemInfo(NodeList children, StringBuilder orderDetailsBuilder) {

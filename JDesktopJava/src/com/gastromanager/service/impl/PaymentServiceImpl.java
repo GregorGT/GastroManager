@@ -57,7 +57,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     public void printBill(OrderItemTransactionInfo orderItemTransactionInfo) {
-    	StringBuilder bill = constructBill(orderItemTransactionInfo.getOrderId(), orderItemTransactionInfo.getServerName());
+    	StringBuilder bill = constructBill(orderItemTransactionInfo);
     	PrintServiceImpl printService = new PrintServiceImpl();
 		try {
 			printService.executePrintOverNetwork(bill.toString(), PropertiesUtil.getPropertyValue("networkPrinter.ip.billing"), Integer.parseInt(PropertiesUtil.getPropertyValue("networkPrinter.port.billing")));
@@ -75,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
     
     
-    private StringBuilder constructBill(String orderId, String serverName) {
+    private StringBuilder constructBill(OrderItemTransactionInfo orderItemTransactionInfo) {
     	StringBuilder bill = new StringBuilder();
 		
 		writeFileToBill("resources/billinghead.txt", bill);
@@ -91,26 +91,8 @@ public class PaymentServiceImpl implements PaymentService {
 		bill.append("\n");
 		bill.append("\n");
 		
-		bill.append(printService.getPrintInfo(orderId, serverName, GastroManagerConstants.PRINT_RECEIPT));
+		bill.append(printService.getPrintInfo(orderItemTransactionInfo.getOrderId(), orderItemTransactionInfo.getServerName(), orderItemTransactionInfo.getOrderItemInfo(), GastroManagerConstants.PRINT_RECEIPT));
 		bill.append("\n");
-	
-		
-		Double totalPrice = DbUtil.getTotalPrice(orderId);
-		Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
-		
-		double tmpvalue = (totalPrice * (salsetax / 100));
-		tmpvalue = Util.roundDouble(tmpvalue, 2);
-		double taxes = tmpvalue;
-				
-		Double finalPrice = totalPrice + taxes;
-		finalPrice = Util.roundDouble(finalPrice, 2);
-		
-	
-		bill.append("--------------------------------\n");
-		bill.append("SubTotal:  " + GastroManagerConstants.FOUR_SPACES + totalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
-		bill.append("Taxes("+ PropertiesUtil.getPropertyValue("salsetax") +"%):" + GastroManagerConstants.FOUR_SPACES + taxes + PropertiesUtil.getPropertyValue("currency") + "\n");
-		bill.append("Total:     " + GastroManagerConstants.FOUR_SPACES + finalPrice + PropertiesUtil.getPropertyValue("currency") + "\n");
-		bill.append("--------------------------------\n");
 		
 		writeFileToBill("resources/billingfooter.txt", bill);
 						
