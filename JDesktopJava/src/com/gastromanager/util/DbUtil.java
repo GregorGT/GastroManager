@@ -14,13 +14,10 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.*;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 public class DbUtil {
 
    private static String printer = "";
-   private static String lastReset;
 	
     public static DateTimeFormatter DATE_TME_FORMATTER = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
     public static List<OrderItem> getOrderDetails(OrderDetailQuery orderDetailQuery, Boolean queryForPrint) {
@@ -44,10 +40,15 @@ public class DbUtil {
                     StringBuilder queryBuilder = new StringBuilder();
                     queryBuilder.append("SELECT * from ORDERITEM WHERE" +
                                 " order_id = '"+ orderId +"'" +
-                                 " AND DATETIME > \"" + lastReset + "\"");
+                                 " AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
+//                    queryBuilder.append("SELECT * from ORDERITEM o JOIN ORDERS ord "
+//                    		+ "WHERE ord.humanreadable_id= '" + orderId + "' AND o.order_id = ord.id AND ord.DATETIME >= \"" + lastReset + "\"");
+
                     if(queryForPrint) {
                         queryBuilder.append(" AND PRINT_STATUS = 0");
                     }
+                   
+
                     
 //                    SELECT * from ORDERITEM o JOIN ORDERS ord WHERE ord.humanreadable_id=1 AND o.order_id = ord.id AND ord.DATETIME >= "2021-11-04 22:15:30";
                     queryBuilder.append(" ORDER BY datetime ASC");
@@ -224,7 +225,7 @@ public class DbUtil {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT * from ORDERITEM WHERE" +
                     " ORDER_ID = '"+ orderId + "'");
-               //     " AND DATE(DATETIME) > DATE(\"" + lastReset + "\")");
+               //     " AND DATE(DATETIME) > DATE(\"" + PropertiesUtil.getPropertyValue("lastReset") + "\")");
             if(queryForPrint) {
                 queryBuilder.append(" AND PRINT_STATUS = 0");
             }
@@ -250,7 +251,7 @@ public class DbUtil {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT * from ORDERITEM o JOIN ORDERS ord WHERE" +
                     " ord.humanreadable_id = '"+ orderId + "' AND o.order_id=ord.id" +
-                    " AND ord.DATETIME > \"" + lastReset + "\"");
+                    " AND ord.DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
             if(queryForPrint) {
                 queryBuilder.append(" AND o.PRINT_STATUS = 0");
             }
@@ -276,7 +277,7 @@ public class DbUtil {
             StringBuilder queryBuilder = new StringBuilder();
             queryBuilder.append("SELECT SUM(o.price) from ORDERITEM o JOIN ORDERS ord WHERE" +
                     " ord.humanreadable_id = '"+ id + "' AND o.order_id=ord.id" +
-                    " AND ord.DATETIME > \"" + lastReset + "\"");
+                    " AND ord.DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
             queryBuilder.append(" AND o.PRINT_STATUS = 0");
             
             queryBuilder.append(" ORDER BY o.DATETIME ASC");
@@ -306,7 +307,7 @@ public class DbUtil {
                     queryBuilder.append("UPDATE ORDERITEM SET PRINT_STATUS = 1 WHERE" + " ORDER_ID = '")
                             .append(orderId)
                             .append("'")
-                            .append(" AND DATETIME > \"" + lastReset + "\"");
+                            .append(" AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
                     if(queryForPrint) {
                         queryBuilder.append(" AND PRINT_STATUS = 0");
                     }
@@ -335,7 +336,7 @@ public class DbUtil {
         String query = "SELECT O.DATETIME, O.HUMANREADABLE_ID, O.STAFF_ID, L.FLOOR_ID, L.TABLE_ID, S.LASTNAME, S.FIRSTNAME, F.NAME AS FLOOR_NAME, T.NAME AS TABLE_NAME \n" +
                 "FROM ORDERS O, LOCATION L, STAFF S, FLOOR F, TABLEDETAILS T\n" +
                 "WHERE O.HUMANREADABLE_ID = ?\n" +
-                "AND O.DATETIME > \"" + lastReset + "\"\n" +
+                "AND O.DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"\n" +
                 "AND L.ID = O.LOCATION_ID\n" +
                 //"AND O.STAFF_ID = S.ID\n" +
                 "AND L.FLOOR_ID = F.ID\n" +
@@ -490,7 +491,7 @@ public class DbUtil {
                         "SELECT ID from ORDERS WHERE \n" +
                                 "HUMANREADABLE_ID = ?\n" +
                                 " AND LOCATION_ID = ?" +
-                                " AND DATETIME > \"" + lastReset + "\"");
+                                " AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
                 stmt.setInt(1,Integer.parseInt(orderDetailQuery.getHumanreadableId()));
                 stmt.setInt(2,locationId);
                 ResultSet resultOrder = stmt.executeQuery();
@@ -517,7 +518,7 @@ public class DbUtil {
                         "SELECT ID from ORDERS WHERE \n" +
                                 "HUMANREADABLE_ID = ?\n" +
                                 " AND LOCATION_ID = ?" +
-                                " AND DATETIME > \"" + lastReset + "\"");
+                                " AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
                 stmt.setInt(1,Integer.parseInt(humanReadableId));
                 stmt.setInt(2,locationId);
                 ResultSet resultOrder = stmt.executeQuery();
@@ -543,7 +544,7 @@ public class DbUtil {
                 PreparedStatement stmt=connection.prepareStatement(
                         "SELECT * from ORDERS WHERE \n" +
                                 "LOCATION_ID = ?" +
-                                " AND DATETIME > \"" + lastReset + "\"");
+                                " AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"");
                 stmt.setInt(1,locationId);
                 ResultSet resultOrders = stmt.executeQuery();
                 orderList = loadOrders(resultOrders);
@@ -726,7 +727,7 @@ public class DbUtil {
                     " WHERE ORDER_ID='"+orderItemInfo.getOrderId()+"'"+
                     " AND ITEM_ID ='"+orderItemInfo.getItemId()+"'" +
                     " AND DATETIME = '"+translateToSqlDate(orderItemInfo.getDateTime())+"'"+
-                    " AND DATETIME > \"" + lastReset + "\""+
+                    " AND DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\""+
                     " AND PRINT_STATUS = 0";
             System.out.println(query);
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
@@ -746,9 +747,9 @@ public class DbUtil {
     public static Integer getNewHumanReadableOrderId() {
         Integer nextOrderId = null;
         try {
-            String query = "SELECT HUMANREADABLE_ID AS MAX_ID, MAX(DATETIME) FROM ORDERS "
-                    + "WHERE  DATETIME > \"" + lastReset + "\" "
-                    +"ORDER BY DATETIME DESC";
+            String query = "SELECT MAX(HUMANREADABLE_ID) AS MAX_ID, MAX(DATETIME) FROM ORDERS "
+                    + "WHERE  DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\" ;";
+//                    +"ORDER BY DATETIME DESC";
 
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -773,7 +774,7 @@ public class DbUtil {
                     "WHERE L.FLOOR_ID = ?\n" +
                     "AND L.TABLE_ID = ?\n" +
                     "AND L.ID = O.LOCATION_ID\n" +
-                    "AND O.DATETIME > \"" + lastReset + "\"";
+                    "AND O.DATETIME > \"" + PropertiesUtil.getPropertyValue("lastReset") + "\"";
 
             Connection connection = DbConnection.getDbConnection().gastroDbConnection;
             PreparedStatement stmt=connection.prepareStatement(query);
@@ -851,13 +852,6 @@ public class DbUtil {
         }
 
         return nextOrderItemId;
-    }
-    
-    public static void resetHumanReadableId() {
-    	Date now = new Date();
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    	lastReset = sdf.format(now);
-    	PropertiesUtil.setAndSavePropertyValue("lastReset", lastReset);
     }
 
     public static void main(String[] args) {

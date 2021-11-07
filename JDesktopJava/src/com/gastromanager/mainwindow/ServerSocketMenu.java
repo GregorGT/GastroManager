@@ -12,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class ServerSocketMenu extends JPanel {
@@ -36,6 +38,7 @@ public class ServerSocketMenu extends JPanel {
     private JButton resetHumanReadableId;
     private JLabel resetHumanReadableIdLabel;
     private JLabel lastResetTime;
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 
 
@@ -102,9 +105,9 @@ public class ServerSocketMenu extends JPanel {
         lastResetTime = new JLabel("Last modified time");
         lastResetTime.setBounds(350, 350, 400, 50);
         lastResetTime.setText("Last modified time: " + PropertiesUtil.getPropertyValue("lastReset"));
-        
+
         resetHumanReadableId.addActionListener(l -> {
-        	DbUtil.resetHumanReadableId();
+        	PropertiesUtil.setAndSavePropertyValue("lastReset", sdf.format(new Date()));
         	lastResetTime.setText("Last modified time: " + PropertiesUtil.getPropertyValue("lastReset"));	
         });
         
