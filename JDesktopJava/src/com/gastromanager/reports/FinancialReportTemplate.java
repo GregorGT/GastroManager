@@ -113,7 +113,7 @@ public class FinancialReportTemplate {
 		xContext = null;
 		
 		try {
-			xContext = Bootstrap.bootstrap();
+			xContext = com.sun.star.comp.helper.Bootstrap.bootstrap();
 		} catch (Exception e) {
 			e.printStackTrace(System.err);
 			System.exit(1);
@@ -377,7 +377,7 @@ public class FinancialReportTemplate {
 		XComponentLoader xLoader = null;
 		XTextDocument xDocument = null;
 		XComponent xComponent = null;
-		
+
 		try {
 			XMultiComponentFactory xMultiComponentFactory = xContext.getServiceManager();
 			

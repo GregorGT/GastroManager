@@ -29,11 +29,15 @@ import java.util.Date;
 
 public class ServerSocketMenu extends JPanel {
 
-    private final JButton serverStartStopButton;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private final JButton serverStartStopButton;
     private final JLabel serverStatusLabel;
     private final JLabel serverStatusInfoLabel;
-    private static Integer serverSocketPort =
-            Integer.parseInt(PropertiesUtil.getPropertyValue("serverSocketPort"));
+    private static Integer serverSocketPort = Integer.parseInt(PropertiesUtil.getPropertyValue("serverSocketPort"));
     private Server3 socketServer;
     private Boolean isServerAlive;
 
@@ -44,7 +48,7 @@ public class ServerSocketMenu extends JPanel {
     
     
     public  static JTextField serverTextField;
-    private JLabel 	   serverLabel;
+    private JLabel serverLabel;
     
     private JButton resetHumanReadableId;
     private JLabel resetHumanReadableIdLabel;
@@ -57,8 +61,9 @@ public class ServerSocketMenu extends JPanel {
 
     public ServerSocketMenu(String versionTagText) {
         isServerAlive = false;
-        
-       this.setLayout(new BorderLayout() );
+
+//        this.setVisible(true);
+       this.setLayout(null );
         
        serverStartStopButton = new JButton("Start Server");
        serverStartStopButton.setBounds(320, 80, 150, 50);
@@ -102,11 +107,11 @@ public class ServerSocketMenu extends JPanel {
         portTextField.setBounds(200, 80, 100, 50);
         
         serverLabel = new JLabel("Server name:");
-        serverTextField	= new JTextField();
-        
+
         serverLabel.setBounds(50, 250, 100, 50);
+        serverTextField	= new JTextField();
+        serverTextField.setBounds(150, 250, 100, 50);        
         serverTextField.setText("Server name");
-        serverTextField.setBounds(150, 250, 100, 50);
 
         resetHumanReadableIdLabel = new JLabel("Reset human readable ID");
         resetHumanReadableIdLabel.setBounds(400, 250, 200, 50);
@@ -128,8 +133,10 @@ public class ServerSocketMenu extends JPanel {
         
     	versionTag = new JLabel();
     	versionTag.setText(versionTagText);
-    	versionTag.setBounds(0, 0, 150, 50);
+    	versionTag.setBounds(500, 0, 150, 50);
     	versionTag.setFont(new Font(Font.SANS_SERIF,  Font.BOLD, 11));
+    	
+    	
     	this.add(versionTag);
         
         
@@ -149,9 +156,10 @@ public class ServerSocketMenu extends JPanel {
         this.add(portTextField);
         
         
-        
+
         this.add(serverLabel);
-        this.add(serverTextField);
+
+        this.add(serverTextField);        
 
     }
 

@@ -176,8 +176,6 @@ public class MainWindow extends JFrame {
 		
 
 		ServerSocketMenu serverSocketMenu = new ServerSocketMenu(VERSION_TAG);
-		
-		
 		tabbedPane.addTab("Server/Settings", null, serverSocketMenu, null);
 		
 		JMenuItem mntmLoad = new JMenuItem("Load");

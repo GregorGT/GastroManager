@@ -11,6 +11,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 package com.gastromanager.mainwindow;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -88,15 +89,17 @@ public class BookingsMenu extends JPanel{
 	private JTable jTable;
 	private String columns[] = {"Date","Start time","End time", "Floor", "Table", "Name"};  
 	private JLabel result;
-	private String floorId = "";
-	private String tableId = "";
+	private JLabel floorId;
+	private JLabel tableId;
 	private String[] dates = new String[2];
 	private DefaultTableModel model;
 	private boolean canBeInserted = false;
 	private JTextField textField;
 	private int selectedRow;
 	private int selectedId;
-	
+	private JTextField fl;
+	private JTextField ta;
+    	
 	
 	BookingsMenu() {
 		
@@ -167,7 +170,7 @@ public class BookingsMenu extends JPanel{
 	    BoxLayout boxLayout = new BoxLayout(eastPanel, BoxLayout.Y_AXIS);
 	    eastPanel.setLayout(boxLayout);
 	    
-	    JButton checkAvailability = new JButton("<html>Check Availability<html/>");
+	    JButton checkAvailability = new JButton("<html>Find available table<html/>");
 	    eastPanel.add(checkAvailability);
 	    checkAvailability.addActionListener(checkAvailabilityActionListener());
 	    JButton addReservation = new JButton("<html>Add reservation<html/>");
@@ -175,6 +178,16 @@ public class BookingsMenu extends JPanel{
 	    addReservation.addActionListener(addReservationListener());
 	    
 	    result = new JLabel();
+	    floorId = new JLabel("Floor id:");
+	    tableId = new JLabel("Table id:");
+	    fl = new JTextField();
+	    ta = new JTextField();
+	    fl.setMaximumSize(new Dimension(500, 20));
+	    ta.setMaximumSize(new Dimension(500, 20));
+	    eastPanel.add(floorId);
+	    eastPanel.add(fl);
+	    eastPanel.add(tableId);
+	    eastPanel.add(ta);
 	    eastPanel.add(result);
 	    
 	    jTable = new JTable(new DefaultTableModel(null, columns));
@@ -293,6 +306,8 @@ public class BookingsMenu extends JPanel{
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				
+				result.setText("");
+				
 				if(!checkDatePicker()) {
 					JOptionPane.showMessageDialog(null, "Please select a date.");
 					return;
@@ -321,11 +336,13 @@ public class BookingsMenu extends JPanel{
 					ResultSet rs = preparedStatement.executeQuery();
 
 					if (rs.next()) {
-						floorId = rs.getString("floor_id");
-						tableId = rs.getString("table_id");
-						result.setText("<html>Floor: " + floorId + "<br/>Table:" + tableId + "</html>");
+						fl.setText(rs.getString("floor_id"));
+						ta.setText(rs.getString("table_id"));
+//						result.setText("<html>Floor: " + floorId + "<br/>Table:" + tableId + "</html>");
 						canBeInserted = true;
 					} else {
+						fl.setText("");
+						ta.setText("");
 						result.setText("No available tables");
 						canBeInserted = false;
 					}
@@ -343,15 +360,26 @@ public class BookingsMenu extends JPanel{
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-
+				result.setText("");
 				if (!checkName()) {
 					JOptionPane.showMessageDialog(null, "Please enter a name.");
 					return;					
 				}
 				
-				if (floorId == null || tableId == null || result.getText().equals("No available tables") || !canBeInserted) {
+				if (result.getText().equals("No available tables") || !canBeInserted) {
+					 int input = JOptionPane.showConfirmDialog(null, 
+				                "Do you want to proceed?", "Select an Option...",JOptionPane.YES_NO_OPTION);
+					 if (input == JOptionPane.NO_OPTION) {
+						return;		 
+					 }
+				} 
+				
+				if (fl.getText() == null || ta.getText() == null ||	
+						fl.getText().isEmpty() || ta.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Please enter flood and table.");
 					return;
 				}
+				
 				getStartingAndEndingDate();
 				
 				try {
@@ -365,8 +393,8 @@ public class BookingsMenu extends JPanel{
 					preparedStatement.setString(2, spinner.getValue().toString());
 					preparedStatement.setString(3, "");
 					preparedStatement.setString(4,  dates[0]);
-					preparedStatement.setInt(5, Integer.parseInt(floorId));
-					preparedStatement.setInt(6, Integer.parseInt(tableId));
+					preparedStatement.setInt(5, Integer.parseInt(fl.getText()));
+					preparedStatement.setInt(6, Integer.parseInt(ta.getText()));
 					preparedStatement.setString(7, dates[1]);
 					preparedStatement.setString(8, textField.getText());
 					
