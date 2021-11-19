@@ -33,23 +33,18 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.gastromanager.db.DbConnection;
+import com.gastromanager.util.PropertiesUtil;
+import com.gastromanager.util.Util;
 import com.sun.star.beans.PropertyValue;
 import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertySet;
-import com.sun.star.chart.XChartDocument;
-import com.sun.star.chart.XDiagram;
-import com.sun.star.comp.helper.Bootstrap;
-import com.sun.star.container.XNameAccess;
-import com.sun.star.document.XEmbeddedObjectSupplier;
 import com.sun.star.frame.XComponentLoader;
 import com.sun.star.lang.IllegalArgumentException;
 import com.sun.star.lang.WrappedTargetException;
 import com.sun.star.lang.XComponent;
 import com.sun.star.lang.XMultiComponentFactory;
 import com.sun.star.lang.XMultiServiceFactory;
-import com.sun.star.table.CellRangeAddress;
-import com.sun.star.table.XTableChartsSupplier;
 import com.sun.star.text.ControlCharacter;
 import com.sun.star.text.XText;
 import com.sun.star.text.XTextCursor;
@@ -87,7 +82,7 @@ public class FinancialReportTemplate {
 	private static XTextCursor xTextCursor;
 	private static XTextDocument writerDocument;
 	private static Connection connectionDB;
-	private static Double totalRevenue;
+	private static Double subTotal;
 
 	public FinancialReportTemplate() {
 		this.xContext = null;
@@ -95,7 +90,7 @@ public class FinancialReportTemplate {
 		this.xTextCursor = null;
 		this.writerDocument = null;
 		this.connectionDB = null;
-		this.totalRevenue = 0.0;
+		this.subTotal = 0.0;
 	}
 	
 	public void connectDB() {
@@ -158,15 +153,36 @@ public class FinancialReportTemplate {
 			stmt.setString(1, startDate);
 			stmt.setString(2, endDate);
 			ResultSet rs = stmt.executeQuery();
-			totalRevenue = rs.getDouble("revenue");
+			subTotal = rs.getDouble("revenue");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 			
 		
-		String revenue = String.format("\nTotal Revenue: %.2f $", totalRevenue);
-		xText.insertString(xTextCursor, revenue, false);
-		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+//		StringBuilder sb = new StringBuilder("\nSubtotal: "+subTotal+" $\n0\n0");
+		
+    	Double salsetax = Double.parseDouble(PropertiesUtil.getPropertyValue("salsetax"));
+		
+    	double tmpvalue = (subTotal * (salsetax / 100));
+		tmpvalue = Util.roundDouble(tmpvalue, 2);
+		double taxes = tmpvalue;
+				
+		Double finalPrice = subTotal + taxes;
+		finalPrice = Util.roundDouble(finalPrice, 2);
+		
+		
+		String withoutTaxes = String.format("\nSubtotal: "+subTotal+" $\nTaxes: "+taxes+"\nTotal: "+finalPrice+" $");
+		xText.insertString(xTextCursor, withoutTaxes, false);
+//		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+	
+//		String taxes = String.format("\nTaxes: %.2f $", 0);
+//		xText.insertString(xTextCursor, taxes, false);
+////		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+//		
+//		String total = String.format("\nTotal: %.2f $", 0);
+//		xText.insertString(xTextCursor, total, false);
+//		xText.insertControlCharacter(xTextCursor, ControlCharacter.PARAGRAPH_BREAK, false);
+	
 	}
 	
 	public XTextTable createAndFillIncomeTable(String startDate, String endDate, int totalItems) throws IllegalArgumentException, UnknownPropertyException, PropertyVetoException, WrappedTargetException, NoSuchElementException {
